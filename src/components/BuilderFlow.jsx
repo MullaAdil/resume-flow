@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import CreatableSelect from 'react-select/creatable';
+import { SKILL_OPTIONS_BY_CATEGORY, ALL_TECH_OPTIONS } from '../constants/skillsData';
 // ── Deckled Torn Paper Edges ──
 const TornEdge = ({ isBottom }) => (
   <svg 
@@ -1065,7 +1067,27 @@ const BuilderFlow = () => {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
                           <label style={labelStyle}>Tools & Technologies</label>
-                          <input style={inputStyle} placeholder="e.g. React, Node.js, MongoDB" value={proj.technologies || ''} onChange={(e) => updateItem('projects', proj.id, { technologies: e.target.value })} />
+                          <CreatableSelect
+                            isMulti
+                            placeholder="Select or type tools..."
+                            options={ALL_TECH_OPTIONS}
+                            value={(proj.technologies || '').split(',').map(t => t.trim()).filter(Boolean).map(t => ({ label: t, value: t }))}
+                            onChange={(newValues) => {
+                              const techString = newValues ? newValues.map(v => v.value).join(', ') : '';
+                              updateItem('projects', proj.id, { technologies: techString });
+                            }}
+                            styles={{
+                              control: (base) => ({
+                                ...base,
+                                padding: '2px',
+                                borderRadius: '4px',
+                                border: '1px solid #CBD5E1',
+                                boxShadow: 'none',
+                                '&:hover': { border: '1px solid #94A3B8' },
+                                fontSize: '1rem'
+                              })
+                            }}
+                          />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1126,7 +1148,7 @@ const BuilderFlow = () => {
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {/* Category heading */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                       <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#1E293B' }}>
                         {label}
                       </h4>
@@ -1135,50 +1157,52 @@ const BuilderFlow = () => {
                       </span>
                     </div>
 
-                    {/* Add skill input */}
-                    <form onSubmit={(e) => handleAddSkillToCategory(key, e)} style={{ display: 'flex', gap: '0.75rem' }}>
-                      <input 
-                        style={{ ...inputStyle, flex: 1, fontSize: '1.1rem', padding: '0.75rem 1rem' }} 
-                        placeholder={`Add ${label.toLowerCase()} skill...`} 
-                        value={inputValue} 
-                        onChange={(e) => setNewSkillByCategory(prev => ({ ...prev, [key]: e.target.value }))} 
-                      />
-                      <button type="submit" style={{ 
-                        padding: '0.75rem 1.5rem', background: '#059669', color: '#FFFFFF', 
-                        border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', 
-                        display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1.05rem',
-                        opacity: inputValue.trim() ? 1 : 0.5
-                      }}>
-                        <Plus size={16} /> Add
-                      </button>
-                    </form>
-
-                    {/* Skill chips */}
-                    {hasSkills && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        {categorySkills.map((skill, index) => {
-                          const name = typeof skill === 'object' ? skill.name : skill;
-                          return (
-                            <div key={index} className="premium-pill" style={{ padding: '0.4rem 0.5rem 0.4rem 0.85rem' }}>
-                              <span>{name}</span>
-                              <button 
-                                type="button"
-                                onClick={() => handleRemoveSkillFromCategory(key, index)} 
-                                style={{ 
-                                  background: 'none', border: 'none', color: '#475569', cursor: 'pointer', 
-                                  display: 'flex', padding: '2px', borderRadius: '50%',
-                                  transition: 'color 0.15s ease'
-                                }}
-                                onMouseOver={(e) => e.currentTarget.style.color = '#EF4444'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#94A3B8'}
-                              >
-                                <X size={14} />
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                    <CreatableSelect
+                      isMulti
+                      placeholder={`Select or type ${label.toLowerCase()} skills...`}
+                      options={SKILL_OPTIONS_BY_CATEGORY[key] || []}
+                      value={categorySkills.map(s => {
+                        const name = typeof s === 'object' ? s.name : s;
+                        return { label: name, value: name };
+                      })}
+                      onChange={(newValues) => {
+                        const newSkills = newValues ? newValues.map(v => ({ name: v.value, level: 'Expert' })) : [];
+                        updateSection('skills', { ...resumeData.skills, [key]: newSkills });
+                      }}
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          padding: '4px',
+                          borderRadius: '8px',
+                          border: '1px solid #CBD5E1',
+                          boxShadow: 'none',
+                          '&:hover': { border: '1px solid #94A3B8' },
+                          fontSize: '1.05rem',
+                          background: '#FFFFFF'
+                        }),
+                        multiValue: (base) => ({
+                          ...base,
+                          backgroundColor: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '16px',
+                          padding: '2px 6px'
+                        }),
+                        multiValueLabel: (base) => ({
+                          ...base,
+                          color: '#334155',
+                          fontWeight: 600
+                        }),
+                        multiValueRemove: (base) => ({
+                          ...base,
+                          color: '#64748B',
+                          ':hover': {
+                            backgroundColor: '#FEF2F2',
+                            color: '#EF4444',
+                            borderRadius: '50%'
+                          }
+                        })
+                      }}
+                    />
                   </div>
                 );
               })}
