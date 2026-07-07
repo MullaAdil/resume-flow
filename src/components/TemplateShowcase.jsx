@@ -33,7 +33,7 @@ import { useResume } from '../context/ResumeContext';
 import { templates, allTags } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
 import { mockResumeData, templateMockData } from '../utils/mockResumeData';
-import { Layout, Search, ZoomIn, X, ArrowLeft } from 'lucide-react';
+import { Layout, Search, ZoomIn, X, ArrowLeft, FileText } from 'lucide-react';
 
 const TemplateShowcase = () => {
   const [selectedColor, setSelectedColor] = React.useState(null);
@@ -118,7 +118,12 @@ const TemplateShowcase = () => {
   }, [filteredTemplates]);
 
   return (
-    <div style={{ minHeight: '100%', backgroundColor: '#F8F9FA', display: 'flex', flexDirection: 'column' }}>
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      style={{ minHeight: '100%', backgroundColor: '#F8F9FA', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header Navigation */}
       <header style={{ 
@@ -139,7 +144,10 @@ const TemplateShowcase = () => {
             Back
           </button>
           <div style={{ height: '20px', width: '1px', background: '#E5E7EB' }}></div>
-
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.25rem', color: '#111827' }}>
+             <FileText size={28} color="var(--primary)" />
+             Elevate Resume
+          </div>
 
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -401,7 +409,7 @@ const TemplateShowcase = () => {
           border-color: #10B981 !important;
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 };
 

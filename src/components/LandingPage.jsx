@@ -85,7 +85,12 @@ const LandingPage = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', overflowY: 'auto', backgroundColor: 'var(--bg-color)' }}>
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', overflowY: 'auto', backgroundColor: 'var(--bg-color)' }}>
       
       {/* Header - Compact */}
       <header style={{ 
@@ -94,8 +99,10 @@ const LandingPage = () => {
         borderBottom: '1px solid var(--border-color)',
         position: 'sticky', top: 0, zIndex: 50
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-main)' }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-main)' }}>
+           <FileText size={28} color="var(--primary)" />
+           Elevate Resume
+        </div>
 
         <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           <button 
@@ -347,7 +354,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer style={{ background: 'var(--card-bg)', padding: '2rem 2rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} ResumeFlow. All rights reserved.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} Elevate Resume. All rights reserved.</p>
       </footer>
       {/* Clean Formal Login Modal */}
       {showLoginModal && (
@@ -369,7 +376,7 @@ const LandingPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

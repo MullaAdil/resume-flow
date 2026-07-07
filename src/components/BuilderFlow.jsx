@@ -1414,7 +1414,12 @@ const BuilderFlow = () => {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', backgroundColor: '#F8FAFC', fontFamily: "'Inter', sans-serif" }}>
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#F8FAFC', fontFamily: "'Inter', sans-serif" }}>
       <style>{`
         /* Custom Scrollbar for editor */
         ::-webkit-scrollbar {
@@ -1839,7 +1844,7 @@ const BuilderFlow = () => {
         )}
       </AnimatePresence>
 
-    </div>
+    </motion.div>
   );
 };
 

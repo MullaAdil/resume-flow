@@ -2,9 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResume } from '../context/ResumeContext';
 import { useNavigate } from 'react-router-dom';
-import { UploadCloud, ArrowLeft } from 'lucide-react';
-import { Layout } from 'lucide-react';
-
+import { UploadCloud, ArrowLeft, FileText } from 'lucide-react';
 
 // ── Deckled Torn Paper Edges ──
 const TornEdge = ({ isBottom }) => (
@@ -67,7 +65,12 @@ const ImportFlow = () => {
   const triggerFileInput = () => fileInputRef.current?.click();
 
   return (
-    <div style={{ 
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      style={{ 
       display: 'flex', flexDirection: 'column', minHeight: '100vh', 
       backgroundColor: 'var(--bg-color)'
     }}>
@@ -80,8 +83,8 @@ const ImportFlow = () => {
           onClick={() => navigate('/')}
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.5rem', color: 'var(--text-main)', letterSpacing: '-0.02em', cursor: 'pointer' }}
         >
-           <Layout size={28} color="var(--primary)" />
-           ResumeFlow
+           <FileText size={28} color="var(--primary)" />
+           Elevate Resume
         </div>
       </header>
 
@@ -188,7 +191,7 @@ const ImportFlow = () => {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
