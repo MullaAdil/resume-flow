@@ -135,7 +135,7 @@ const LandingPage = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="container"
+          className="container hero-grid"
           style={{ 
             display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '2rem', alignItems: 'center', 
             paddingTop: '6rem', paddingBottom: '6rem', position: 'relative', zIndex: 10
@@ -143,7 +143,7 @@ const LandingPage = () => {
         >
           {/* Left Side: Content */}
           <div style={{ paddingRight: '2rem' }}>
-            <h1 style={{ fontSize: '4rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+            <h1 className="hero-title" style={{ fontSize: '4rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
               Land more interviews with our <span style={{ color: 'var(--primary)' }}>Resume Builder</span>
             </h1>
             
@@ -151,7 +151,7 @@ const LandingPage = () => {
               ATS Check, AI Writer, and One-Click Job Tailoring make your resume stand out to recruiters instantly.
             </p>
 
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
+            <div className="hero-actions" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
               <button 
                 className="btn-primary" 
                 onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
@@ -175,7 +175,7 @@ const LandingPage = () => {
           </div>
 
           {/* Right Side: Visual Preview */}
-          <div style={{ position: 'relative', height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div className="hero-preview" style={{ position: 'relative', height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
              <motion.div 
                initial={{ y: 20, rotate: -2 }}
                animate={{ y: 0, rotate: 0 }}

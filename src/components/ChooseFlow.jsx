@@ -84,7 +84,7 @@ const ChooseFlow = () => {
           transition={{ duration: 0.2 }}
           onClick={() => navigate('/builder')}
           style={{ 
-            width: '370px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', 
+            width: '100%', maxWidth: '370px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', 
             gap: '1.5rem', padding: '3.5rem 2.5rem', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', 
             borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none',
             boxShadow: '0 12px 30px -10px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.02)', transition: 'all 0.15s ease',
@@ -112,7 +112,7 @@ const ChooseFlow = () => {
           transition={{ duration: 0.2 }}
           onClick={() => navigate('/import')}
           style={{ 
-            width: '370px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', 
+            width: '100%', maxWidth: '370px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', 
             gap: '1.5rem', padding: '3.5rem 2.5rem', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', 
             borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none',
             boxShadow: '0 12px 30px -10px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.02)', transition: 'all 0.15s ease',

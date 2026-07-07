@@ -679,7 +679,7 @@ const BuilderFlow = () => {
               <TornEdge isBottom />
               <TornEdge />
               <TornEdge isBottom />
-              <div style={{ display: 'flex', gap: '1.5rem' }}>
+              <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={labelStyle}>Full Name</label>
                   <div style={{ position: 'relative' }}>
@@ -694,7 +694,7 @@ const BuilderFlow = () => {
                   <input style={inputStyle} value={resumeData.personalInfo.jobTitle || ''} onChange={(e) => updatePersonalInfo('jobTitle', e.target.value)} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1.5rem' }}>
+              <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={labelStyle}>Email</label>
                   <div style={{ position: 'relative' }}>
@@ -714,7 +714,7 @@ const BuilderFlow = () => {
                   </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1.5rem' }}>
+              <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={labelStyle}>Location</label>
                   <input style={inputStyle} value={resumeData.personalInfo.location || ''} placeholder="e.g. San Francisco, CA" onChange={(e) => updatePersonalInfo('location', e.target.value)} />
@@ -724,7 +724,7 @@ const BuilderFlow = () => {
                   <input style={inputStyle} value={resumeData.personalInfo.linkedin || ''} placeholder="linkedin.com/in/..." onChange={(e) => updatePersonalInfo('linkedin', e.target.value)} />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1.5rem' }}>
+              <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={labelStyle}>GitHub</label>
                   <input style={inputStyle} value={resumeData.personalInfo.github || ''} placeholder="github.com/..." onChange={(e) => updatePersonalInfo('github', e.target.value)} />
@@ -1585,10 +1585,10 @@ const BuilderFlow = () => {
       </header>
 
       {/* Main 50/50 Split */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="builder-layout" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
         {/* Left Pane */}
-        <div className="editor-container" style={{ 
+        <div className="editor-container builder-sidebar" style={{ 
           flex: 1, 
           borderRight: '1.5px solid #E2E8F0', 
           display: 'flex', 
@@ -1677,7 +1677,7 @@ const BuilderFlow = () => {
         </div>
 
         {/* Right Pane — Live Preview */}
-        <div style={{ flex: 1, background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
+        <div className="builder-preview-area" style={{ flex: 1, background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', minHeight: '100%', padding: '2rem 1rem' }}>
             <div 
               style={{ 

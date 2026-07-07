@@ -260,3 +260,81 @@ textarea.input-field {
     size: A4 portrait;
   }
 }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 992px) {
+  .container {
+    padding: 0 1rem;
+  }
+  
+  /* Landing Page Hero */
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem !important;
+  }
+  
+  .hero-actions {
+    justify-content: center !important;
+  }
+  
+  .hero-preview {
+    display: none !important;
+  }
+
+  /* Header */
+  header {
+    padding: 1rem !important;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  header nav {
+    display: none !important;
+  }
+
+  /* Builder Flow */
+  .builder-layout {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  
+  .builder-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem !important;
+  }
+  
+  .builder-content {
+    flex-direction: column !important;
+    overflow-y: visible !important;
+  }
+  
+  .builder-form-area {
+    width: 100% !important;
+    border-right: none !important;
+    padding: 1rem !important;
+  }
+  
+  .builder-preview-area {
+    width: 100% !important;
+    padding: 1rem !important;
+  }
+  
+  .input-row {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem !important;
+  }
+}
