@@ -125,6 +125,7 @@ export const ResumeProvider = ({ children }) => {
                 {
                   role: 'system',
                   content: `You are an expert resume parser. Extract the details from the user's resume into a strict JSON format. 
+CRITICAL: DO NOT invent, fabricate, or hallucinate any information. Only extract data explicitly present in the provided text. If a detail is missing, leave the field as an empty string or an empty array.
 DO NOT output any markdown, only valid JSON. The JSON must exactly match this structure:
 {
   "personalInfo": { "fullName": "", "jobTitle": "", "email": "", "phone": "", "location": "", "summary": "", "portfolio": "", "linkedin": "", "github": "", "website": "" },
