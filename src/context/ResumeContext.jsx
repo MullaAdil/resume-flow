@@ -250,16 +250,22 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
     }
   };
 
-  const generateSummaryAI = async (skillsArray, type) => {
+  const generateSummaryAI = async (skillsArray, projectsArray, type) => {
     const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
     if (!groqApiKey) {
       throw new Error("Missing Groq API Key");
     }
     const skillsList = skillsArray.map(s => typeof s === 'object' ? s.name : s).join(', ');
-    const profileContext = type === 'student' 
+    const projectsList = (projectsArray || []).map(p => `${p.name}: ${p.technologies || ''}`).filter(Boolean).join('; ');
+    
+    let profileContext = type === 'student' 
       ? "The user is a student with no professional experience. Emphasize their academic background, enthusiasm to learn, and core skills."
       : "The user is a professional. Emphasize their expertise and track record of success.";
       
+    if (projectsList) {
+      profileContext += ` The user has worked on these projects: ${projectsList}. Highlight their practical project experience.`;
+    }
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -285,9 +291,39 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
     return data.choices[0].message.content.trim().replace(/^"|"$/g, '');
   };
 
+  const generateProjectDescriptionAI = async (projectName, technologies) => {
+    const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
+    if (!groqApiKey) {
+      throw new Error("Missing Groq API Key");
+    }
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${groqApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an expert resume writer. Write a 2-3 sentence professional, impactful project description suitable for a resume. Focus on what the project achieves and how the technologies were utilized. Output ONLY the plain text description without quotes or prefixes.`
+          },
+          {
+            role: 'user',
+            content: `Write a description for a project named '${projectName}' built using the following technologies: '${technologies}'.`
+          }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error("API request failed");
+    const data = await response.json();
+    return data.choices[0].message.content.trim().replace(/^"|"$/g, '');
+  };
+
   return (
     <ResumeContext.Provider value={{
-      resumeData, setResumeData, selectedTemplate, setSelectedTemplate, processRealFile, setProfileType, generateSummaryAI,
+      resumeData, setResumeData, selectedTemplate, setSelectedTemplate, processRealFile, setProfileType, generateSummaryAI, generateProjectDescriptionAI,
       updateSection: _updateSection, updatePersonalInfo, addItem, updateItem, removeItem, updateSkills, updateSettings,
       addExperience, updateExperience, removeExperience,
       addEducation, updateEducation, removeEducation,

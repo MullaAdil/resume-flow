@@ -131,7 +131,8 @@ const BuilderFlow = () => {
     selectedTemplate, setSelectedTemplate,
     updateSettings,
     updateSection,
-    generateSummaryAI
+    generateSummaryAI,
+    generateProjectDescriptionAI
   } = useResume();
 
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -167,14 +168,14 @@ const BuilderFlow = () => {
   const [auditReport, setAuditReport] = useState(null);
 
   const allSteps = [
-    { id: 'personal', title: "Personal Details", subtitle: "Users who added phone number and email received 64% more positive feedback from recruiters.", btnText: "Professional Summary" },
-    { id: 'summary', title: "Professional Summary", subtitle: "Write 2-4 short, energetic sentences about how great you are.", btnText: "Experience" },
-    { id: 'experience', title: "Professional Experience", subtitle: "Show your relevant experience (last 10 years). Use bullet points.", btnText: "Education" },
-    { id: 'education', title: "Education", subtitle: "A varied education on your resume sums up the value that your learnings and background will bring to job.", btnText: "Areas of Expertise" },
-    { id: 'projects', title: "Projects", subtitle: "Showcase key projects you have worked on.", btnText: "Skills" },
-    { id: 'skills', title: "Areas of Expertise", subtitle: "Choose 5 important skills that show you fit the position.", btnText: "Certifications" },
-    { id: 'certifications', title: "Certifications", subtitle: "Include relevant certificates or licenses.", btnText: "Languages" },
-    { id: 'languages', title: "Languages", subtitle: "List languages you speak and your proficiency.", btnText: "Finish" }
+    { id: 'personal', title: "Personal Details", subtitle: "Users who added phone number and email received 64% more positive feedback from recruiters." },
+    { id: 'skills', title: "Areas of Expertise", subtitle: "Choose 5 important skills that show you fit the position." },
+    { id: 'projects', title: "Projects", subtitle: "Showcase key projects you have worked on." },
+    { id: 'summary', title: "Professional Summary", subtitle: "Write 2-4 short, energetic sentences about how great you are." },
+    { id: 'experience', title: "Professional Experience", subtitle: "Show your relevant experience (last 10 years). Use bullet points." },
+    { id: 'education', title: "Education", subtitle: "A varied education on your resume sums up the value that your learnings and background will bring to job." },
+    { id: 'certifications', title: "Certifications", subtitle: "Include relevant certificates or licenses." },
+    { id: 'languages', title: "Languages", subtitle: "List languages you speak and your proficiency." }
   ];
 
   const steps = allSteps.filter(s => !(s.id === 'experience' && resumeData.profileType === 'student'));
@@ -250,7 +251,8 @@ const BuilderFlow = () => {
     setIsGeneratingAI(true);
     try {
       const skillsArray = resumeData.skills?.programming || [];
-      const summary = await generateSummaryAI(skillsArray, resumeData.profileType);
+      const projectsArray = resumeData.projects || [];
+      const summary = await generateSummaryAI(skillsArray, projectsArray, resumeData.profileType);
       updatePersonalInfo('summary', summary);
     } catch (err) {
       console.error("AI Generation failed:", err);
@@ -1061,8 +1063,39 @@ const BuilderFlow = () => {
                             <input style={inputStyle} value={proj.duration || ''} onChange={(e) => updateItem('projects', proj.id, { duration: e.target.value })} />
                           </div>
                         </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                          <label style={labelStyle}>Tools & Technologies</label>
+                          <input style={inputStyle} placeholder="e.g. React, Node.js, MongoDB" value={proj.technologies || ''} onChange={(e) => updateItem('projects', proj.id, { technologies: e.target.value })} />
+                        </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                          <label style={labelStyle}>Description</label>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <label style={labelStyle}>Description</label>
+                            <button 
+                              onClick={async () => {
+                                if (!proj.name || !proj.technologies) {
+                                  alert("Please enter a Project Name and Tools & Technologies first.");
+                                  return;
+                                }
+                                setIsGeneratingAI(true);
+                                try {
+                                  const desc = await generateProjectDescriptionAI(proj.name, proj.technologies);
+                                  updateItem('projects', proj.id, { description: desc });
+                                } catch (err) {
+                                  console.error("Project AI Rewrite failed:", err);
+                                  alert("Failed to generate description.");
+                                } finally {
+                                  setIsGeneratingAI(false);
+                                }
+                              }}
+                              disabled={isGeneratingAI}
+                              style={{ 
+                                background: 'transparent', border: 'none', color: '#059669', 
+                                fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: isGeneratingAI ? 'wait' : 'pointer' 
+                              }}
+                            >
+                              <Sparkles size={14} /> Rewrite with AI
+                            </button>
+                          </div>
                           <textarea style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={proj.description || ''} onChange={(e) => updateItem('projects', proj.id, { description: e.target.value })} />
                         </div>
                       </div>
@@ -1677,7 +1710,7 @@ const BuilderFlow = () => {
                 onClick={handleNext} 
                 style={{ background: '#059669', color: '#FFFFFF', minWidth: '150px', border: 'none', borderRadius: '24px 12px 24px 12px' }}
               >
-                {activeStepIndex === steps.length - 1 ? 'Finish' : 'Next: ' + activeStep.btnText}
+                {activeStepIndex === steps.length - 1 ? 'Finish' : 'Next: ' + steps[activeStepIndex + 1]?.title}
               </JellyButton>
             </div>
           )}
