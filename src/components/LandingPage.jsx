@@ -95,7 +95,7 @@ const LandingPage = () => {
       {/* Header - Compact */}
       <header style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-        padding: '1rem 3rem', background: 'var(--card-bg)', 
+        padding: '1.5rem 3rem 1rem 3rem', background: 'var(--card-bg)', 
         borderBottom: '1px solid var(--border-color)',
         position: 'sticky', top: 0, zIndex: 50
       }}>

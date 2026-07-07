@@ -77,7 +77,7 @@ const ImportFlow = () => {
       {/* Header */}
       <header style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-        padding: '1.25rem 3rem', background: 'transparent'
+        padding: '1.5rem 3rem 1rem 3rem', background: 'transparent'
       }}>
         <div 
           onClick={() => navigate('/')}
