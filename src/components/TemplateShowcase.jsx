@@ -51,45 +51,6 @@ const TemplateShowcase = () => {
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
-    // Load matching celebrity data into the resume context so builder matches the card
-    const celeb = templateMockData[id];
-    if (celeb) {
-      const skillsArray = celeb.skills || [];
-      setResumeData(prev => ({
-        ...prev,
-        personalInfo: {
-          fullName: celeb.personalInfo.fullName || '',
-          jobTitle: celeb.personalInfo.jobTitle || '',
-          email: celeb.personalInfo.email || '',
-          phone: celeb.personalInfo.phone || '',
-          location: celeb.personalInfo.location || '',
-          summary: celeb.personalInfo.summary || '',
-          portfolio: celeb.personalInfo.portfolio || '',
-          linkedin: celeb.personalInfo.linkedIn || '',
-          github: '',
-          website: celeb.personalInfo.portfolio || ''
-        },
-        experience: (celeb.experience || []).map((e, i) => ({
-          ...e, id: e.id || String(i + 1)
-        })),
-        education: (celeb.education || []).map((e, i) => ({
-          ...e, id: e.id || String(i + 1)
-        })),
-        skills: {
-          programming: skillsArray.slice(0, 4),
-          frameworks: skillsArray.slice(4, 7),
-          databases: [],
-          cloud: skillsArray.slice(7, 9),
-          tools: skillsArray.slice(9),
-          soft: [],
-          other: []
-        },
-        projects: [],
-        certifications: [],
-        languages: [],
-        customSections: celeb.customSections || []
-      }));
-    }
     if (location.state?.skipPathSelection) {
       navigate('/builder');
     } else {
