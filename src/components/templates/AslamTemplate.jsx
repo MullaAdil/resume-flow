@@ -4,16 +4,16 @@ import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
 export const localDummyData = {
   personalInfo: {
-    fullName: "MULLA ADIL",
-    email: "aslam8bboys@gmail.com",
-    phone: "",
-    location: "Bengaluru, India",
-    linkedin: "linkedin.com/in/mohammad-aslam90b9b725b",
-    github: "github.com/aslam7177",
-    jobTitle: "",
+    fullName: "JOHN DOE",
+    email: "john.doe@example.com",
+    phone: "+1 (555) 123-4567",
+    location: "San Francisco, CA",
+    linkedin: "linkedin.com/in/johndoe",
+    github: "github.com/johndoe",
+    jobTitle: "Software Engineer",
   },
   skills: [
-    { name: "Programming Languages", value: "SAP ABAP, Python" },
+    { name: "Programming Languages", value: "Python, JavaScript, Java" },
     {
       name: "Core Computer Science",
       value:
@@ -21,72 +21,72 @@ export const localDummyData = {
     },
     {
       name: "Backend & Development",
-      value: "Flask, REST API Development, MVC Architecture",
+      value: "Node.js, REST API Development, MVC Architecture",
     },
-    { name: "Databases", value: "MySQL, SQLite, SAP HANA" },
+    { name: "Databases", value: "PostgreSQL, MongoDB, Redis" },
     {
       name: "Tools & Technologies",
-      value: "Git, GitHub, Docker, VS Code, Postman, Selenium WebDriver",
+      value: "Git, GitHub, Docker, VS Code, AWS, CI/CD",
     },
   ],
   projects: [
     {
-      id: "aslam-proj-1",
-      name: "Flash Notes - Full Stack Web Application",
-      technologies: "Flask | SQLite | Docker | Selenium",
+      id: "dummy-proj-1",
+      name: "E-Commerce Platform - Full Stack Web Application",
+      technologies: "React | Node.js | MongoDB | Docker",
       description:
-        "Designed and developed a full-stack notes management application from scratch with secure user authentication (login, register, session management)\nBuilt backend architecture following MVC pattern with REST API endpoints for create, read, update, and delete operations\nImplemented SQLite database with normalized schema for efficient data storage and retrieval across multiple user accounts\nWrote automated end-to-end test suite using Selenium WebDriver to simulate real user interactions including form submissions, navigation, and authentication flows\nContainerized the entire application using Docker ensuring consistent deployment across different environments with zero configuration issues\nIdentified and resolved a hardcoded credential vulnerability during development — applied OWASP Top 10 security principles to harden the application",
+        "Designed and developed a full-stack e-commerce application from scratch with secure user authentication (login, register, session management)\nBuilt backend architecture following MVC pattern with REST API endpoints for create, read, update, and delete operations\nImplemented database with normalized schema for efficient data storage and retrieval across multiple user accounts\nWrote automated end-to-end test suite using Selenium WebDriver to simulate real user interactions including form submissions, navigation, and authentication flows\nContainerized the entire application using Docker ensuring consistent deployment across different environments with zero configuration issues\nIdentified and resolved a hardcoded credential vulnerability during development — applied OWASP Top 10 security principles to harden the application",
     },
     {
-      id: "aslam-proj-2",
-      name: "IoT Smart Parking System - Capstone Project",
-      technologies: "Python | Arduino | IR Sensors | Serial Communication",
+      id: "dummy-proj-2",
+      name: "Smart Home Dashboard - Capstone Project",
+      technologies: "Python | React | IoT Sensors | WebSockets",
       description:
-        "Designed and built a real-time smart parking detection system as final year capstone project, integrating hardware and software components end to end\nAssembled hardware circuit with IR sensors connected to Arduino board for detecting vehicle presence across multiple parking slots simultaneously\nDeveloped Python backend to receive and process live sensor data via serial communication, updating slot occupancy status in real time\nDocumented full system architecture including circuit diagrams, data flow, and test results for academic submission",
+        "Designed and built a real-time smart home monitoring system as final year capstone project, integrating hardware and software components end to end\nAssembled hardware circuit with temperature sensors connected to microcontroller for detecting environmental changes simultaneously\nDeveloped Python backend to receive and process live sensor data via WebSockets, updating dashboard status in real time\nDocumented full system architecture including circuit diagrams, data flow, and test results for academic submission",
     },
     {
-      id: "aslam-proj-3",
-      name: "Spam Message Detector - Machine Learning",
-      technologies: "Python | Scikit-learn | NLP | Flask",
+      id: "dummy-proj-3",
+      name: "Customer Churn Predictor - Machine Learning",
+      technologies: "Python | Scikit-learn | Pandas | Flask",
       description:
-        "Built a binary spam classifier using Naive Bayes and SVM algorithms, achieving 95%+ accuracy on held-out test data\nEngineered full NLP preprocessing pipeline — tokenization, stop-word removal, TF-IDF vectorization — to convert raw text into model-ready features\nDeployed real-time prediction interface using Flask/Streamlit for live message classification",
+        "Built a binary classification model using Random Forest and XGBoost algorithms, achieving 92%+ accuracy on held-out test data\nEngineered full data preprocessing pipeline — missing value imputation, feature scaling, one-hot encoding — to convert raw data into model-ready features\nDeployed real-time prediction interface using Flask for live customer risk assessment",
     },
     {
-      id: "aslam-proj-4",
-      name: "SQL Business Data Analysis - Sakila Database",
-      technologies: "MySQL | Advanced SQL | Business Intelligence",
+      id: "dummy-proj-4",
+      name: "Sales Data Analysis - Enterprise Database",
+      technologies: "PostgreSQL | Advanced SQL | PowerBI",
       description:
-        "Conducted end-to-end business data analysis on MySQL Sakila sample database simulating a real DVD rental company dataset\nAnalysed revenue performance, customer lifetime value, film profitability, store efficiency, and time-based sales trends across the full dataset\nWrote advanced SQL queries using multi-table joins, correlated subqueries, CTEs, and window functions for ranking, cumulative totals, and segmentation\nDerived actionable insights including top revenue-generating films, high-value customer segments, underperforming stores, and peak rental periods",
+        "Conducted end-to-end business data analysis on enterprise sample database simulating a real retail company dataset\nAnalysed revenue performance, customer lifetime value, product profitability, store efficiency, and time-based sales trends across the full dataset\nWrote advanced SQL queries using multi-table joins, correlated subqueries, CTEs, and window functions for ranking, cumulative totals, and segmentation\nDerived actionable insights including top revenue-generating products, high-value customer segments, underperforming regions, and peak sales periods",
     },
   ],
   certifications: [
     {
-      id: "aslam-cert-1",
-      name: "Deloitte Australia - Technology Job Simulation (Forage)",
+      id: "dummy-cert-1",
+      name: "AWS Certified Solutions Architect - Associate",
     },
     {
-      id: "aslam-cert-2",
-      name: "Deloitte Australia - Cyber Security Job Simulation (Forage)",
+      id: "dummy-cert-2",
+      name: "Google Cloud Professional Cloud Developer",
     },
     {
-      id: "aslam-cert-3",
+      id: "dummy-cert-3",
       name: "Cisco - Networking & Python Essentials (Cisco Networking Academy)",
     },
-    { id: "aslam-cert-4", name: "Microsoft Python Fundamentals - Coursera" },
+    { id: "dummy-cert-4", name: "Microsoft Fundamentals - Coursera" },
   ],
   education: [
     {
-      id: "aslam-edu-1",
-      degree: "B.Tech - Computer Science Engineering",
-      school: "GITAM Deemed to be University, Bengaluru",
-      date: "June 2022 - May 2026",
+      id: "dummy-edu-1",
+      degree: "B.S. - Computer Science",
+      school: "University of California, Berkeley",
+      date: "Aug 2018 - May 2022",
       location: "",
     },
     {
-      id: "aslam-edu-2",
-      degree: "Intermediate - MPC (Mathematics, Physics, Chemistry)",
-      school: "Sri Chaitanya Junior College, Tirupati",
-      date: "June 2020 - May 2022",
+      id: "dummy-edu-2",
+      degree: "High School Diploma - STEM Focus",
+      school: "Lincoln High School, San Francisco",
+      date: "Aug 2014 - May 2018",
       location: "",
     },
   ],

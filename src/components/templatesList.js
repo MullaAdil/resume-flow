@@ -1,5 +1,5 @@
 export const templates = [
-  { id: 'aslam',          name: 'Mulla Adil',       tags: ['ATS', 'Professional', 'Simple'],      colors: ['#1E3A8A', '#FFFFFF'] },
+  { id: 'aslam',          name: 'Elite IT',         tags: ['ATS', 'Professional', 'Simple'],      colors: ['#1E3A8A', '#FFFFFF'] },
   { id: 'classic',        name: 'Classic',           tags: ['ATS', 'Professional', 'Simple'],      colors: ['#000000'] },
   { id: 'minimalclassic', name: 'Minimal Classic',   tags: ['ATS', 'Professional', 'Simple'],      colors: ['#000000', '#475569'] },
   { id: 'basic',          name: 'Basic',             tags: ['ATS', 'Professional', 'Simple'],      colors: ['#000000', '#FFFFFF'] },
