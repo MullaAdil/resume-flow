@@ -129,8 +129,7 @@ const TemplateShowcase = () => {
       <header style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
         padding: '1.25rem 2.5rem', background: '#FFFFFF', 
-        borderBottom: '1px solid rgba(0,0,0,0.08)',
-        position: 'sticky', top: 0, zIndex: 50
+        borderBottom: '1px solid rgba(0,0,0,0.08)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <button 

@@ -90,14 +90,13 @@ const LandingPage = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', overflowY: 'auto', backgroundColor: 'var(--bg-color)' }}>
+      style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', backgroundColor: 'var(--bg-color)' }}>
       
       {/* Header - Compact */}
       <header style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
         padding: '1rem 3rem', background: 'var(--card-bg)', 
-        borderBottom: '1px solid var(--border-color)',
-        position: 'sticky', top: 0, zIndex: 50
+        borderBottom: '1px solid var(--border-color)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-main)' }}>
            <FileText size={28} color="var(--primary)" />
