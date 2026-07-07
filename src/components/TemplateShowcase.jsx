@@ -128,7 +128,7 @@ const TemplateShowcase = () => {
       {/* Header Navigation */}
       <header style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-        padding: '1.5rem 2.5rem 1rem 2.5rem', background: '#FFFFFF', 
+        padding: '1.25rem 2.5rem', background: '#FFFFFF', 
         borderBottom: '1px solid rgba(0,0,0,0.08)',
         position: 'sticky', top: 0, zIndex: 50
       }}>
