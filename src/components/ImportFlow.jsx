@@ -51,7 +51,7 @@ const ImportFlow = () => {
     try {
       const success = await processRealFile(file);
       if(success) {
-        navigate('/builder');
+        navigate('/templates', { state: { skipPathSelection: true } });
       } else {
         alert("Extraction failed.");
         setIsProcessing(false);
@@ -186,7 +186,7 @@ const ImportFlow = () => {
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid var(--border-color)', borderTop: '3px solid var(--primary)', animation: 'spin 1s linear infinite', margin: '0 auto 1.5rem auto' }} />
               <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>Parsing your resume...</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Taking you to the builder directly.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Taking you to select a template...</p>
             </motion.div>
           )}
         </AnimatePresence>
