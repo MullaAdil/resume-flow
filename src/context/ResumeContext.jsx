@@ -9,6 +9,7 @@ const ResumeContext = createContext();
 export const useResume = () => useContext(ResumeContext);
 
 export const defaultState = {
+  profileType: null,
   personalInfo: { fullName: '', jobTitle: '', email: '', phone: '', location: '', summary: '', portfolio: '', linkedin: '', github: '', website: '' },
   experience: [], education: [], projects: [], skills: { programming: [], frameworks: [], databases: [], cloud: [], tools: [], soft: [], other: [] },
   certifications: [], publications: [], awards: [], languages: [], interests: [], volunteer: [], references: [], customSections: [],
@@ -37,8 +38,8 @@ export const ResumeProvider = ({ children }) => {
     return updateSection(section, data);
   };
 
-  // NOTE: removed temporary debug exposure to window in production.
   const updatePersonalInfo = (field, value) => setResumeData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, [field]: value } }));
+  const setProfileType = (type) => setResumeData(prev => ({ ...prev, profileType: type }));
   const addItem = (section, item) => setResumeData(prev => ({ ...prev, [section]: [...prev[section], { ...item, id: Date.now().toString() }] }));
   const updateItem = (section, id, updated) => setResumeData(prev => ({ ...prev, [section]: prev[section].map(i => i.id === id ? { ...i, ...updated } : i) }));
   const removeItem = (section, id) => setResumeData(prev => ({ ...prev, [section]: prev[section].filter(i => i.id !== id) }));
@@ -113,6 +114,10 @@ export const ResumeProvider = ({ children }) => {
 
       if (groqApiKey) {
         try {
+          const profileContext = resumeData.profileType === 'student' 
+            ? "The user is a student with NO professional work experience. DO NOT extract or invent professional experience. Emphasize their education, academic projects, and skills. Generate a professional summary focusing purely on their academic skills, enthusiasm to learn, and coursework."
+            : "The user is a professional. Extract their work experience and generate a summary highlighting their track record.";
+
           const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -126,6 +131,7 @@ export const ResumeProvider = ({ children }) => {
                   role: 'system',
                   content: `You are an expert resume parser. Extract the details from the user's resume into a strict JSON format. 
 CRITICAL: DO NOT invent, fabricate, or hallucinate any information. Only extract data explicitly present in the provided text. If a detail is missing, leave the field as an empty string or an empty array.
+${profileContext}
 DO NOT output any markdown, only valid JSON. The JSON must exactly match this structure:
 {
   "personalInfo": { "fullName": "", "jobTitle": "", "email": "", "phone": "", "location": "", "summary": "", "portfolio": "", "linkedin": "", "github": "", "website": "" },
@@ -244,9 +250,44 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
     }
   };
 
+  const generateSummaryAI = async (skillsArray, type) => {
+    const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
+    if (!groqApiKey) {
+      throw new Error("Missing Groq API Key");
+    }
+    const skillsList = skillsArray.map(s => typeof s === 'object' ? s.name : s).join(', ');
+    const profileContext = type === 'student' 
+      ? "The user is a student with no professional experience. Emphasize their academic background, enthusiasm to learn, and core skills."
+      : "The user is a professional. Emphasize their expertise and track record of success.";
+      
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${groqApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an expert resume writer. Generate a 3-sentence professional summary for a resume. ${profileContext} Output only the plain text summary without quotes or extra explanation.`
+          },
+          {
+            role: 'user',
+            content: `Write a summary using these skills: ${skillsList}`
+          }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error("API request failed");
+    const data = await response.json();
+    return data.choices[0].message.content.trim().replace(/^"|"$/g, '');
+  };
+
   return (
     <ResumeContext.Provider value={{
-      resumeData, setResumeData, selectedTemplate, setSelectedTemplate, processRealFile,
+      resumeData, setResumeData, selectedTemplate, setSelectedTemplate, processRealFile, setProfileType, generateSummaryAI,
       updateSection: _updateSection, updatePersonalInfo, addItem, updateItem, removeItem, updateSkills, updateSettings,
       addExperience, updateExperience, removeExperience,
       addEducation, updateEducation, removeEducation,

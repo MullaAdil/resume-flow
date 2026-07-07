@@ -130,7 +130,8 @@ const BuilderFlow = () => {
     addSkill, removeSkill, addItem, updateItem, removeItem,
     selectedTemplate, setSelectedTemplate,
     updateSettings,
-    updateSection
+    updateSection,
+    generateSummaryAI
   } = useResume();
 
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -165,7 +166,7 @@ const BuilderFlow = () => {
   const [auditLoadingText, setAuditLoadingText] = useState('');
   const [auditReport, setAuditReport] = useState(null);
 
-  const steps = [
+  const allSteps = [
     { id: 'personal', title: "Personal Details", subtitle: "Users who added phone number and email received 64% more positive feedback from recruiters.", btnText: "Professional Summary" },
     { id: 'summary', title: "Professional Summary", subtitle: "Write 2-4 short, energetic sentences about how great you are.", btnText: "Experience" },
     { id: 'experience', title: "Professional Experience", subtitle: "Show your relevant experience (last 10 years). Use bullet points.", btnText: "Education" },
@@ -175,6 +176,8 @@ const BuilderFlow = () => {
     { id: 'certifications', title: "Certifications", subtitle: "Include relevant certificates or licenses.", btnText: "Languages" },
     { id: 'languages', title: "Languages", subtitle: "List languages you speak and your proficiency.", btnText: "Finish" }
   ];
+
+  const steps = allSteps.filter(s => !(s.id === 'experience' && resumeData.profileType === 'student'));
 
   useEffect(() => {
     const handleResize = () => {
@@ -243,24 +246,28 @@ const BuilderFlow = () => {
 
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
-  const handleAIRewrite = () => {
+  const handleAIRewrite = async () => {
     setIsGeneratingAI(true);
-    setTimeout(() => {
+    try {
+      const skillsArray = resumeData.skills?.programming || [];
+      const summary = await generateSummaryAI(skillsArray, resumeData.profileType);
+      updatePersonalInfo('summary', summary);
+    } catch (err) {
+      console.error("AI Generation failed:", err);
+      // Fallback
       const jobTitle = resumeData.experience?.[0]?.title || resumeData.personalInfo?.jobTitle || 'Professional';
       const company = resumeData.experience?.[0]?.company || 'industry-leading companies';
       const skillsNames = (resumeData.skills?.programming || []).map(s => typeof s === 'object' ? s.name : s);
       const skillsList = skillsNames.slice(0, 3).join(', ') || 'strategic planning and execution';
       
-      const summaries = [
-        `Results-driven ${jobTitle} with a proven track record of success at ${company}. Skilled in ${skillsList}, with a strong commitment to delivering high-quality results and driving team performance.`,
-        `Innovative and detail-oriented ${jobTitle} with expertise in ${skillsList}. Experienced in leading projects at ${company} and implementing efficient solutions to complex challenges.`,
-        `Dedicated ${jobTitle} offering extensive experience in ${skillsList} at ${company}. Known for exceptional problem-solving abilities, strong communication skills, and a collaborative team attitude.`
-      ];
+      const fallbackSummary = resumeData.profileType === 'student'
+        ? `Motivated and detail-oriented student with a strong foundation in ${skillsList}. Eager to leverage academic background to contribute effectively to a dynamic team.`
+        : `Results-driven ${jobTitle} with a proven track record of success at ${company}. Skilled in ${skillsList}, with a strong commitment to delivering high-quality results.`;
       
-      const randomSummary = summaries[Math.floor(Math.random() * summaries.length)];
-      updatePersonalInfo('summary', randomSummary);
+      updatePersonalInfo('summary', fallbackSummary);
+    } finally {
       setIsGeneratingAI(false);
-    }, 1200);
+    }
   };
 
   const handlePrewrittenPhrases = () => {
