@@ -210,23 +210,23 @@ const TemplateRenderer = ({ templateId, resumeData }) => {
   const mergedData = {
     ...resumeData,
     personalInfo: {
-      fullName: p.fullName || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : ''),
-      firstName: p.firstName || (p.fullName ? p.fullName.split(' ')[0] : ''),
-      lastName: p.lastName || (p.fullName ? p.fullName.split(' ').slice(1).join(' ') : ''),
-      jobTitle: p.jobTitle || '',
-      email: p.email || '',
-      phone: p.phone || '',
-      location: p.location || '',
-      linkedin: p.linkedin || '',
-      github: p.github || '',
-      website: p.website || '',
-      portfolio: p.portfolio || '',
-      summary: p.summary || '',
-      address: p.address || '',
-      city: p.city || '',
-      country: p.country || '',
+      fullName: p.fullName || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || d.fullName,
+      firstName: p.firstName || (p.fullName ? p.fullName.split(' ')[0] : '') || d.firstName,
+      lastName: p.lastName || (p.fullName ? p.fullName.split(' ').slice(1).join(' ') : '') || d.lastName,
+      jobTitle: p.jobTitle || d.jobTitle || '',
+      email: p.email || d.email || '',
+      phone: p.phone || d.phone || '',
+      location: p.location || d.location || '',
+      linkedin: p.linkedin || d.linkedin || '',
+      github: p.github || d.github || '',
+      website: p.website || d.website || '',
+      portfolio: p.portfolio || d.portfolio || '',
+      summary: p.summary || d.summary || '',
+      address: p.address || d.address || '',
+      city: p.city || d.city || '',
+      country: p.country || d.country || '',
     },
-    experience: (resumeData?.experience || []).map(exp => ({
+    experience: (hasUserExperience ? resumeData.experience : fallbackExperience).map(exp => ({
       ...exp,
       title: exp.title || exp.jobTitle || '',
       jobTitle: exp.jobTitle || exp.title || '',
@@ -234,20 +234,20 @@ const TemplateRenderer = ({ templateId, resumeData }) => {
       institution: exp.institution || exp.school || '',
       date: exp.date || (exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : exp.startDate || exp.endDate || ''),
     })),
-    education: (resumeData?.education || []).map(edu => ({
+    education: (hasUserEducation ? resumeData.education : fallbackEducation).map(edu => ({
       ...edu,
       school: edu.school || edu.institution || '',
       institution: edu.institution || edu.school || '',
       date: edu.date || (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : edu.startDate || edu.endDate || ''),
     })),
-    projects: resumeData?.projects || [],
+    projects: hasUserProjects ? resumeData.projects : fallbackProjects,
     skills: isAslam
-      ? aslamUserSkills
+      ? (hasUserSkills ? aslamUserSkills : dummySkills)
       : (templateId === 'boxedmodern' || templateId === 'letscode') 
-        ? userSkills
-        : userSkills.map(s => typeof s === 'object' ? s.name : s),
-    certifications: resumeData?.certifications || [],
-    languages: resumeData?.languages || [],
+        ? (hasUserSkills ? userSkills : dummySkills)
+        : (hasUserSkills ? userSkills.map(s => typeof s === 'object' ? s.name : s) : dummySkills.map(s => typeof s === 'object' ? s.name : s)),
+    certifications: hasUserCertifications ? resumeData.certifications : fallbackCertifications,
+    languages: hasUserLanguages ? resumeData.languages : fallbackLanguages,
     customSections: resumeData?.customSections || [],
     settings: resumeData?.settings || dummyData.settings || {}
   };
