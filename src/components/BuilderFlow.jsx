@@ -134,7 +134,8 @@ const BuilderFlow = () => {
     updateSettings,
     updateSection,
     generateSummaryAI,
-    generateProjectDescriptionAI
+    generateProjectDescriptionAI,
+    resetResume
   } = useResume();
 
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -206,8 +207,7 @@ const BuilderFlow = () => {
   };
 
   const handleConfirmExit = () => {
-    setResumeData({ ...defaultState });
-    localStorage.removeItem('resumeData');
+    resetResume();
     setShowExitConfirm(false);
     navigate('/');
   };

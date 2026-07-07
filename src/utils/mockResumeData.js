@@ -462,20 +462,20 @@ export const templateMockData = {
 
   aslam: {
     personalInfo: {
-      fullName: "Mulla Adil",
+      fullName: "John Doe",
       jobTitle: "Full Stack Software Engineer",
-      email: "adil@example.com",
-      phone: "+91 98765 43210",
-      location: "Bengaluru, India",
-      linkedIn: "linkedin.com/in/mulla-adil",
-      portfolio: "mullaadil.dev",
+      email: "john.doe@example.com",
+      phone: "+1 (555) 123-4567",
+      location: "San Francisco, CA",
+      linkedIn: "linkedin.com/in/johndoe",
+      portfolio: "johndoe.dev",
       summary: "Full Stack Software Engineer focused on building scalable web applications and clean user experiences. Skilled in React, Node.js, API development, and cloud deployment.",
     },
     experience: [
-      { id: "1", company: "Tech Solutions Pvt Ltd", title: "Senior Software Engineer", location: "Bengaluru, India", date: "Jun 2024 - Present", description: "Developed modern web applications using React and Node.js.\nBuilt reusable components, optimized performance, and integrated REST APIs for data-driven features." },
-      { id: "2", company: "Innovatech Labs", title: "Software Engineer", location: "Bengaluru, India", date: "Jan 2022 - May 2024", description: "Worked on full stack product development with JavaScript, Express, and PostgreSQL.\nCollaborated in agile teams to deliver customer-focused solutions and automation tools." }
+      { id: "1", company: "Tech Solutions Inc.", title: "Senior Software Engineer", location: "San Francisco, CA", date: "Jun 2024 - Present", description: "Developed modern web applications using React and Node.js.\nBuilt reusable components, optimized performance, and integrated REST APIs for data-driven features." },
+      { id: "2", company: "Innovatech Labs", title: "Software Engineer", location: "San Jose, CA", date: "Jan 2022 - May 2024", description: "Worked on full stack product development with JavaScript, Express, and PostgreSQL.\nCollaborated in agile teams to deliver customer-focused solutions and automation tools." }
     ],
-    education: [{ id: "1", school: "Bangalore Institute of Technology", degree: "B.Tech in Computer Science & Engineering", location: "Bengaluru, India", date: "Jun 2020", details: "Graduated with honors, focused on web development, data structures, and cloud computing." }],
+    education: [{ id: "1", school: "University of California", degree: "B.S. in Computer Science", location: "Berkeley, CA", date: "Jun 2020", details: "Graduated with honors, focused on web development, data structures, and cloud computing." }],
     skills: ["React", "Node.js", "JavaScript", "TypeScript", "REST APIs", "SQL", "AWS", "Docker"],
     customSections: []
   },

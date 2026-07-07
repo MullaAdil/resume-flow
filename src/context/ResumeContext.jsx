@@ -17,20 +17,14 @@ export const defaultState = {
 };
 
 export const ResumeProvider = ({ children }) => {
-  const [resumeData, setResumeData] = useState(() => {
-    const stored = localStorage.getItem('resumeData');
-    return stored ? JSON.parse(stored) : defaultState;
-  });
+  const [resumeData, setResumeData] = useState(defaultState);
 
-  const [selectedTemplate, setSelectedTemplate] = useState(() => {
-    return localStorage.getItem('selectedTemplate') || 'multicolor';
-  });
+  const [selectedTemplate, setSelectedTemplate] = useState('multicolor');
 
-  // Persist resume data to localStorage on change
-  useEffect(() => {
-    localStorage.setItem('resumeData', JSON.stringify(resumeData));
-    localStorage.setItem('selectedTemplate', selectedTemplate);
-  }, [resumeData, selectedTemplate]);
+  const resetResume = () => {
+    setResumeData(defaultState);
+    setSelectedTemplate('multicolor');
+  };
 
   const updateSection = (section, data) => setResumeData(prev => ({ ...prev, [section]: data }));
   // Debug wrapper: log updates to sections to trace UI actions
@@ -323,7 +317,7 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
 
   return (
     <ResumeContext.Provider value={{
-      resumeData, setResumeData, selectedTemplate, setSelectedTemplate, processRealFile, setProfileType, generateSummaryAI, generateProjectDescriptionAI,
+      resumeData, setResumeData, selectedTemplate, setSelectedTemplate, processRealFile, setProfileType, generateSummaryAI, generateProjectDescriptionAI, resetResume,
       updateSection: _updateSection, updatePersonalInfo, addItem, updateItem, removeItem, updateSkills, updateSettings,
       addExperience, updateExperience, removeExperience,
       addEducation, updateEducation, removeEducation,
