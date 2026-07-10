@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreatableSelect from 'react-select/creatable';
-import { SKILL_OPTIONS_BY_CATEGORY, ALL_TECH_OPTIONS, getSuggestedTechs } from '../constants/skillsData';
+import { SKILL_OPTIONS_BY_CATEGORY, ALL_TECH_OPTIONS, getSuggestedTechs, WORLDWIDE_JOB_ROLES, getTechsForRole } from '../constants/skillsData';
 // ── Deckled Torn Paper Edges ──
 const TornEdge = ({ isBottom }) => (
   <svg 
@@ -435,6 +435,22 @@ const BuilderFlow = () => {
     }
   };
 
+  const handleAddRoleSkill = (tech) => {
+    let category = 'other';
+    const techLower = tech.toLowerCase();
+    for (const [catKey, options] of Object.entries(SKILL_OPTIONS_BY_CATEGORY)) {
+      if (options.some(opt => opt.value.toLowerCase() === techLower)) {
+        category = catKey;
+        break;
+      }
+    }
+    const currentList = resumeData.skills?.[category] || [];
+    const isAlreadyPresent = currentList.some(s => (typeof s === 'object' ? s.name : s).toLowerCase() === techLower);
+    if (!isAlreadyPresent) {
+      addSkill(category, [...currentList, { name: tech, level: 80 }]);
+    }
+  };
+
   // ── Shared input style ──
   const inputStyle = { 
     padding: '0.95rem 1.35rem', 
@@ -722,7 +738,62 @@ const BuilderFlow = () => {
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={labelStyle}>Job Title</label>
-                  <input style={inputStyle} value={resumeData.personalInfo.jobTitle || ''} onChange={(e) => updatePersonalInfo('jobTitle', e.target.value)} />
+                  <input 
+                    list="worldwide-job-roles"
+                    style={inputStyle} 
+                    value={resumeData.personalInfo.jobTitle || ''} 
+                    placeholder="e.g. Frontend Engineer"
+                    onChange={(e) => updatePersonalInfo('jobTitle', e.target.value)} 
+                  />
+                  <datalist id="worldwide-job-roles">
+                    {WORLDWIDE_JOB_ROLES.map(role => (
+                      <option key={role} value={role} />
+                    ))}
+                  </datalist>
+                  
+                  {/* Skill Recommendations based on Job Title */}
+                  {(() => {
+                    const suggestedSkills = getTechsForRole(resumeData.personalInfo.jobTitle);
+                    if (suggestedSkills.length === 0) return null;
+                    return (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginTop: '0.25rem' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                          <Sparkles size={12} style={{ color: '#059669' }} /> Recommend Skills:
+                        </span>
+                        {suggestedSkills.map(tech => {
+                          const isAlreadyAdded = Object.values(resumeData.skills || {}).some(arr => 
+                            (arr || []).some(s => (typeof s === 'object' ? s.name : s).toLowerCase() === tech.toLowerCase())
+                          );
+                          if (isAlreadyAdded) return null;
+                          return (
+                            <button
+                              key={tech}
+                              type="button"
+                              onClick={() => handleAddRoleSkill(tech)}
+                              style={{
+                                background: 'rgba(5, 150, 105, 0.05)',
+                                border: '1.5px solid rgba(5, 150, 105, 0.2)',
+                                borderRadius: '12px',
+                                padding: '2px 8px',
+                                fontSize: '0.8rem',
+                                color: '#059669',
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                transition: 'all 0.15s ease'
+                              }}
+                              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.12)'; e.currentTarget.style.borderColor = '#059669'; }}
+                              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.05)'; e.currentTarget.style.borderColor = 'rgba(5, 150, 105, 0.2)'; }}
+                            >
+                              + {tech}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>

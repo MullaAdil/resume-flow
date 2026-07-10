@@ -150,3 +150,122 @@ export const getSuggestedTechs = (projectName) => {
   return Array.from(matched);
 };
 
+// Worldwide common job roles for autocomplete
+export const WORLDWIDE_JOB_ROLES = [
+  "Software Engineer",
+  "Frontend Engineer",
+  "Backend Engineer",
+  "Full Stack Engineer",
+  "Mobile App Developer",
+  "DevOps Engineer",
+  "Site Reliability Engineer (SRE)",
+  "Data Scientist",
+  "Data Analyst",
+  "Business Analyst",
+  "Machine Learning Engineer",
+  "AI Engineer",
+  "Product Manager",
+  "Project Manager",
+  "Scrum Master",
+  "UI/UX Designer",
+  "Product Designer",
+  "QA Engineer",
+  "Test Automation Engineer",
+  "Cybersecurity Engineer",
+  "Cloud Architect",
+  "Database Administrator (DBA)",
+  "System Administrator",
+  "Solution Architect",
+  "Technical Lead",
+  "Engineering Manager",
+  "Director of Engineering",
+  "Marketing Manager",
+  "Sales Representative",
+  "HR Specialist",
+  "Content Writer",
+  "Graphic Designer"
+];
+
+// Mapping of job roles to recommended skills
+export const ROLE_SUGGESTIONS = [
+  {
+    role: "Frontend Engineer",
+    keywords: ["front", "ui", "react", "angular", "vue", "frontend", "web developer", "website"],
+    techs: ["React", "TypeScript", "JavaScript", "Next.js", "Tailwind CSS", "HTML5", "CSS3", "Redux", "Figma", "Vite"]
+  },
+  {
+    role: "Backend Engineer",
+    keywords: ["back", "api", "node", "backend", "python developer", "java developer", "database"],
+    techs: ["Node.js", "Express.js", "Python", "FastAPI", "PostgreSQL", "MongoDB", "Redis", "Docker", "REST API", "SQL"]
+  },
+  {
+    role: "Full Stack Engineer",
+    keywords: ["fullstack", "full stack", "mern", "mean"],
+    techs: ["React", "Node.js", "Express.js", "MongoDB", "TypeScript", "JavaScript", "PostgreSQL", "Docker", "Tailwind CSS", "Git"]
+  },
+  {
+    role: "Machine Learning / AI Engineer",
+    keywords: ["ml", "machine learning", "ai", "artificial intelligence", "deep learning", "nlp", "computer vision"],
+    techs: ["Python", "PyTorch", "TensorFlow", "Scikit-learn", "Pandas", "NumPy", "FastAPI", "Jupyter Notebooks", "LangChain", "OpenAI API"]
+  },
+  {
+    role: "Data Scientist",
+    keywords: ["data scientist", "data science"],
+    techs: ["Python", "R", "SQL", "Pandas", "NumPy", "Scikit-learn", "Tableau", "Jupyter Notebooks", "Spark", "Data Analysis"]
+  },
+  {
+    role: "Data Analyst",
+    keywords: ["data analyst", "business analyst", "bi", "analytics"],
+    techs: ["SQL", "Excel", "Tableau", "Power BI", "Python", "Pandas", "Data Analysis", "Communication", "Problem Solving"]
+  },
+  {
+    role: "DevOps / SRE Engineer",
+    keywords: ["devops", "sre", "site reliability", "infrastructure", "cloud engineer", "sysops"],
+    techs: ["Docker", "Kubernetes", "Amazon Web Services (AWS)", "Terraform", "GitHub Actions", "Linux", "Bash", "Jenkins", "Ansible", "Prometheus"]
+  },
+  {
+    role: "Mobile App Developer",
+    keywords: ["mobile", "ios", "android", "react native", "flutter", "swift", "kotlin"],
+    techs: ["React Native", "Flutter", "Swift", "Kotlin", "TypeScript", "Dart", "Xcode", "Android Studio", "Firebase"]
+  },
+  {
+    role: "UI/UX Designer",
+    keywords: ["design", "ui/ux", "ux", "designer", "product designer"],
+    techs: ["Figma", "Sketch", "Adobe XD", "Photoshop", "Illustrator", "UI/UX Design", "Wireframing", "Prototyping", "User Research"]
+  },
+  {
+    role: "Cybersecurity Engineer",
+    keywords: ["cyber", "security", "penetration", "ethical hacker", "cryptography"],
+    techs: ["Linux", "Python", "Cybersecurity", "Penetration Testing", "Wireshark", "Metasploit", "Cryptography", "Network Security", "Bash"]
+  },
+  {
+    role: "Product Manager",
+    keywords: ["product manager", "scrum master", "project manager", "agile", "scrum"],
+    techs: ["Jira", "Confluence", "Agile Methodologies", "Scrum", "Product Management", "Leadership", "Communication", "Trello"]
+  },
+  {
+    role: "Database Administrator (DBA)",
+    keywords: ["dba", "database admin", "database administrator"],
+    techs: ["PostgreSQL", "MySQL", "Oracle", "Microsoft SQL Server", "SQL", "Database Design", "Performance Tuning", "Linux"]
+  }
+];
+
+/**
+ * Returns suggested technologies/skills based on a job title.
+ * @param {string} jobTitle 
+ * @returns {string[]}
+ */
+export const getTechsForRole = (jobTitle) => {
+  if (!jobTitle || typeof jobTitle !== 'string') return [];
+  const normalized = jobTitle.toLowerCase();
+  const matched = new Set();
+  
+  for (const group of ROLE_SUGGESTIONS) {
+    if (normalized.includes(group.role.toLowerCase()) || group.keywords.some(keyword => normalized.includes(keyword))) {
+      group.techs.forEach(tech => matched.add(tech));
+    }
+  }
+  
+  return Array.from(matched);
+};
+
