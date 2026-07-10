@@ -33,7 +33,8 @@ const TornEdge = ({ isBottom }) => (
 import { useResume, defaultState } from '../context/ResumeContext';
 import { useNavigate } from 'react-router-dom';
 import LivePreview from './LivePreview';
-import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Sparkles, Cloud, Database } from 'lucide-react';
+import { supabase } from '../utils/supabaseClient';
 
 // Static Jelly Button with clean flat styling (no motion scaling or morphing)
 const JellyButton = ({ onClick, style, children, className, onMouseOver, onMouseOut, disabled, type = "button" }) => {
@@ -161,6 +162,178 @@ const BuilderFlow = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Supabase Cloud Sync States
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const [syncTab, setSyncTab] = useState('save'); // 'save' or 'load'
+  const [syncUserKey, setSyncUserKey] = useState(localStorage.getItem('sync_user_key') || '');
+  const [syncResumeName, setSyncResumeName] = useState('');
+  const [savedResumesList, setSavedResumesList] = useState([]);
+  const [isLoadingSync, setIsLoadingSync] = useState(false);
+  const [syncMessage, setSyncMessage] = useState('');
+  const [syncError, setSyncError] = useState('');
+
+  // Prefill resume name when the sync modal is opened
+  useEffect(() => {
+    if (showSyncModal && !syncResumeName) {
+      const name = resumeData.personalInfo?.fullName || '';
+      const title = resumeData.personalInfo?.jobTitle || '';
+      setSyncResumeName(name ? `${name} - ${title || 'Resume'}`.trim() : 'My Resume');
+    }
+  }, [showSyncModal, resumeData.personalInfo]);
+
+  // Save current resume to Supabase
+  const handleSaveToCloud = async (e) => {
+    if (e) e.preventDefault();
+    if (!supabase) {
+      setSyncError("Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.");
+      return;
+    }
+    if (!syncUserKey.trim()) {
+      setSyncError("Please enter your Sync Key (Email/Username).");
+      return;
+    }
+    if (!syncResumeName.trim()) {
+      setSyncError("Please enter a name for this resume.");
+      return;
+    }
+
+    setIsLoadingSync(true);
+    setSyncError('');
+    setSyncMessage('');
+
+    try {
+      localStorage.setItem('sync_user_key', syncUserKey.trim());
+      
+      const { data: existing, error: findError } = await supabase
+        .from('resumes')
+        .select('id')
+        .eq('user_id', syncUserKey.trim().toLowerCase())
+        .eq('name', syncResumeName.trim())
+        .maybeSingle();
+
+      if (findError) throw findError;
+
+      if (existing) {
+        const { error: updateError } = await supabase
+          .from('resumes')
+          .update({
+            data: resumeData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id);
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from('resumes')
+          .insert({
+            user_id: syncUserKey.trim().toLowerCase(),
+            name: syncResumeName.trim(),
+            data: resumeData
+          });
+        if (insertError) throw insertError;
+      }
+
+      setSyncMessage("Resume saved successfully to cloud!");
+      if (syncTab === 'load') {
+        handleRetrieveResumes();
+      }
+    } catch (err) {
+      console.error("Cloud Save Error:", err);
+      setSyncError("Failed to save resume: " + err.message);
+    } finally {
+      setIsLoadingSync(false);
+    }
+  };
+
+  // Retrieve saved resumes from Supabase
+  const handleRetrieveResumes = async () => {
+    if (!supabase) {
+      setSyncError("Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.");
+      return;
+    }
+    if (!syncUserKey.trim()) {
+      setSyncError("Please enter your Sync Key (Email/Username).");
+      return;
+    }
+
+    setIsLoadingSync(true);
+    setSyncError('');
+    setSyncMessage('');
+
+    try {
+      localStorage.setItem('sync_user_key', syncUserKey.trim());
+      const { data, error } = await supabase
+        .from('resumes')
+        .select('id, name, updated_at')
+        .eq('user_id', syncUserKey.trim().toLowerCase())
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      setSavedResumesList(data || []);
+      if (!data || data.length === 0) {
+        setSyncMessage("No saved resumes found for this Sync Key.");
+      }
+    } catch (err) {
+      console.error("Cloud Fetch Error:", err);
+      setSyncError("Failed to fetch resumes: " + err.message);
+    } finally {
+      setIsLoadingSync(false);
+    }
+  };
+
+  // Load a selected resume into the editor
+  const handleLoadResume = async (resumeId) => {
+    setIsLoadingSync(true);
+    setSyncError('');
+    setSyncMessage('');
+
+    try {
+      const { data, error } = await supabase
+        .from('resumes')
+        .select('name, data')
+        .eq('id', resumeId)
+        .single();
+
+      if (error) throw error;
+      if (data && data.data) {
+        setResumeData(data.data);
+        setSyncResumeName(data.name);
+        setSyncMessage(`Successfully loaded "${data.name}"!`);
+        setShowSyncModal(false);
+      }
+    } catch (err) {
+      console.error("Cloud Load Error:", err);
+      setSyncError("Failed to load resume: " + err.message);
+    } finally {
+      setIsLoadingSync(false);
+    }
+  };
+
+  // Delete a saved resume
+  const handleDeleteCloudResume = async (resumeId) => {
+    if (!window.confirm("Are you sure you want to delete this resume from the cloud? This cannot be undone.")) return;
+    
+    setIsLoadingSync(true);
+    setSyncError('');
+    setSyncMessage('');
+
+    try {
+      const { error } = await supabase
+        .from('resumes')
+        .delete()
+        .eq('id', resumeId);
+
+      if (error) throw error;
+      setSyncMessage("Resume deleted successfully.");
+      setSavedResumesList(prev => prev.filter(r => r.id !== resumeId));
+    } catch (err) {
+      console.error("Cloud Delete Error:", err);
+      setSyncError("Failed to delete resume: " + err.message);
+    } finally {
+      setIsLoadingSync(false);
+    }
+  };
 
   // Helper validation methods
   const isValidEmail = (email) => email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -1939,6 +2112,36 @@ const BuilderFlow = () => {
         </div>
         <div style={{ position: 'absolute', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button 
+            onClick={() => {
+              setShowSyncModal(true);
+              setSyncMessage('');
+              setSyncError('');
+              if (syncUserKey) {
+                handleRetrieveResumes();
+              }
+            }}
+            style={{
+              padding: '0.5rem 1.25rem',
+              borderRadius: '8px',
+              border: '1.5px solid #059669',
+              background: 'rgba(5, 150, 105, 0.05)',
+              color: '#059669',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              boxShadow: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.1s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.12)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.05)'; }}
+          >
+            <Cloud size={14} /> Cloud Sync
+          </button>
+
+          <button 
             onClick={handleDownloadPDF}
             style={{
               padding: '0.5rem 1.25rem',
@@ -2219,6 +2422,265 @@ const BuilderFlow = () => {
                   Discard Changes
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Supabase Cloud Sync Modal ── */}
+      <AnimatePresence>
+        {showSyncModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            style={{ 
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+              background: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+              padding: '1.5rem'
+            }}
+            onClick={() => setShowSyncModal(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 15 }} 
+              animate={{ scale: 1, y: 0 }} 
+              exit={{ scale: 0.95, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              style={{ 
+                background: '#FFFFFF', borderRadius: '24px', 
+                border: '1.5px solid #E2E8F0', padding: '2rem', 
+                width: '100%', maxWidth: '520px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                position: 'relative'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setShowSyncModal(false)}
+                style={{ 
+                  position: 'absolute', top: '1.25rem', right: '1.25rem', 
+                  background: 'transparent', border: 'none', color: '#64748B', 
+                  cursor: 'pointer' 
+                }}
+              >
+                <X size={20} />
+              </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
+                <Database size={24} style={{ color: '#059669' }} />
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  Cloud Database Sync
+                </h2>
+              </div>
+              <p style={{ fontSize: '0.9rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
+                Save your progress or sync your resumes across multiple devices.
+              </p>
+
+              {/* Warnings for unconfigured state */}
+              {!supabase && (
+                <div style={{
+                  background: '#FFFBEB',
+                  border: '1px solid #FDE68A',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'flex-start'
+                }}>
+                  <AlertCircle size={18} style={{ color: '#D97706', flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ fontSize: '0.85rem', color: '#B45309', lineHeight: 1.4 }}>
+                    <strong>Supabase Not Configured:</strong> Add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> to your local <code>.env</code> file to activate the cloud backend.
+                  </div>
+                </div>
+              )}
+
+              {/* Tabs */}
+              <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '12px', padding: '4px', marginBottom: '1.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => { setSyncTab('save'); setSyncError(''); setSyncMessage(''); }}
+                  style={{
+                    flex: 1, padding: '8px 16px', borderRadius: '8px', border: 'none',
+                    background: syncTab === 'save' ? '#059669' : 'transparent',
+                    color: syncTab === 'save' ? '#FFFFFF' : '#475569',
+                    fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  Save to Cloud
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setSyncTab('load'); setSyncError(''); setSyncMessage(''); if (syncUserKey) handleRetrieveResumes(); }}
+                  style={{
+                    flex: 1, padding: '8px 16px', borderRadius: '8px', border: 'none',
+                    background: syncTab === 'load' ? '#059669' : 'transparent',
+                    color: syncTab === 'load' ? '#FFFFFF' : '#475569',
+                    fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  Load from Cloud
+                </button>
+              </div>
+
+              {/* Error and Success Alerts */}
+              {syncError && (
+                <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 500 }}>
+                  ⚠️ {syncError}
+                </div>
+              )}
+              {syncMessage && (
+                <div style={{ background: '#ECFDF5', border: '1px solid #6EE7B7', color: '#047857', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
+                  ✨ {syncMessage}
+                </div>
+              )}
+
+              {/* Save Tab Content */}
+              {syncTab === 'save' && (
+                <form onSubmit={handleSaveToCloud} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Sync Key (Email / Username)
+                    </label>
+                    <input 
+                      type="text"
+                      required
+                      style={{ ...inputStyle, padding: '0.75rem 1rem', fontSize: '1rem' }}
+                      placeholder="e.g. adil@example.com"
+                      value={syncUserKey}
+                      onChange={(e) => setSyncUserKey(e.target.value)}
+                      disabled={!supabase}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Resume Version / Name
+                    </label>
+                    <input 
+                      type="text"
+                      required
+                      style={{ ...inputStyle, padding: '0.75rem 1rem', fontSize: '1rem' }}
+                      placeholder="e.g. Software Engineer Resume"
+                      value={syncResumeName}
+                      onChange={(e) => setSyncResumeName(e.target.value)}
+                      disabled={!supabase}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoadingSync || !supabase}
+                    style={{
+                      background: '#059669', color: '#FFFFFF', border: 'none',
+                      padding: '0.85rem 1.5rem', borderRadius: '12px',
+                      fontWeight: 700, fontSize: '0.95rem', cursor: (isLoadingSync || !supabase) ? 'not-allowed' : 'pointer',
+                      marginTop: '0.5rem', width: '100%',
+                      opacity: (isLoadingSync || !supabase) ? 0.7 : 1
+                    }}
+                  >
+                    {isLoadingSync ? 'Saving to Database...' : 'Save Current Resume'}
+                  </button>
+                </form>
+              )}
+
+              {/* Load Tab Content */}
+              {syncTab === 'load' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Sync Key (Email / Username)
+                    </label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input 
+                        type="text"
+                        style={{ ...inputStyle, flex: 1, padding: '0.75rem 1rem', fontSize: '1rem' }}
+                        placeholder="e.g. adil@example.com"
+                        value={syncUserKey}
+                        onChange={(e) => setSyncUserKey(e.target.value)}
+                        disabled={!supabase}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRetrieveResumes}
+                        disabled={isLoadingSync || !supabase}
+                        style={{
+                          background: '#1E293B', color: '#FFFFFF', border: 'none',
+                          padding: '0.75rem 1.25rem', borderRadius: '10px',
+                          fontWeight: 700, fontSize: '0.9rem', cursor: (isLoadingSync || !supabase) ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Fetch
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Resumes List */}
+                  {supabase && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+                      <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Your Saved Resumes
+                      </label>
+                      <div style={{ 
+                        maxHeight: '200px', overflowY: 'auto', 
+                        border: '1.5px solid #E2E8F0', borderRadius: '12px',
+                        background: '#F8FAFC'
+                      }}>
+                        {savedResumesList.length === 0 ? (
+                          <div style={{ padding: '2rem 1rem', textAlign: 'center', fontSize: '0.9rem', color: '#64748B', fontStyle: 'italic' }}>
+                            No resumes retrieved yet. Enter your Sync Key and click Fetch.
+                          </div>
+                        ) : (
+                          savedResumesList.map(res => (
+                            <div 
+                              key={res.id} 
+                              style={{ 
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                                padding: '0.85rem 1rem', borderBottom: '1px solid #E2E8F0' 
+                              }}
+                            >
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden', paddingRight: '0.5rem' }}>
+                                <strong style={{ fontSize: '0.95rem', color: '#0F172A', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                  {res.name}
+                                </strong>
+                                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                                  Updated: {new Date(res.updated_at).toLocaleString()}
+                                </span>
+                              </div>
+                              <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleLoadResume(res.id)}
+                                  style={{
+                                    background: '#059669', color: '#FFFFFF', border: 'none',
+                                    padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem',
+                                    fontWeight: 700, cursor: 'pointer'
+                                  }}
+                                >
+                                  Load
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteCloudResume(res.id)}
+                                  style={{
+                                    background: 'transparent', border: 'none', color: '#EF4444',
+                                    cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center'
+                                  }}
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}
