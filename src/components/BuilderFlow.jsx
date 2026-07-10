@@ -147,6 +147,20 @@ const BuilderFlow = () => {
   const [activeCertIndex, setActiveCertIndex] = useState(0);
   const [activeLangIndex, setActiveLangIndex] = useState(0);
   const [activeCustIndex, setActiveCustIndex] = useState(0);
+  const [showJobRoleDropdown, setShowJobRoleDropdown] = useState(false);
+  const jobRoleDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (jobRoleDropdownRef.current && !jobRoleDropdownRef.current.contains(event.target)) {
+        setShowJobRoleDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Helper validation methods
   const isValidEmail = (email) => email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -736,27 +750,78 @@ const BuilderFlow = () => {
                     )}
                   </div>
                 </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', position: 'relative' }} ref={jobRoleDropdownRef}>
                   <label style={labelStyle}>Job Title</label>
                   <input 
-                    list="worldwide-job-roles"
                     style={inputStyle} 
                     value={resumeData.personalInfo.jobTitle || ''} 
                     placeholder="e.g. Frontend Engineer"
+                    onFocus={() => setShowJobRoleDropdown(true)}
                     onChange={(e) => {
                       const newRole = e.target.value;
                       updatePersonalInfo('jobTitle', newRole);
-                      const suggested = getTechsForRole(newRole);
-                      suggested.forEach(tech => {
-                        handleAddRoleSkill(tech);
-                      });
+                      const exactMatch = WORLDWIDE_JOB_ROLES.find(r => r.toLowerCase() === newRole.toLowerCase());
+                      if (exactMatch) {
+                        const suggested = getTechsForRole(exactMatch);
+                        suggested.forEach(tech => handleAddRoleSkill(tech));
+                      }
                     }} 
                   />
-                  <datalist id="worldwide-job-roles">
-                    {WORLDWIDE_JOB_ROLES.map(role => (
-                      <option key={role} value={role} />
-                    ))}
-                  </datalist>
+                  
+                  {/* Custom Dropdown */}
+                  {showJobRoleDropdown && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      zIndex: 100,
+                      background: '#FFFFFF',
+                      border: '1.5px solid #CBD5E1',
+                      borderRadius: '10px',
+                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                      maxHeight: '220px',
+                      overflowY: 'auto',
+                      marginTop: '0.25rem',
+                      padding: '4px'
+                    }}>
+                      {WORLDWIDE_JOB_ROLES.filter(role => 
+                        !resumeData.personalInfo.jobTitle || 
+                        role.toLowerCase().includes(resumeData.personalInfo.jobTitle.toLowerCase())
+                      ).map(role => (
+                        <div
+                          key={role}
+                          onClick={() => {
+                            updatePersonalInfo('jobTitle', role);
+                            setShowJobRoleDropdown(false);
+                            const suggested = getTechsForRole(role);
+                            suggested.forEach(tech => handleAddRoleSkill(tech));
+                          }}
+                          style={{
+                            padding: '0.65rem 1rem',
+                            fontSize: '1rem',
+                            color: '#1E293B',
+                            cursor: 'pointer',
+                            borderRadius: '6px',
+                            fontWeight: 500,
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.08)'; e.currentTarget.style.color = '#059669'; }}
+                          onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#1E293B'; }}
+                        >
+                          {role}
+                        </div>
+                      ))}
+                      {WORLDWIDE_JOB_ROLES.filter(role => 
+                        !resumeData.personalInfo.jobTitle || 
+                        role.toLowerCase().includes(resumeData.personalInfo.jobTitle.toLowerCase())
+                      ).length === 0 && (
+                        <div style={{ padding: '0.65rem 1rem', fontSize: '0.95rem', color: '#64748B', fontStyle: 'italic' }}>
+                          No matching roles found
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   {/* Skill Recommendations based on Job Title */}
                   {(() => {
