@@ -743,7 +743,14 @@ const BuilderFlow = () => {
                     style={inputStyle} 
                     value={resumeData.personalInfo.jobTitle || ''} 
                     placeholder="e.g. Frontend Engineer"
-                    onChange={(e) => updatePersonalInfo('jobTitle', e.target.value)} 
+                    onChange={(e) => {
+                      const newRole = e.target.value;
+                      updatePersonalInfo('jobTitle', newRole);
+                      const suggested = getTechsForRole(newRole);
+                      suggested.forEach(tech => {
+                        handleAddRoleSkill(tech);
+                      });
+                    }} 
                   />
                   <datalist id="worldwide-job-roles">
                     {WORLDWIDE_JOB_ROLES.map(role => (
@@ -1263,6 +1270,11 @@ const BuilderFlow = () => {
                             onChange={(newValues) => {
                               const techString = newValues ? newValues.map(v => v.value).join(', ') : '';
                               updateItem('projects', proj.id, { technologies: techString });
+                              if (newValues) {
+                                newValues.forEach(v => {
+                                  handleAddRoleSkill(v.value);
+                                });
+                              }
                             }}
                             styles={{
                               control: (base) => ({
@@ -1366,8 +1378,47 @@ const BuilderFlow = () => {
                         return { label: name, value: name };
                       })}
                       onChange={(newValues) => {
-                        const newSkills = newValues ? newValues.map(v => ({ name: v.value, level: 'Expert' })) : [];
-                        updateSection('skills', { ...resumeData.skills, [key]: newSkills });
+                        const updatedSkills = { ...resumeData.skills };
+                        const prevSkills = resumeData.skills?.[key] || [];
+                        const newSkillsValues = newValues ? newValues.map(v => v.value) : [];
+                        
+                        const addedSkillName = newSkillsValues.find(val => 
+                          !prevSkills.some(s => (typeof s === 'object' ? s.name : s) === val)
+                        );
+                        
+                        if (addedSkillName) {
+                          let targetCat = key;
+                          const techLower = addedSkillName.toLowerCase();
+                          for (const [catKey, options] of Object.entries(SKILL_OPTIONS_BY_CATEGORY)) {
+                            if (options.some(opt => opt.value.toLowerCase() === techLower)) {
+                              targetCat = catKey;
+                              break;
+                            }
+                          }
+                          
+                          if (targetCat !== key) {
+                            const targetCatList = resumeData.skills?.[targetCat] || [];
+                            if (!targetCatList.some(s => (typeof s === 'object' ? s.name : s).toLowerCase() === techLower)) {
+                              updatedSkills[targetCat] = [...targetCatList, { name: addedSkillName, level: 80 }];
+                            }
+                            updatedSkills[key] = prevSkills.filter(s => {
+                              const name = typeof s === 'object' ? s.name : s;
+                              return newSkillsValues.includes(name) && name !== addedSkillName;
+                            });
+                          } else {
+                            updatedSkills[key] = newValues.map(v => {
+                              const existing = prevSkills.find(s => (typeof s === 'object' ? s.name : s) === v.value);
+                              return existing || { name: v.value, level: 80 };
+                            });
+                          }
+                        } else {
+                          updatedSkills[key] = newValues ? newValues.map(v => {
+                            const existing = prevSkills.find(s => (typeof s === 'object' ? s.name : s) === v.value);
+                            return existing || { name: v.value, level: 80 };
+                          }) : [];
+                        }
+                        
+                        updateSection('skills', updatedSkills);
                       }}
                       styles={{
                         control: (base) => ({
