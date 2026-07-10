@@ -11,7 +11,7 @@ const isConfigured =
   supabaseAnonKey !== 'your_supabase_anon_key_here';
 
 if (!isConfigured) {
-  console.warn("Supabase is not configured yet. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.");
+  console.warn("Supabase is not configured yet. Received URL:", supabaseUrl, "Key length:", supabaseAnonKey ? supabaseAnonKey.length : 0);
 }
 
 export const supabase = isConfigured 
