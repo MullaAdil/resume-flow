@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useResume } from '../context/ResumeContext';
+import { useAuth } from '../context/AuthContext';
 import { templates } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
 import { mockResumeData, templateMockData } from '../utils/mockResumeData';
@@ -38,12 +39,11 @@ const TornEdge = ({ isBottom }) => (
 );
 
 const LandingPage = () => {
-  const [showLoginModal, setShowLoginModal] = React.useState(false);
   const [showProfileModal, setShowProfileModal] = React.useState(false);
   const [pendingNavigation, setPendingNavigation] = React.useState(null);
-  const [loginEmail, setLoginEmail] = React.useState('');
   const navigate = useNavigate();
   const { setSelectedTemplate, setProfileType } = useResume();
+  const { user, signOut } = useAuth();
   const templatesRef = useRef(null);
 
   const scrollToTemplates = () => {
@@ -97,14 +97,44 @@ const LandingPage = () => {
           <a href="#features" style={{ color: 'var(--text-main)', fontWeight: 600, textDecoration: 'none', fontSize: '0.95rem' }}>Features</a>
         </nav>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-           <button onClick={() => setShowLoginModal(true)} style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', padding: '0.5rem', fontSize: '1.05rem' }}>Login</button>
-           <button 
-             className="btn-primary" 
-             onClick={() => handleActionClick('/templates', true)}
-             style={{ padding: '0.5rem 1.25rem', borderRadius: '6px', fontSize: '0.95rem' }}
-           >
-             Sign Up
-           </button>
+          {user ? (
+            <>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                {user.email}
+              </span>
+              <button 
+                className="btn-primary" 
+                onClick={() => handleActionClick('/templates', true)}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '6px', fontSize: '0.95rem' }}
+              >
+                Dashboard
+              </button>
+              <button 
+                onClick={signOut}
+                style={{ 
+                  background: 'transparent', border: '1px solid #CBD5E1', 
+                  color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', 
+                  padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.95rem',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = '#F8FAFC'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => navigate('/login')} style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', padding: '0.5rem', fontSize: '1.05rem' }}>Login</button>
+              <button 
+                className="btn-primary" 
+                onClick={() => navigate('/login')}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '6px', fontSize: '0.95rem' }}
+              >
+                Sign Up
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -317,25 +347,7 @@ const LandingPage = () => {
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} Elevate Resume. All rights reserved.</p>
       </footer>
       {/* Clean Formal Login Modal */}
-      {showLoginModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15, 23, 42, 0.2)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowLoginModal(false)}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '3rem 2.5rem', maxWidth: '400px', width: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative' }}>
-            <TornEdge />
-            <TornEdge isBottom />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#111827' }}>Welcome Back</h3>
-              <button onClick={() => setShowLoginModal(false)} style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', fontSize: '1.25rem' }}>×</button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#374151', textTransform: 'uppercase' }}>Email Address</label>
-              <input style={{ padding: '0.85rem 1.25rem', borderRadius: '10px', border: '1.5px solid #CBD5E1', outline: 'none', fontSize: '1.05rem' }} placeholder="you@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
-            </div>
-            <button onClick={() => { if(loginEmail) { setShowLoginModal(false); navigate('/templates'); } }} style={{ padding: '0.9rem', borderRadius: '24px 12px 24px 12px', border: 'none', background: '#059669', color: '#FFFFFF', fontWeight: 800, fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              Continue
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* Profile Selection Modal */}
       {showProfileModal && (

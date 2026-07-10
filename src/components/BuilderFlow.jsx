@@ -35,6 +35,7 @@ import { useNavigate } from 'react-router-dom';
 import LivePreview from './LivePreview';
 import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Sparkles, Cloud, Database } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 // Static Jelly Button with clean flat styling (no motion scaling or morphing)
 const JellyButton = ({ onClick, style, children, className, onMouseOver, onMouseOut, disabled, type = "button" }) => {
@@ -138,6 +139,7 @@ const BuilderFlow = () => {
     generateProjectDescriptionAI,
     resetResume
   } = useResume();
+  const { user } = useAuth();
 
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   
@@ -173,14 +175,21 @@ const BuilderFlow = () => {
   const [syncMessage, setSyncMessage] = useState('');
   const [syncError, setSyncError] = useState('');
 
-  // Prefill resume name when the sync modal is opened
+  // Prefill resume name and sync key when the sync modal is opened
   useEffect(() => {
-    if (showSyncModal && !syncResumeName) {
-      const name = resumeData.personalInfo?.fullName || '';
-      const title = resumeData.personalInfo?.jobTitle || '';
-      setSyncResumeName(name ? `${name} - ${title || 'Resume'}`.trim() : 'My Resume');
+    if (showSyncModal) {
+      if (user?.email) {
+        setSyncUserKey(user.email);
+      } else if (!syncUserKey) {
+        setSyncUserKey(localStorage.getItem('sync_user_key') || '');
+      }
+      if (!syncResumeName) {
+        const name = resumeData.personalInfo?.fullName || '';
+        const title = resumeData.personalInfo?.jobTitle || '';
+        setSyncResumeName(name ? `${name} - ${title || 'Resume'}`.trim() : 'My Resume');
+      }
     }
-  }, [showSyncModal, resumeData.personalInfo]);
+  }, [showSyncModal, resumeData.personalInfo, user]);
 
   // Save current resume to Supabase
   const handleSaveToCloud = async (e) => {
