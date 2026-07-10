@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreatableSelect from 'react-select/creatable';
-import { SKILL_OPTIONS_BY_CATEGORY, ALL_TECH_OPTIONS } from '../constants/skillsData';
+import { SKILL_OPTIONS_BY_CATEGORY, ALL_TECH_OPTIONS, getSuggestedTechs } from '../constants/skillsData';
 // ── Deckled Torn Paper Edges ──
 const TornEdge = ({ isBottom }) => (
   <svg 
@@ -248,21 +248,33 @@ const BuilderFlow = () => {
   };
 
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [roughSummaryNotes, setRoughSummaryNotes] = useState('');
 
   const handleAIRewrite = async () => {
     setIsGeneratingAI(true);
     try {
-      const skillsArray = resumeData.skills?.programming || [];
+      const skillsArray = [
+        ...(resumeData.skills?.programming || []),
+        ...(resumeData.skills?.frameworks || []),
+        ...(resumeData.skills?.databases || []),
+        ...(resumeData.skills?.cloud || []),
+        ...(resumeData.skills?.tools || []),
+        ...(resumeData.skills?.other || [])
+      ];
       const projectsArray = resumeData.projects || [];
-      const summary = await generateSummaryAI(skillsArray, projectsArray, resumeData.profileType);
+      const summary = await generateSummaryAI(skillsArray, projectsArray, resumeData.profileType, roughSummaryNotes);
       updatePersonalInfo('summary', summary);
     } catch (err) {
       console.error("AI Generation failed:", err);
       // Fallback
       const jobTitle = resumeData.experience?.[0]?.title || resumeData.personalInfo?.jobTitle || 'Professional';
       const company = resumeData.experience?.[0]?.company || 'industry-leading companies';
-      const skillsNames = (resumeData.skills?.programming || []).map(s => typeof s === 'object' ? s.name : s);
-      const skillsList = skillsNames.slice(0, 3).join(', ') || 'strategic planning and execution';
+      const skillsNames = [
+        ...(resumeData.skills?.programming || []),
+        ...(resumeData.skills?.frameworks || []),
+        ...(resumeData.skills?.databases || [])
+      ].map(s => typeof s === 'object' ? s.name : s);
+      const skillsList = skillsNames.slice(0, 4).join(', ') || 'strategic planning and execution';
       
       const fallbackSummary = resumeData.profileType === 'student'
         ? `Motivated and detail-oriented student with a strong foundation in ${skillsList}. Eager to leverage academic background to contribute effectively to a dynamic team.`
@@ -414,6 +426,14 @@ const BuilderFlow = () => {
   };
 
   const activeStep = steps[activeStepIndex];
+
+  const handleAddSuggestedTech = (projId, currentTechsStr, techToAdd) => {
+    const currentTechs = currentTechsStr ? currentTechsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+    if (!currentTechs.includes(techToAdd)) {
+      const nextTechs = [...currentTechs, techToAdd].join(', ');
+      updateItem('projects', projId, { technologies: nextTechs });
+    }
+  };
 
   // ── Shared input style ──
   const inputStyle = { 
@@ -751,6 +771,62 @@ const BuilderFlow = () => {
           {/* ── Summary ── */}
           {activeStep.id === 'summary' && (
             <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {/* Experience Level Selector */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={labelStyle}>Experience Level</label>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setProfileType('student')}
+                    style={{
+                      flex: 1,
+                      padding: '0.75rem 1.25rem',
+                      borderRadius: '8px',
+                      border: '1.5px solid',
+                      borderColor: resumeData.profileType === 'student' ? '#059669' : '#CBD5E1',
+                      background: resumeData.profileType === 'student' ? 'rgba(5, 150, 105, 0.08)' : '#FFFFFF',
+                      color: resumeData.profileType === 'student' ? '#059669' : '#475569',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    Fresher / Student
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProfileType('professional')}
+                    style={{
+                      flex: 1,
+                      padding: '0.75rem 1.25rem',
+                      borderRadius: '8px',
+                      border: '1.5px solid',
+                      borderColor: resumeData.profileType === 'professional' ? '#059669' : '#CBD5E1',
+                      background: resumeData.profileType === 'professional' ? 'rgba(5, 150, 105, 0.08)' : '#FFFFFF',
+                      color: resumeData.profileType === 'professional' ? '#059669' : '#475569',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    Experienced Professional
+                  </button>
+                </div>
+              </div>
+
+              {/* Rough Notes for AI */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={labelStyle}>Rough notes or career goals (helps AI generate)</label>
+                <input
+                  style={inputStyle}
+                  value={roughSummaryNotes}
+                  onChange={(e) => setRoughSummaryNotes(e.target.value)}
+                  placeholder="e.g. Target junior full-stack role, focus on React and Node.js..."
+                />
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label style={labelStyle}>Professional Summary</label>
@@ -1008,6 +1084,8 @@ const BuilderFlow = () => {
                 <>
                   {resumeData.projects.map((proj, index) => {
                     const isExpanded = index === activeProjIndex;
+                    const suggestedTechs = getSuggestedTechs(proj.name);
+                    
                     if (!isExpanded) {
                       return (
                         <div 
@@ -1065,6 +1143,45 @@ const BuilderFlow = () => {
                             <input style={inputStyle} value={proj.duration || ''} onChange={(e) => updateItem('projects', proj.id, { duration: e.target.value })} />
                           </div>
                         </div>
+
+                        {/* Suggested Technologies Pills */}
+                        {suggestedTechs.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginBottom: '1rem', marginTop: '-0.25rem' }}>
+                            <span style={{ fontSize: '0.9rem', color: '#4B5563', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                              <Sparkles size={12} style={{ color: '#059669' }} /> Suggested:
+                            </span>
+                            {suggestedTechs.map(tech => {
+                              const isAdded = (proj.technologies || '').split(',').map(t => t.trim()).includes(tech);
+                              if (isAdded) return null;
+                              return (
+                                <button
+                                  key={tech}
+                                  type="button"
+                                  onClick={() => handleAddSuggestedTech(proj.id, proj.technologies, tech)}
+                                  style={{
+                                    background: 'rgba(5, 150, 105, 0.05)',
+                                    border: '1.5px solid rgba(5, 150, 105, 0.2)',
+                                    borderRadius: '16px',
+                                    padding: '3px 10px',
+                                    fontSize: '0.85rem',
+                                    color: '#059669',
+                                    cursor: 'pointer',
+                                    fontWeight: 600,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    transition: 'all 0.15s ease'
+                                  }}
+                                  onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.12)'; e.currentTarget.style.borderColor = '#059669'; }}
+                                  onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.05)'; e.currentTarget.style.borderColor = 'rgba(5, 150, 105, 0.2)'; }}
+                                >
+                                  + {tech}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
                           <label style={labelStyle}>Tools & Technologies</label>
                           <CreatableSelect
@@ -1089,9 +1206,21 @@ const BuilderFlow = () => {
                             }}
                           />
                         </div>
+
+                        {/* Project Details input for AI context */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                          <label style={labelStyle}>Project Details / Key Features (helps AI generate points)</label>
+                          <textarea
+                            style={{ ...inputStyle, minHeight: '70px', resize: 'vertical' }}
+                            placeholder="e.g. Developed a chatbot using OpenAI API, optimized search with vector database Pinecone, handled 1000+ users..."
+                            value={proj.projectInfo || ''}
+                            onChange={(e) => updateItem('projects', proj.id, { projectInfo: e.target.value })}
+                          />
+                        </div>
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <label style={labelStyle}>Description</label>
+                            <label style={labelStyle}>Description / Bullet Points</label>
                             <button 
                               onClick={async () => {
                                 if (!proj.name || !proj.technologies) {
@@ -1100,7 +1229,7 @@ const BuilderFlow = () => {
                                 }
                                 setIsGeneratingAI(true);
                                 try {
-                                  const desc = await generateProjectDescriptionAI(proj.name, proj.technologies);
+                                  const desc = await generateProjectDescriptionAI(proj.name, proj.technologies, proj.projectInfo);
                                   updateItem('projects', proj.id, { description: desc });
                                 } catch (err) {
                                   console.error("Project AI Rewrite failed:", err);
@@ -1115,7 +1244,7 @@ const BuilderFlow = () => {
                                 fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: isGeneratingAI ? 'wait' : 'pointer' 
                               }}
                             >
-                              <Sparkles size={14} /> Rewrite with AI
+                              <Sparkles size={14} /> Generate Bullet Points with AI
                             </button>
                           </div>
                           <textarea style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={proj.description || ''} onChange={(e) => updateItem('projects', proj.id, { description: e.target.value })} />

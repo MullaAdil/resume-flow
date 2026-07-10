@@ -242,9 +242,7 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
       console.error(e);
       return false;
     }
-  };
-
-  const generateSummaryAI = async (skillsArray, projectsArray, type) => {
+  };  const generateSummaryAI = async (skillsArray, projectsArray, type, roughNotes) => {
     const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
     if (!groqApiKey) {
       throw new Error("Missing Groq API Key");
@@ -253,11 +251,15 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
     const projectsList = (projectsArray || []).map(p => `${p.name}: ${p.technologies || ''}`).filter(Boolean).join('; ');
     
     let profileContext = type === 'student' 
-      ? "The user is a student with no professional experience. Emphasize their academic background, enthusiasm to learn, and core skills."
-      : "The user is a professional. Emphasize their expertise and track record of success.";
+      ? "The user is a fresher/student with no professional experience. Focus on their academic background, enthusiasm to learn, projects, and core technical skills."
+      : "The user is an experienced professional. Highlight their expertise, key achievements, professional track record, and senior skills.";
       
     if (projectsList) {
-      profileContext += ` The user has worked on these projects: ${projectsList}. Highlight their practical project experience.`;
+      profileContext += ` The user has worked on these projects: ${projectsList}.`;
+    }
+    
+    if (roughNotes) {
+      profileContext += ` Integrate these specific details or career goals: ${roughNotes}.`;
     }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -271,7 +273,7 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
         messages: [
           {
             role: 'system',
-            content: `You are an expert resume writer. Generate a 3-sentence professional summary for a resume. ${profileContext} Output only the plain text summary without quotes or extra explanation.`
+            content: `You are an expert resume writer. Generate a professional, cohesive summary (3-4 sentences) for a resume. ${profileContext} Output only the plain text summary without quotes or extra explanation.`
           },
           {
             role: 'user',
@@ -285,11 +287,17 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
     return data.choices[0].message.content.trim().replace(/^"|"$/g, '');
   };
 
-  const generateProjectDescriptionAI = async (projectName, technologies) => {
+  const generateProjectDescriptionAI = async (projectName, technologies, projectInfo) => {
     const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
     if (!groqApiKey) {
       throw new Error("Missing Groq API Key");
     }
+    
+    let userContext = `Write a description for a project named '${projectName}' built using the following technologies: '${technologies}'.`;
+    if (projectInfo) {
+      userContext += ` Here are some specific details/features about the project that you must incorporate: ${projectInfo}.`;
+    }
+    
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -301,11 +309,11 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
         messages: [
           {
             role: 'system',
-            content: `You are an expert resume writer. Write a 2-3 sentence professional, impactful project description suitable for a resume. Focus on what the project achieves and how the technologies were utilized. Output ONLY the plain text description without quotes or prefixes.`
+            content: `You are an expert resume writer. Generate 3 professional, action-oriented bullet points describing achievements in this project for a resume. Start each bullet point with a strong action verb (e.g., Developed, Optimized, Implemented). Highlight the technical implementation and business or performance impact. DO NOT include any bullet characters (such as •, -, or *) at the beginning of the lines. Output each bullet point on a new line.`
           },
           {
             role: 'user',
-            content: `Write a description for a project named '${projectName}' built using the following technologies: '${technologies}'.`
+            content: userContext
           }
         ]
       })

@@ -122,7 +122,7 @@ const TemplateRenderer = ({ templateId, resumeData }) => {
     const primary = settings?.primaryColor || '#1e40af';
     const bullets = (text) => (
       <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{text.split('\n').map((line, i) => (
-        line.trim().length > 0 ? <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.3rem' }}><span style={{ color: primary }}>•</span> <span>{line}</span></div> : null
+        line.trim().length > 0 ? <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.3rem' }}><span style={{ color: primary }}>•</span> <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span></div> : null
       ))}</div>
     );
 
@@ -232,13 +232,13 @@ const TemplateRenderer = ({ templateId, resumeData }) => {
       jobTitle: exp.jobTitle || exp.title || '',
       school: exp.school || exp.institution || '',
       institution: exp.institution || exp.school || '',
-      date: exp.date || (exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : exp.startDate || exp.endDate || ''),
+      date: (exp.startDate || exp.endDate) ? `${exp.startDate || ''} - ${exp.endDate || ''}`.replace(/^ - | - $/g, '') : exp.date || '',
     })),
     education: (hasUserEducation ? resumeData.education : fallbackEducation).map(edu => ({
       ...edu,
       school: edu.school || edu.institution || '',
       institution: edu.institution || edu.school || '',
-      date: edu.date || (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : edu.startDate || edu.endDate || ''),
+      date: (edu.startDate || edu.endDate) ? `${edu.startDate || ''} - ${edu.endDate || ''}`.replace(/^ - | - $/g, '') : edu.date || '',
     })),
     projects: hasUserProjects ? resumeData.projects : fallbackProjects,
     skills: isAslam
@@ -290,7 +290,7 @@ const TemplateRenderer = ({ templateId, resumeData }) => {
             {sec.description && (
               <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
                 {sec.description.split('\n').map((line, i) => (
-                  line.trim().length > 0 ? <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.3rem' }}><span style={{ color: primary }}>•</span> <span>{line}</span></div> : null
+                  line.trim().length > 0 ? <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.3rem' }}><span style={{ color: primary }}>•</span> <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span></div> : null
                 ))}
               </div>
             )}
