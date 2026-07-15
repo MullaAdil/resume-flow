@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "echo \"Building project... VITE_SUPABASE_URL is present: ${VITE_SUPABASE_URL:+'yes', 'no'}\" && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
