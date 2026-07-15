@@ -43,7 +43,7 @@ const LoginPage = () => {
   const handleAuth = async (e) => {
     e.preventDefault();
     if (!supabase) {
-      setError('Supabase is not configured yet. Please enter your API keys in the .env file.');
+      setError('Authentication is currently unavailable. Please try again later.');
       return;
     }
 
