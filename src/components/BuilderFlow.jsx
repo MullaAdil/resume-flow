@@ -34,7 +34,7 @@ import { useResume, defaultState } from '../context/ResumeContext';
 import { useNavigate } from 'react-router-dom';
 import LivePreview from './LivePreview';
 import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Sparkles, Cloud, Database } from 'lucide-react';
-import { supabase } from '../utils/supabaseClient';
+import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../context/AuthContext';
 
 // Static Jelly Button with clean flat styling (no motion scaling or morphing)
@@ -191,13 +191,9 @@ const BuilderFlow = () => {
     }
   }, [showSyncModal, resumeData.personalInfo, user]);
 
-  // Save current resume to Supabase
+  // Save current resume to MongoDB
   const handleSaveToCloud = async (e) => {
     if (e) e.preventDefault();
-    if (!supabase) {
-      setSyncError("Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.");
-      return;
-    }
     if (!syncUserKey.trim()) {
       setSyncError("Please enter your Sync Key (Email/Username).");
       return;
@@ -214,34 +210,11 @@ const BuilderFlow = () => {
     try {
       localStorage.setItem('sync_user_key', syncUserKey.trim());
       
-      const { data: existing, error: findError } = await supabase
-        .from('resumes')
-        .select('id')
-        .eq('user_id', syncUserKey.trim().toLowerCase())
-        .eq('name', syncResumeName.trim())
-        .maybeSingle();
-
-      if (findError) throw findError;
-
-      if (existing) {
-        const { error: updateError } = await supabase
-          .from('resumes')
-          .update({
-            data: resumeData,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existing.id);
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
-          .from('resumes')
-          .insert({
-            user_id: syncUserKey.trim().toLowerCase(),
-            name: syncResumeName.trim(),
-            data: resumeData
-          });
-        if (insertError) throw insertError;
-      }
+      await apiClient.resumes.save(
+        syncUserKey.trim().toLowerCase(),
+        syncResumeName.trim(),
+        resumeData
+      );
 
       setSyncMessage("Resume saved successfully to cloud!");
       if (syncTab === 'load') {
@@ -255,12 +228,8 @@ const BuilderFlow = () => {
     }
   };
 
-  // Retrieve saved resumes from Supabase
+  // Retrieve saved resumes from MongoDB
   const handleRetrieveResumes = async () => {
-    if (!supabase) {
-      setSyncError("Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.");
-      return;
-    }
     if (!syncUserKey.trim()) {
       setSyncError("Please enter your Sync Key (Email/Username).");
       return;
@@ -272,13 +241,7 @@ const BuilderFlow = () => {
 
     try {
       localStorage.setItem('sync_user_key', syncUserKey.trim());
-      const { data, error } = await supabase
-        .from('resumes')
-        .select('id, name, updated_at')
-        .eq('user_id', syncUserKey.trim().toLowerCase())
-        .order('updated_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await apiClient.resumes.list(syncUserKey.trim().toLowerCase());
       setSavedResumesList(data || []);
       if (!data || data.length === 0) {
         setSyncMessage("No saved resumes found for this Sync Key.");
@@ -298,13 +261,7 @@ const BuilderFlow = () => {
     setSyncMessage('');
 
     try {
-      const { data, error } = await supabase
-        .from('resumes')
-        .select('name, data')
-        .eq('id', resumeId)
-        .single();
-
-      if (error) throw error;
+      const data = await apiClient.resumes.get(resumeId);
       if (data && data.data) {
         setResumeData(data.data);
         setSyncResumeName(data.name);
@@ -328,12 +285,7 @@ const BuilderFlow = () => {
     setSyncMessage('');
 
     try {
-      const { error } = await supabase
-        .from('resumes')
-        .delete()
-        .eq('id', resumeId);
-
-      if (error) throw error;
+      await apiClient.resumes.delete(resumeId);
       setSyncMessage("Resume deleted successfully.");
       setSavedResumesList(prev => prev.filter(r => r.id !== resumeId));
     } catch (err) {
@@ -2486,25 +2438,6 @@ const BuilderFlow = () => {
                 Save your progress or sync your resumes across multiple devices.
               </p>
 
-              {/* Warnings for unconfigured state */}
-              {!supabase && (
-                <div style={{
-                  background: '#FFFBEB',
-                  border: '1px solid #FDE68A',
-                  borderRadius: '12px',
-                  padding: '1rem',
-                  marginBottom: '1.5rem',
-                  display: 'flex',
-                  gap: '8px',
-                  alignItems: 'flex-start'
-                }}>
-                  <AlertCircle size={18} style={{ color: '#D97706', flexShrink: 0, marginTop: '2px' }} />
-                  <div style={{ fontSize: '0.85rem', color: '#B45309', lineHeight: 1.4 }}>
-                    <strong>Supabase Not Configured:</strong> Add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> to your local <code>.env</code> file to activate the cloud backend.
-                  </div>
-                </div>
-              )}
-
               {/* Tabs */}
               <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '12px', padding: '4px', marginBottom: '1.5rem' }}>
                 <button
@@ -2561,7 +2494,6 @@ const BuilderFlow = () => {
                       placeholder="e.g. adil@example.com"
                       value={syncUserKey}
                       onChange={(e) => setSyncUserKey(e.target.value)}
-                      disabled={!supabase}
                     />
                   </div>
 
@@ -2576,19 +2508,18 @@ const BuilderFlow = () => {
                       placeholder="e.g. Software Engineer Resume"
                       value={syncResumeName}
                       onChange={(e) => setSyncResumeName(e.target.value)}
-                      disabled={!supabase}
                     />
                   </div>
 
                   <button
                     type="submit"
-                    disabled={isLoadingSync || !supabase}
+                    disabled={isLoadingSync}
                     style={{
                       background: '#059669', color: '#FFFFFF', border: 'none',
                       padding: '0.85rem 1.5rem', borderRadius: '12px',
-                      fontWeight: 700, fontSize: '0.95rem', cursor: (isLoadingSync || !supabase) ? 'not-allowed' : 'pointer',
+                      fontWeight: 700, fontSize: '0.95rem', cursor: isLoadingSync ? 'not-allowed' : 'pointer',
                       marginTop: '0.5rem', width: '100%',
-                      opacity: (isLoadingSync || !supabase) ? 0.7 : 1
+                      opacity: isLoadingSync ? 0.7 : 1
                     }}
                   >
                     {isLoadingSync ? 'Saving to Database...' : 'Save Current Resume'}
@@ -2610,16 +2541,15 @@ const BuilderFlow = () => {
                         placeholder="e.g. adil@example.com"
                         value={syncUserKey}
                         onChange={(e) => setSyncUserKey(e.target.value)}
-                        disabled={!supabase}
                       />
                       <button
                         type="button"
                         onClick={handleRetrieveResumes}
-                        disabled={isLoadingSync || !supabase}
+                        disabled={isLoadingSync}
                         style={{
                           background: '#1E293B', color: '#FFFFFF', border: 'none',
                           padding: '0.75rem 1.25rem', borderRadius: '10px',
-                          fontWeight: 700, fontSize: '0.9rem', cursor: (isLoadingSync || !supabase) ? 'not-allowed' : 'pointer'
+                          fontWeight: 700, fontSize: '0.9rem', cursor: isLoadingSync ? 'not-allowed' : 'pointer'
                         }}
                       >
                         Fetch
@@ -2628,66 +2558,64 @@ const BuilderFlow = () => {
                   </div>
 
                   {/* Resumes List */}
-                  {supabase && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
-                      <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Your Saved Resumes
-                      </label>
-                      <div style={{ 
-                        maxHeight: '200px', overflowY: 'auto', 
-                        border: '1.5px solid #E2E8F0', borderRadius: '12px',
-                        background: '#F8FAFC'
-                      }}>
-                        {savedResumesList.length === 0 ? (
-                          <div style={{ padding: '2rem 1rem', textAlign: 'center', fontSize: '0.9rem', color: '#64748B', fontStyle: 'italic' }}>
-                            No resumes retrieved yet. Enter your Sync Key and click Fetch.
-                          </div>
-                        ) : (
-                          savedResumesList.map(res => (
-                            <div 
-                              key={res.id} 
-                              style={{ 
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                                padding: '0.85rem 1rem', borderBottom: '1px solid #E2E8F0' 
-                              }}
-                            >
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden', paddingRight: '0.5rem' }}>
-                                <strong style={{ fontSize: '0.95rem', color: '#0F172A', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                  {res.name}
-                                </strong>
-                                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                                  Updated: {new Date(res.updated_at).toLocaleString()}
-                                </span>
-                              </div>
-                              <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                                <button
-                                  type="button"
-                                  onClick={() => handleLoadResume(res.id)}
-                                  style={{
-                                    background: '#059669', color: '#FFFFFF', border: 'none',
-                                    padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem',
-                                    fontWeight: 700, cursor: 'pointer'
-                                  }}
-                                >
-                                  Load
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteCloudResume(res.id)}
-                                  style={{
-                                    background: 'transparent', border: 'none', color: '#EF4444',
-                                    cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center'
-                                  }}
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Your Saved Resumes
+                    </label>
+                    <div style={{ 
+                      maxHeight: '200px', overflowY: 'auto', 
+                      border: '1.5px solid #E2E8F0', borderRadius: '12px',
+                      background: '#F8FAFC'
+                    }}>
+                      {savedResumesList.length === 0 ? (
+                        <div style={{ padding: '2rem 1rem', textAlign: 'center', fontSize: '0.9rem', color: '#64748B', fontStyle: 'italic' }}>
+                          No resumes retrieved yet. Enter your Sync Key and click Fetch.
+                        </div>
+                      ) : (
+                        savedResumesList.map(res => (
+                          <div 
+                            key={res.id} 
+                            style={{ 
+                              display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                              padding: '0.85rem 1rem', borderBottom: '1px solid #E2E8F0' 
+                            }}
+                          >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden', paddingRight: '0.5rem' }}>
+                              <strong style={{ fontSize: '0.95rem', color: '#0F172A', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                {res.name}
+                              </strong>
+                              <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                                Updated: {new Date(res.updated_at).toLocaleString()}
+                              </span>
                             </div>
-                          ))
-                        )}
-                      </div>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                              <button
+                                type="button"
+                                onClick={() => handleLoadResume(res.id)}
+                                style={{
+                                  background: '#059669', color: '#FFFFFF', border: 'none',
+                                  padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem',
+                                  fontWeight: 700, cursor: 'pointer'
+                                }}
+                              >
+                                Load
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteCloudResume(res.id)}
+                                style={{
+                                  background: 'transparent', border: 'none', color: '#EF4444',
+                                  cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center'
+                                }}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </motion.div>

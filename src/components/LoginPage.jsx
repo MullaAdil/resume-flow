@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { supabase } from '../utils/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
 
 const TornEdge = ({ isBottom }) => (
@@ -39,37 +39,21 @@ const LoginPage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { signUp, signIn } = useAuth();
 
   const handleAuth = async (e) => {
     e.preventDefault();
-    if (!supabase) {
-      setError('Authentication is currently unavailable. Please try again later.');
-      return;
-    }
-
     setIsLoading(true);
     setError('');
     setMessage('');
 
     try {
       if (isSignUp) {
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (signUpError) throw signUpError;
-        if (data?.user && data?.session === null) {
-          setMessage('Confirmation email sent! Please check your inbox.');
-        } else {
-          setMessage('Account created successfully! Redirecting...');
-          setTimeout(() => navigate('/templates'), 1500);
-        }
+        await signUp(email, password);
+        setMessage('Account created successfully! Redirecting...');
+        setTimeout(() => navigate('/templates'), 1500);
       } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (signInError) throw signInError;
+        await signIn(email, password);
         setMessage('Sign in successful! Redirecting...');
         setTimeout(() => navigate('/templates'), 1000);
       }
