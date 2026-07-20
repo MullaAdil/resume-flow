@@ -263,8 +263,39 @@ const LoginPage = () => {
                 <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Email Address
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569' }}><Mail size={18} /></span>
+                <div style={{ position: 'relative', overflow: 'visible' }}>
+                  {/* Stacked Sheet 1 (Bottom colorful cover layer) */}
+                  <motion.div
+                    animate={{
+                      transform: emailFocus ? 'rotate(1.2deg) translateY(2px)' : 'rotate(0.8deg) translateY(1.5px)',
+                      opacity: emailFocus ? 1 : 0.7
+                    }}
+                    style={{
+                      position: 'absolute',
+                      inset: '1px -1px -3px -1px',
+                      background: 'linear-gradient(135deg, #10B981, #3B82F6, #EC4899)',
+                      borderRadius: '8px',
+                      zIndex: 1,
+                      pointerEvents: 'none'
+                    }}
+                  />
+                  {/* Stacked Sheet 2 (Middle white sheet layer) */}
+                  <motion.div
+                    animate={{
+                      transform: emailFocus ? 'rotate(-0.8deg) translateY(-1px)' : 'rotate(-0.5deg) translateY(-0.5px)'
+                    }}
+                    style={{
+                      position: 'absolute',
+                      inset: '0',
+                      background: '#FFFFFF',
+                      border: '1.5px solid #E2E8F0',
+                      borderRadius: '8px',
+                      zIndex: 2,
+                      pointerEvents: 'none'
+                    }}
+                  />
+
+                  <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569', zIndex: 4 }}><Mail size={18} /></span>
                   <input 
                     type="email" 
                     required
@@ -272,12 +303,15 @@ const LoginPage = () => {
                       width: '100%',
                       padding: '0.75rem 1rem 0.75rem 2.75rem',
                       borderRadius: '8px',
-                      border: '2px solid #CBD5E1',
+                      border: '2.5px solid #CBD5E1',
                       outline: 'none',
                       fontSize: '1rem',
                       color: '#0F172A',
                       boxShadow: 'none',
-                      borderColor: emailFocus ? '#94A3B8' : '#CBD5E1',
+                      borderColor: emailFocus ? '#0F172A' : '#CBD5E1',
+                      background: '#FFFFFF',
+                      position: 'relative',
+                      zIndex: 3,
                       transition: 'all 0.15s ease'
                     }}
                     onFocus={() => setEmailFocus(true)}
@@ -286,9 +320,6 @@ const LoginPage = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
-
-                  {/* Paint Drips under input field when focused (stretches full width) */}
-                  <PaintDrips isHovered={emailFocus} offset="-10px" height="14px" />
                 </div>
               </div>
 
@@ -297,8 +328,39 @@ const LoginPage = () => {
                 <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Password
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569' }}><Lock size={18} /></span>
+                <div style={{ position: 'relative', overflow: 'visible' }}>
+                  {/* Stacked Sheet 1 (Bottom colorful cover layer) */}
+                  <motion.div
+                    animate={{
+                      transform: passFocus ? 'rotate(1.2deg) translateY(2px)' : 'rotate(0.8deg) translateY(1.5px)',
+                      opacity: passFocus ? 1 : 0.7
+                    }}
+                    style={{
+                      position: 'absolute',
+                      inset: '1px -1px -3px -1px',
+                      background: 'linear-gradient(135deg, #8B5CF6, #EC4899, #F59E0B)',
+                      borderRadius: '8px',
+                      zIndex: 1,
+                      pointerEvents: 'none'
+                    }}
+                  />
+                  {/* Stacked Sheet 2 (Middle white sheet layer) */}
+                  <motion.div
+                    animate={{
+                      transform: passFocus ? 'rotate(-0.8deg) translateY(-1px)' : 'rotate(-0.5deg) translateY(-0.5px)'
+                    }}
+                    style={{
+                      position: 'absolute',
+                      inset: '0',
+                      background: '#FFFFFF',
+                      border: '1.5px solid #E2E8F0',
+                      borderRadius: '8px',
+                      zIndex: 2,
+                      pointerEvents: 'none'
+                    }}
+                  />
+
+                  <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569', zIndex: 4 }}><Lock size={18} /></span>
                   <input 
                     type="password" 
                     required
@@ -307,12 +369,15 @@ const LoginPage = () => {
                       width: '100%',
                       padding: '0.75rem 1rem 0.75rem 2.75rem',
                       borderRadius: '8px',
-                      border: '2px solid #CBD5E1',
+                      border: '2.5px solid #CBD5E1',
                       outline: 'none',
                       fontSize: '1rem',
                       color: '#0F172A',
                       boxShadow: 'none',
-                      borderColor: passFocus ? '#94A3B8' : '#CBD5E1',
+                      borderColor: passFocus ? '#0F172A' : '#CBD5E1',
+                      background: '#FFFFFF',
+                      position: 'relative',
+                      zIndex: 3,
                       transition: 'all 0.15s ease'
                     }}
                     onFocus={() => setPassFocus(true)}
@@ -321,9 +386,6 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-
-                  {/* Paint Drips under input field when focused (stretches full width) */}
-                  <PaintDrips isHovered={passFocus} offset="-10px" height="14px" />
                 </div>
               </div>
 
