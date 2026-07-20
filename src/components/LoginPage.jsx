@@ -4,32 +4,65 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
 
-const TornEdge = ({ isBottom }) => (
-  <svg 
-    width="100%" 
-    height="10" 
-    viewBox="0 0 1200 10" 
-    preserveAspectRatio="none"
-    style={{ 
-      position: 'absolute', 
-      left: 0, 
-      right: 0, 
-      [isBottom ? 'bottom' : 'top']: '-5px', 
-      zIndex: 10,
-      pointerEvents: 'none'
-    }}
-  >
-    <path 
-      d={isBottom 
-        ? "M0,5 L20,10 L40,5 L60,10 L80,5 L100,10 L120,5 L140,10 L160,5 L180,10 L200,5 L220,10 L240,5 L260,10 L280,5 L300,10 L320,5 L340,10 L360,5 L380,10 L400,5 L420,10 L440,5 L460,10 L480,5 L500,10 L520,5 L540,10 L560,5 L580,10 L600,5 L620,10 L640,5 L660,10 L680,5 L700,10 L720,5 L740,10 L760,5 L780,10 L800,5 L840,10 L880,5 L920,10 L960,5 L1000,10 L1040,5 L1080,10 L1120,5 L1160,10 L1200,5 L1200,0 L0,0 Z"
-        : "M0,5 L20,0 L40,5 L60,0 L80,5 L100,0 L120,5 L140,0 L160,5 L180,0 L200,5 L220,0 L240,5 L260,0 L280,5 L300,0 L320,5 L340,0 L360,5 L380,0 L400,5 L420,0 L440,5 L460,0 L480,5 L500,0 L520,6 L540,0 L560,5 L580,0 L600,5 L620,0 L640,5 L660,0 L680,5 L700,0 L720,5 L740,0 L760,5 L780,0 L800,5 L840,0 L880,5 L920,0 L960,5 L1000,0 L1040,5 L1080,0 L1120,5 L1160,0 L1200,5 L1200,10 L0,10 Z"
-      } 
-      fill="#FFFFFF" 
-      stroke="#CBD5E1"
-      strokeWidth="1.5"
-    />
-  </svg>
-);
+const TornEdge = ({ isBottom }) => {
+  const gradientId = isBottom ? "paint-gradient-bottom" : "paint-gradient-top";
+  
+  // Custom organic torn paths with varying peaks and valleys to look hand-torn
+  const d_white_top = "M0,18 L15,4 L35,22 L50,6 L70,24 L85,9 L100,19 L120,4 L138,22 L155,7 L175,20 L190,5 L210,24 L225,8 L245,17 L260,3 L280,21 L295,6 L315,24 L330,9 L350,18 L365,4 L385,22 L400,7 L420,20 L435,5 L455,24 L470,8 L490,17 L505,3 L525,21 L540,6 L560,24 L575,9 L595,18 L610,4 L630,22 L645,7 L665,20 L680,5 L700,24 L715,8 L735,17 L750,3 L770,21 L785,6 L805,24 L820,9 L840,18 L855,4 L875,22 L890,7 L910,20 L925,5 L945,24 L960,8 L980,17 L995,3 L1015,21 L1030,6 L1050,24 L1065,9 L1085,18 L1100,4 L1120,22 L1135,7 L1155,20 L1170,5 L1190,24 L1200,9 L1200,35 L0,35 Z";
+  const d_paint_top = "M0,14 L15,0 L35,18 L50,2 L70,20 L85,5 L100,15 L120,0 L138,18 L155,3 L175,16 L190,1 L210,20 L225,4 L245,13 L260,0 L280,17 L295,2 L315,20 L330,5 L350,14 L365,0 L385,18 L400,3 L420,16 L435,1 L455,20 L470,4 L490,13 L505,0 L525,17 L540,2 L560,20 L575,5 L595,14 L610,0 L630,18 L645,3 L665,16 L680,1 L700,20 L715,4 L735,13 L750,0 L770,17 L785,2 L805,20 L820,5 L840,14 L855,0 L875,18 L890,3 L910,16 L925,1 L945,20 L960,4 L980,13 L995,0 L1015,17 L1030,2 L1050,20 L1065,5 L1085,14 L1100,0 L1120,18 L1135,3 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
+  
+  const d_white_bottom = "M0,12 L15,26 L35,8 L50,24 L70,6 L85,21 L100,11 L120,26 L138,8 L155,23 L175,10 L190,25 L210,6 L225,22 L245,13 L260,27 L280,9 L295,24 L315,6 L330,21 L350,12 L365,26 L385,8 L400,23 L420,10 L435,25 L455,6 L470,22 L490,13 L505,27 L525,9 L540,24 L560,6 L575,21 L595,12 L610,26 L630,8 L645,23 L665,10 L680,25 L700,6 L715,22 L735,13 L750,27 L770,9 L785,24 L805,6 L820,21 L840,12 L855,26 L875,8 L890,23 L910,10 L925,25 L945,6 L960,22 L980,13 L995,27 L1015,9 L1030,24 L1050,6 L1065,21 L1085,12 L1100,26 L1120,8 L1135,23 L1155,10 L1170,25 L1190,6 L1200,21 L1200,0 L0,0 Z";
+  const d_paint_bottom = "M0,16 L15,30 L35,12 L50,28 L70,10 L85,25 L100,15 L120,30 L138,12 L155,27 L175,14 L190,29 L210,10 L225,26 L245,17 L260,31 L280,13 L295,28 L315,10 L330,25 L350,16 L365,30 L385,12 L400,27 L420,14 L435,29 L455,10 L470,26 L490,17 L505,31 L525,13 L540,28 L560,10 L575,25 L595,16 L610,30 L630,12 L645,27 L665,14 L680,29 L700,10 L715,26 L735,17 L750,31 L770,13 L785,28 L805,10 L820,25 L840,16 L855,30 L875,12 L890,27 L910,14 L925,29 L945,10 L960,26 L980,17 L995,31 L1015,13 L1030,28 L1050,10 L1065,25 L1085,16 L1100,30 L1120,12 L1135,27 L1155,14 L1170,29 L1190,10 L1200,25 L1200,0 L0,0 Z";
+
+  return (
+    <svg 
+      width="100%" 
+      height="35" 
+      viewBox="0 0 1200 35" 
+      preserveAspectRatio="none"
+      style={{ 
+        position: 'absolute', 
+        left: 0, 
+        right: 0, 
+        [isBottom ? 'bottom' : 'top']: '-18px', 
+        zIndex: 10,
+        pointerEvents: 'none'
+      }}
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#10B981" />   {/* Emerald */}
+          <stop offset="20%" stopColor="#3B82F6" />  {/* Blue */}
+          <stop offset="40%" stopColor="#8B5CF6" />  {/* Purple */}
+          <stop offset="60%" stopColor="#EC4899" />  {/* Pink */}
+          <stop offset="80%" stopColor="#F59E0B" />  {/* Amber */}
+          <stop offset="100%" stopColor="#EF4444" /> {/* Red */}
+        </linearGradient>
+      </defs>
+      
+      {/* Background Multicolor Paint Layer */}
+      <path 
+        d={isBottom ? d_paint_bottom : d_paint_top} 
+        fill={`url(#${gradientId})`}
+        opacity="0.85"
+      />
+      
+      {/* Foreground White Cover Layer */}
+      <path 
+        d={isBottom ? d_white_bottom : d_white_top} 
+        fill="#FFFFFF" 
+      />
+      
+      {/* Physical depth border line */}
+      <path 
+        d={isBottom ? d_white_bottom : d_white_top} 
+        fill="none"
+        stroke="#E2E8F0"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+};
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
