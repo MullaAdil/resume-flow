@@ -1,34 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, Briefcase, Award, ArrowRightLeft } from 'lucide-react';
+import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
 
-// ── DECKLED TORN PAPER EDGES (VERTICAL) ──
-const VerticalTornEdge = ({ isFlipped }) => {
-  const gradientId = "vertical-paint-gradient";
-  const d_white_vertical = "M0,0 L20,15 L6,35 L22,55 L8,75 L24,95 L9,115 L23,135 L7,155 L21,175 L5,195 L22,215 L8,235 L24,255 L9,275 L23,295 L6,315 L22,335 L8,355 L24,375 L9,395 L21,415 L5,435 L22,455 L8,475 L24,495 L9,515 L23,535 L7,555 L21,575 L5,595 L22,615 L8,635 L24,655 L9,675 L23,695 L6,715 L22,735 L8,755 L24,775 L9,795 L21,815 L5,835 L22,855 L8,875 L24,895 L9,915 L23,935 L7,955 L21,975 L5,995 L22,1015 L8,1035 L24,1055 L9,1075 L23,1095 L6,1115 L22,1135 L8,1155 L24,1175 L9,1190 L20,1200 L0,1200 Z";
-  const d_paint_vertical = "M0,0 L24,15 L10,35 L26,55 L12,75 L28,95 L13,115 L27,135 L11,155 L25,175 L9,195 L26,215 L12,235 L28,255 L13,275 L27,295 L10,315 L26,335 L12,355 L28,375 L13,395 L25,415 L9,435 L26,455 L12,475 L28,495 L13,515 L27,535 L11,555 L25,575 L9,595 L26,615 L12,635 L28,655 L13,675 L27,695 L10,715 L26,735 L12,755 L28,775 L13,795 L25,815 L9,835 L26,855 L12,875 L28,895 L13,915 L27,935 L11,955 L25,975 L9,995 L26,1015 L12,1035 L28,1055 L13,1075 L27,1095 L10,1115 L26,1135 L12,1155 L28,1175 L13,1190 L24,1200 L0,1200 Z";
+// ── DECKLED TORN PAPER EDGES (HORIZONTAL) ──
+const TornEdge = ({ isBottom }) => {
+  const gradientId = isBottom ? "paint-gradient-bottom" : "paint-gradient-top";
+  
+  const d_white_top = "M0,18 L15,4 L35,22 L50,6 L70,24 L85,9 L100,19 L120,4 L138,22 L155,7 L175,20 L190,5 L210,24 L225,8 L245,17 L260,3 L280,21 L295,6 L315,24 L330,9 L350,18 L365,4 L385,22 L400,7 L420,20 L435,5 L455,24 L470,8 L490,17 L505,3 L525,21 L540,6 L560,24 L575,9 L595,18 L610,4 L630,22 L645,7 L665,20 L680,5 L700,24 L715,8 L735,17 L750,3 L770,21 L785,6 L805,24 L820,9 L840,18 L855,4 L875,22 L890,7 L910,20 L925,5 L945,24 L960,8 L980,17 L995,3 L1015,21 L1030,6 L1050,24 L1065,9 L1085,18 L1100,4 L1120,22 L1135,7 L1155,20 L1170,5 L1190,24 L1200,9 L1200,35 L0,35 Z";
+  const d_paint_top = "M0,14 L15,0 L35,18 L50,2 L70,20 L85,5 L100,15 L120,0 L138,18 L155,3 L175,16 L190,1 L210,20 L225,4 L245,13 L260,0 L280,17 L295,2 L315,20 L330,5 L350,14 L365,0 L385,18 L400,3 L420,16 L435,1 L455,20 L470,4 L490,13 L505,0 L525,17 L540,2 L560,20 L575,5 L595,14 L610,0 L630,18 L645,3 L665,16 L680,1 L700,20 L715,4 L735,13 L750,0 L770,17 L785,2 L805,20 L820,5 L840,14 L855,0 L875,18 L890,3 L910,16 L925,1 L945,20 L960,4 L980,13 L995,0 L1015,17 L1030,2 L1050,20 L1065,5 L1085,14 L1100,0 L1120,18 L1135,3 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
+  
+  const d_white_bottom = "M0,12 L15,26 L35,8 L50,24 L70,6 L85,21 L100,11 L120,26 L138,8 L155,23 L175,10 L190,25 L210,6 L225,22 L245,13 L260,27 L280,9 L295,24 L315,6 L330,21 L350,12 L365,26 L385,8 L400,23 L420,10 L435,25 L455,6 L470,22 L490,13 L505,27 L525,9 L540,24 L560,6 L575,21 L595,12 L610,26 L630,8 L645,23 L665,10 L680,25 L700,6 L715,22 L735,13 L750,27 L770,9 L785,24 L805,6 L820,21 L840,12 L855,26 L875,8 L890,23 L910,10 L925,25 L945,6 L960,22 L980,13 L995,27 L1015,9 L1030,24 L1050,6 L1065,21 L1085,12 L1100,26 L1120,8 L1135,23 L1155,10 L1170,25 L1190,6 L1200,21 L1200,0 L0,0 Z";
+  const d_paint_bottom = "M0,16 L15,30 L35,12 L50,28 L70,10 L85,25 L100,15 L120,30 L138,12 L155,27 L175,14 L190,29 L210,10 L225,26 L245,17 L260,31 L280,13 L295,28 L315,10 L330,25 L350,16 L365,30 L385,12 L400,27 L420,14 L435,29 L455,10 L470,26 L490,17 L505,31 L525,13 L540,28 L560,10 L575,25 L595,16 L610,30 L630,12 L645,27 L665,14 L680,29 L700,10 L715,26 L735,17 L750,31 L770,13 L785,28 L805,10 L820,25 L840,16 L855,30 L875,12 L890,27 L910,14 L925,29 L945,10 L960,26 L980,17 L995,31 L1015,13 L1030,28 L1050,10 L1065,25 L1085,16 L1100,30 L1120,12 L1135,27 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
 
   return (
     <svg 
-      width="35" 
-      height="100%" 
-      viewBox="0 0 35 1200" 
+      width="100%" 
+      height="35" 
+      viewBox="0 0 1200 35" 
       preserveAspectRatio="none"
       style={{ 
         position: 'absolute', 
-        top: 0,
-        [isFlipped ? 'left' : 'right']: '-18px', 
-        height: '100%',
-        width: '35px',
+        left: 0, 
+        right: 0, 
+        [isBottom ? 'bottom' : 'top']: '-18px', 
         zIndex: 10,
-        pointerEvents: 'none',
-        transform: isFlipped ? 'scaleX(-1)' : 'none'
+        pointerEvents: 'none'
       }}
     >
       <defs>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#10B981" />
           <stop offset="20%" stopColor="#3B82F6" />
           <stop offset="40%" stopColor="#8B5CF6" />
@@ -37,9 +39,9 @@ const VerticalTornEdge = ({ isFlipped }) => {
           <stop offset="100%" stopColor="#EF4444" />
         </linearGradient>
       </defs>
-      <path d={d_paint_vertical} fill={`url(#${gradientId})`} opacity="0.85" />
-      <path d={d_white_vertical} fill="#FFFFFF" />
-      <path d={d_white_vertical} fill="none" stroke="#E2E8F0" strokeWidth="1.5" />
+      <path d={isBottom ? d_paint_bottom : d_paint_top} fill={`url(#${gradientId})`} opacity="0.85" />
+      <path d={isBottom ? d_white_bottom : d_white_top} fill="#FFFFFF" />
+      <path d={isBottom ? d_white_bottom : d_white_top} fill="none" stroke="#E2E8F0" strokeWidth="1.5" />
     </svg>
   );
 };
@@ -47,7 +49,7 @@ const VerticalTornEdge = ({ isFlipped }) => {
 // ── CREATIVE ANIMATED PAINT DRIPS & SLASHES ──
 const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', borderRadius: '6px' }}>
-    {/* Slash 1: Top-Left to Bottom-Right */}
+    {/* Slash 1 */}
     <motion.svg
       width="100%"
       height="100%"
@@ -65,7 +67,7 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
         transition={{ duration: 0.3, ease: 'easeOut' }}
       />
     </motion.svg>
-    {/* Slash 2: Bottom-Left to Top-Right */}
+    {/* Slash 2 */}
     <motion.svg
       width="100%"
       height="100%"
@@ -115,25 +117,15 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const [flipped, setFlipped] = useState(false);
   
-  // Custom Hover States for Creative Neo-Brutalist Buttons
+  // Hover & Focus states
   const [submitHover, setSubmitHover] = useState(false);
   const [guestHover, setGuestHover] = useState(false);
-
-  // Focus states for sketch outline inputs
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
 
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -168,513 +160,270 @@ const LoginPage = () => {
       minHeight: '100vh',
       width: '100vw',
       display: 'flex',
-      flexDirection: isMobile ? 'column' : (flipped ? 'row-reverse' : 'row'),
+      alignItems: 'center',
+      justifyContent: 'center',
       background: 'var(--bg-color)',
-      overflowX: 'hidden',
-      position: 'relative'
+      position: 'relative',
+      overflow: 'hidden',
+      padding: '2.5rem 1.5rem'
     }}>
-      
-      {/* ── LEFT/RIGHT PANEL: AUTH FORM (Form panel gets more space: 58% on Desktop) ── */}
-      <motion.div 
-        layout
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      {/* Background Soft Watercolor Lighting Blobs */}
+      <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(50px)', zIndex: 0 }} />
+      <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.04) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(50px)', zIndex: 0 }} />
+      <div style={{ position: 'absolute', top: '30%', left: '30%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(45px)', zIndex: 0 }} />
+
+      {/* ── CARD CONTAINER (Centered, Creative Sketched & Torn Edges) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
         style={{
-          flex: isMobile ? '1' : '0 0 58%',
+          width: '100%',
+          maxWidth: '440px',
           background: '#FFFFFF',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: isMobile ? '2.5rem 1.5rem' : '4rem 5.5rem',
+          borderLeft: '4px solid #059669',
+          borderRight: '1.5px solid #CBD5E1',
+          borderTop: 'none',
+          borderBottom: 'none',
+          padding: '3.5rem 2.5rem',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.06)',
           position: 'relative',
-          zIndex: 5,
-          minHeight: isMobile ? 'auto' : '100vh',
-          boxShadow: isMobile ? 'none' : (flipped ? '-10px 0 30px rgba(0, 0, 0, 0.015)' : '10px 0 30px rgba(0, 0, 0, 0.015)')
+          zIndex: 10
         }}
       >
-        {/* Draw vertical torn edge dividing the panels on desktop */}
-        {!isMobile && <VerticalTornEdge isFlipped={flipped} />}
+        {/* Horizontal Torn Edges with Watercolor Paint Backing */}
+        <TornEdge />
+        <TornEdge isBottom />
 
-        {/* Top Control Bar */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%',
-          marginBottom: '2.5rem',
-          alignSelf: 'flex-start'
-        }}>
-          {/* Back Button */}
-          <button 
-            onClick={() => navigate('/')} 
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'transparent',
-              border: 'none',
-              color: '#64748B',
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              padding: 0
-            }}
-          >
-            <ArrowLeft size={16} /> Back to home
-          </button>
+        {/* Back Button */}
+        <button 
+          onClick={() => navigate('/')} 
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'transparent',
+            border: 'none',
+            color: '#64748B',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            marginBottom: '1.5rem',
+            padding: 0
+          }}
+        >
+          <ArrowLeft size={16} /> Back to home
+        </button>
+
+        {/* Logo / Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            padding: '8px',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <FileText size={24} color="#FFFFFF" />
+          </div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+            Elevate Resume
+          </h1>
         </div>
+        <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 2rem 0', fontWeight: 500 }}>
+          {isSignUp ? 'Create your free account to sync resumes.' : 'Sign in to access your saved resumes.'}
+        </p>
 
-        <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
-          {/* Logo / Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
-            <div style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              padding: '8px',
-              borderRadius: '10px',
+        {/* Alerts */}
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
+            >
+              ⚠️ {error}
+            </motion.div>
+          )}
+          {message && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              style={{ background: '#ECFDF5', border: '2px solid #6EE7B7', color: '#047857', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
+            >
+              ✨ {message}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Email input */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Email Address
+            </label>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Mail size={18} /></span>
+              <input 
+                type="email" 
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem 0.75rem 2.75rem',
+                  borderRadius: '8px',
+                  border: '2px solid #E2E8F0',
+                  outline: 'none',
+                  fontSize: '1rem',
+                  color: '#1E293B',
+                  boxShadow: emailFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
+                  borderColor: emailFocus ? '#059669' : '#E2E8F0',
+                  transition: 'all 0.15s ease'
+                }}
+                onFocus={() => setEmailFocus(true)}
+                onBlur={() => setEmailFocus(false)}
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Password input */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Password
+            </label>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Lock size={18} /></span>
+              <input 
+                type="password" 
+                required
+                minLength={6}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem 0.75rem 2.75rem',
+                  borderRadius: '8px',
+                  border: '2px solid #E2E8F0',
+                  outline: 'none',
+                  fontSize: '1rem',
+                  color: '#1E293B',
+                  boxShadow: passFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
+                  borderColor: passFocus ? '#059669' : '#E2E8F0',
+                  transition: 'all 0.15s ease'
+                }}
+                onFocus={() => setPassFocus(true)}
+                onBlur={() => setPassFocus(false)}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button (Creative Sketched Border Style with Slashes & Drips) */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            onMouseEnter={() => setSubmitHover(true)}
+            onMouseLeave={() => setSubmitHover(false)}
+            style={{
+              background: submitHover ? '#059669' : '#FFFFFF',
+              color: submitHover ? '#FFFFFF' : '#059669',
+              border: '2.5px solid #059669',
+              padding: '0.9rem',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '1.05rem',
+              cursor: isLoading ? 'wait' : 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <FileText size={24} color="#FFFFFF" />
-            </div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-              Elevate Resume
-            </h1>
-          </div>
-          
-          <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 2rem 0', fontWeight: 500 }}>
-            {isSignUp ? 'Create your free account to sync resumes.' : 'Sign in to access your saved resumes.'}
-          </p>
-
-          {/* Alerts */}
-          <AnimatePresence mode="wait">
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
-              >
-                ⚠️ {error}
-              </motion.div>
-            )}
-            {message && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                style={{ background: '#ECFDF5', border: '2px solid #6EE7B7', color: '#047857', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
-              >
-                ✨ {message}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Email input */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Email Address
-              </label>
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Mail size={18} /></span>
-                <input 
-                  type="email" 
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem 0.75rem 2.75rem',
-                    borderRadius: '8px',
-                    border: '2px solid #E2E8F0',
-                    outline: 'none',
-                    fontSize: '1rem',
-                    color: '#1E293B',
-                    boxShadow: emailFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                    borderColor: emailFocus ? '#059669' : '#E2E8F0',
-                    transition: 'all 0.15s ease'
-                  }}
-                  onFocus={() => setEmailFocus(true)}
-                  onBlur={() => setEmailFocus(false)}
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Password input */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Password
-              </label>
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Lock size={18} /></span>
-                <input 
-                  type="password" 
-                  required
-                  minLength={6}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem 0.75rem 2.75rem',
-                    borderRadius: '8px',
-                    border: '2px solid #E2E8F0',
-                    outline: 'none',
-                    fontSize: '1rem',
-                    color: '#1E293B',
-                    boxShadow: passFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                    borderColor: passFocus ? '#059669' : '#E2E8F0',
-                    transition: 'all 0.15s ease'
-                  }}
-                  onFocus={() => setPassFocus(true)}
-                  onBlur={() => setPassFocus(false)}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Submit Button (Creative Sketched Border Style with Slashes & Drips) */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              onMouseEnter={() => setSubmitHover(true)}
-              onMouseLeave={() => setSubmitHover(false)}
-              style={{
-                background: submitHover ? '#059669' : '#FFFFFF',
-                color: submitHover ? '#FFFFFF' : '#059669',
-                border: '2.5px solid #059669',
-                padding: '0.9rem',
-                borderRadius: '8px',
-                fontWeight: 800,
-                fontSize: '1.05rem',
-                cursor: isLoading ? 'wait' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                marginTop: '0.5rem',
-                boxShadow: submitHover ? '1px 1px 0px #059669' : '4px 4px 0px #059669',
-                transform: submitHover ? 'translate(3px, 3px)' : 'none',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                opacity: isLoading ? 0.8 : 1,
-                position: 'relative'
-              }}
-            >
-              {/* Background Crossed Paint Slashes */}
-              <CrossedPaintSlashes isHovered={submitHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
-              
-              {/* Bottom Growing Paint Drips */}
-              <PaintDrips isHovered={submitHover} colors={['#10b981', '#3b82f6', '#ec4899']} />
-
-              <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {isLoading ? (
-                  <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                ) : (
-                  <Sparkles size={18} />
-                )}
-                {isSignUp ? 'Create Account' : 'Sign In'}
-              </span>
-            </button>
-          </form>
-
-          {/* Toggle between login and signup */}
-          <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#475569' }}>
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#059669',
-                fontWeight: 700,
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                padding: 0
-              }}
-            >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
-            </button>
-          </div>
-
-          {/* Divider */}
-          <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0' }}>
-            <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
-            <span style={{ padding: '0 0.75rem', fontSize: '0.8rem', color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase' }}>Or</span>
-            <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
-          </div>
-
-          {/* Guest Mode Button (Creative Sketched Border Style with Slashes & Drips) */}
-          <button
-            onClick={handleGuestMode}
-            onMouseEnter={() => setGuestHover(true)}
-            onMouseLeave={() => setGuestHover(false)}
-            style={{
-              width: '100%',
-              background: guestHover ? '#475569' : '#FFFFFF',
-              color: guestHover ? '#FFFFFF' : '#475569',
-              border: '2.5px solid #475569',
-              padding: '0.85rem',
-              borderRadius: '8px',
-              fontSize: '0.95rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              boxShadow: guestHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
-              transform: guestHover ? 'translate(3px, 3px)' : 'none',
+              justifyContent: 'center',
+              gap: '8px',
+              marginTop: '0.5rem',
+              boxShadow: submitHover ? '1px 1px 0px #059669' : '4px 4px 0px #059669',
+              transform: submitHover ? 'translate(3px, 3px)' : 'none',
               transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+              opacity: isLoading ? 0.8 : 1,
               position: 'relative'
             }}
           >
             {/* Background Crossed Paint Slashes */}
-            <CrossedPaintSlashes isHovered={guestHover} primaryColor="#f59e0b" secondaryColor="#ef4444" />
+            <CrossedPaintSlashes isHovered={submitHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
             
             {/* Bottom Growing Paint Drips */}
-            <PaintDrips isHovered={guestHover} colors={['#64748b', '#f59e0b', '#ef4444']} />
+            <PaintDrips isHovered={submitHover} colors={['#10b981', '#3b82f6', '#ec4899']} />
 
-            <span style={{ position: 'relative', zIndex: 1 }}>
-              Continue as Guest (No Cloud Save)
+            <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {isLoading ? (
+                <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+              ) : (
+                <Sparkles size={18} />
+              )}
+              {isSignUp ? 'Create Account' : 'Sign In'}
             </span>
           </button>
+        </form>
+
+        {/* Toggle between login and signup */}
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#475569' }}>
+          {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+          <button
+            onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#059669',
+              fontWeight: 700,
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              padding: 0
+            }}
+          >
+            {isSignUp ? 'Sign In' : 'Sign Up'}
+          </button>
         </div>
-      </motion.div>
 
-      {/* ── RIGHT/LEFT PANEL: INTERACTIVE THEME & SHOWCASE (Compact 42% Width on Desktop) ── */}
-      <motion.div 
-        layout
-        onClick={() => !isMobile && setFlipped(!flipped)}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          flex: isMobile ? 'none' : '1',
-          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(59, 130, 246, 0.02) 25%, rgba(139, 92, 246, 0.02) 55%, rgba(236, 72, 153, 0.02) 80%, rgba(245, 158, 11, 0.01) 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2rem 1.5rem',
-          position: 'relative',
-          overflow: 'hidden',
-          minHeight: isMobile ? '320px' : '100vh',
-          zIndex: 1,
-          cursor: isMobile ? 'default' : 'pointer'
-        }}
-      >
-        {/* Soft Watercolor Radial Ambient Lights */}
-        <div style={{ position: 'absolute', top: '15%', right: '15%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.04) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(45px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '20%', left: '15%', width: '320px', height: '320px', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.03) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(45px)', pointerEvents: 'none' }} />
+        {/* Divider */}
+        <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0' }}>
+          <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
+          <span style={{ padding: '0 0.75rem', fontSize: '0.8rem', color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase' }}>Or</span>
+          <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
+        </div>
 
-        <div style={{
-          maxWidth: '400px',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          gap: '1.75rem',
-          zIndex: 10
-        }}>
-          {/* Header Texts (No AI Badge, Extremely Minimal) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
-              Your Resume. <br />
-              <span style={{ background: 'linear-gradient(135deg, #059669 0%, #3b82f6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Redefined.
-              </span>
-            </h2>
-            <p style={{ color: '#475569', fontSize: '0.85rem', fontWeight: 500, margin: 0, maxWidth: '320px', alignSelf: 'center', lineHeight: 1.4 }}>
-              Upload, customize, and cloud-sync your professional resume with absolute ease.
-            </p>
-          </div>
-
-          {/* ── VISUAL RESUME SHOWCASE (Floating Cards) ── */}
-          <div style={{
-            position: 'relative',
+        {/* Guest Mode Button (Creative Sketched Border Style with Slashes & Drips) */}
+        <button
+          onClick={handleGuestMode}
+          onMouseEnter={() => setGuestHover(true)}
+          onMouseLeave={() => setGuestHover(false)}
+          style={{
             width: '100%',
-            height: '190px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: '0.25rem'
-          }}>
-            {/* Background Sheet 1 */}
-            <motion.div
-              animate={{ 
-                y: [0, -8, 0],
-                rotate: [-6, -4, -6]
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: 'easeInOut'
-              }}
-              style={{
-                position: 'absolute',
-                width: '125px',
-                height: '160px',
-                background: '#FFFFFF',
-                borderRadius: '8px',
-                boxShadow: '0 6px 20px rgba(0,0,0,0.03)',
-                border: '1px solid #F1F5F9',
-                transform: 'rotate(-6deg) translateX(-85px)',
-                zIndex: 2,
-                opacity: 0.65,
-                padding: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px'
-              }}
-            >
-              <div style={{ height: '8px', width: '60%', background: '#E2E8F0', borderRadius: '3px' }} />
-              <div style={{ height: '5px', width: '40%', background: '#F1F5F9', borderRadius: '2px' }} />
-              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '2px 0' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ height: '4px', width: '90%', background: '#F8FAFC', borderRadius: '1px' }} />
-                <div style={{ height: '4px', width: '80%', background: '#F8FAFC', borderRadius: '1px' }} />
-              </div>
-            </motion.div>
+            background: guestHover ? '#475569' : '#FFFFFF',
+            color: guestHover ? '#FFFFFF' : '#475569',
+            border: '2.5px solid #475569',
+            padding: '0.85rem',
+            borderRadius: '8px',
+            fontSize: '0.95rem',
+            fontWeight: 800,
+            cursor: 'pointer',
+            boxShadow: guestHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
+            transform: guestHover ? 'translate(3px, 3px)' : 'none',
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            position: 'relative'
+          }}
+        >
+          {/* Background Crossed Paint Slashes */}
+          <CrossedPaintSlashes isHovered={guestHover} primaryColor="#f59e0b" secondaryColor="#ef4444" />
+          
+          {/* Bottom Growing Paint Drips */}
+          <PaintDrips isHovered={guestHover} colors={['#64748b', '#f59e0b', '#ef4444']} />
 
-            {/* Background Sheet 2 */}
-            <motion.div
-              animate={{ 
-                y: [0, -10, 0],
-                rotate: [6, 4, 6]
-              }}
-              transition={{
-                duration: 5.5,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: 0.5
-              }}
-              style={{
-                position: 'absolute',
-                width: '125px',
-                height: '160px',
-                background: '#FFFFFF',
-                borderRadius: '8px',
-                boxShadow: '0 6px 20px rgba(0,0,0,0.03)',
-                border: '1px solid #F1F5F9',
-                transform: 'rotate(6deg) translateX(85px)',
-                zIndex: 2,
-                opacity: 0.65,
-                padding: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '5px'
-              }}
-            >
-              <div style={{ height: '8px', width: '70%', background: '#D1FAE5', borderRadius: '3px' }} />
-              <div style={{ height: '5px', width: '30%', background: '#ECFDF5', borderRadius: '2px' }} />
-              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '2px 0' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ height: '4px', width: '80%', background: '#F8FAFC', borderRadius: '1px' }} />
-                <div style={{ height: '4px', width: '85%', background: '#F8FAFC', borderRadius: '1px' }} />
-              </div>
-            </motion.div>
-
-            {/* Main Interactive Resume Card */}
-            <motion.div
-              animate={{ 
-                y: [0, -12, 0]
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: 'easeInOut'
-              }}
-              style={{
-                width: '160px',
-                height: '190px',
-                background: '#FFFFFF',
-                borderRadius: '8px',
-                boxShadow: '0 15px 35px rgba(0, 0, 0, 0.05)',
-                border: '1px solid #E2E8F0',
-                padding: '12px',
-                zIndex: 5,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-                textAlign: 'left',
-                position: 'relative'
-              }}
-            >
-              {/* Mini Resume Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 800, color: '#475569' }}>
-                  AM
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>Alex Morgan</div>
-                  <div style={{ fontSize: '0.5rem', fontWeight: 600, color: '#059669' }}>AI Product Designer</div>
-                </div>
-              </div>
-
-              {/* Decorative Resume Sections */}
-              <div style={{ borderBottom: '1.5px solid #F1F5F9', margin: '2px 0' }} />
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                  <Briefcase size={8} color="#64748B" />
-                  <span style={{ fontSize: '0.5rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Experience</span>
-                </div>
-                <div style={{ paddingLeft: '4px', borderLeft: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <div>
-                    <div style={{ fontSize: '0.55rem', fontWeight: 800, color: '#1E293B', lineHeight: 1.1 }}>Senior Lead at Google</div>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '1px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                  <Award size={8} color="#64748B" />
-                  <span style={{ fontSize: '0.5rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Skills</span>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px' }}>
-                  {['React', 'UI/UX'].map((skill, i) => (
-                    <span key={i} style={{ fontSize: '0.45rem', fontWeight: 700, padding: '1px 3px', borderRadius: '2px', background: i === 1 ? '#ECFDF5' : '#F1F5F9', color: i === 1 ? '#059669' : '#475569' }}>
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Floating Badge on Main Card */}
-              <div style={{
-                position: 'absolute',
-                top: '-5px',
-                right: '-5px',
-                background: '#10B981',
-                color: '#FFFFFF',
-                fontSize: '0.45rem',
-                fontWeight: 800,
-                padding: '1.5px 5px',
-                borderRadius: '20px',
-                boxShadow: '0 2px 4px rgba(16,185,129,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1px'
-              }}>
-                <Sparkles size={5} /> AI Active
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Interactive Flip Hint */}
-          <span style={{
-            fontSize: '0.7rem',
-            color: '#94A3B8',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            background: 'rgba(241, 245, 249, 0.6)',
-            border: '1.5px dashed #E2E8F0',
-            padding: '4px 10px',
-            borderRadius: '20px',
-            marginTop: '0.25rem',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px'
-          }}>
-            <ArrowRightLeft size={9} /> Click to flip layout
+          <span style={{ position: 'relative', zIndex: 1 }}>
+            Continue as Guest (No Cloud Save)
           </span>
-
-        </div>
+        </button>
       </motion.div>
 
       {/* Basic rotating spinner animation */}
