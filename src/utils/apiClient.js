@@ -1,5 +1,8 @@
 const TOKEN_KEY = 'auth_token';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+let API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+if (API_BASE_URL && !API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsWith('https://')) {
+  API_BASE_URL = `https://${API_BASE_URL}`;
+}
 
 // Helper function to perform fetch requests with JWT token automatically attached
 async function request(url, options = {}) {
