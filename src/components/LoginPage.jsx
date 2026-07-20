@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
+import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, ArrowRightLeft } from 'lucide-react';
 
 // ── DECKLED TORN PAPER EDGES (HORIZONTAL) ──
 const TornEdge = ({ isBottom }) => {
@@ -49,7 +49,6 @@ const TornEdge = ({ isBottom }) => {
 // ── CREATIVE ANIMATED PAINT DRIPS & SLASHES ──
 const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', borderRadius: '6px' }}>
-    {/* Slash 1 */}
     <motion.svg
       width="100%"
       height="100%"
@@ -67,7 +66,6 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
         transition={{ duration: 0.3, ease: 'easeOut' }}
       />
     </motion.svg>
-    {/* Slash 2 */}
     <motion.svg
       width="100%"
       height="100%"
@@ -117,7 +115,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
   // Hover & Focus states
   const [submitHover, setSubmitHover] = useState(false);
@@ -129,7 +127,7 @@ const LoginPage = () => {
   const { signUp, signIn } = useAuth();
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -171,18 +169,18 @@ const LoginPage = () => {
       padding: '2.5rem 1.5rem'
     }}>
       {/* Background Soft Watercolor Lighting Blobs */}
-      <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(50px)', zIndex: 0 }} />
-      <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.04) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(50px)', zIndex: 0 }} />
+      <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(55px)', zIndex: 0 }} />
+      <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(55px)', zIndex: 0 }} />
       <div style={{ position: 'absolute', top: '30%', left: '30%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(45px)', zIndex: 0 }} />
 
-      {/* ── CARD CONTAINER (Big & Horizontal, 800px wide) ── */}
+      {/* ── CARD CONTAINER (Tri-fold Horizontal Landscape, 960px wide) ── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         style={{
           width: '100%',
-          maxWidth: '820px',
+          maxWidth: '960px',
           background: '#FFFFFF',
           borderLeft: '4px solid #059669',
           borderRight: '1.5px solid #CBD5E1',
@@ -200,14 +198,14 @@ const LoginPage = () => {
         <TornEdge />
         <TornEdge isBottom />
 
-        {/* ── LEFT PANEL: LOGO & WELCOME (Takes 42% width) ── */}
+        {/* ── COLUMN 1: BRANDING (Left, 28% width) ── */}
         <div style={{
-          flex: isMobile ? 'none' : '0 0 42%',
-          padding: isMobile ? '2.5rem 2rem 2rem 2rem' : '3.5rem 3rem',
+          flex: isMobile ? 'none' : '0 0 28%',
+          padding: isMobile ? '2.5rem 2rem 1.5rem 2rem' : '3.5rem 2.5rem',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
-          gap: '1rem',
+          gap: '1.5rem',
           borderRight: isMobile ? 'none' : '1px dashed #E2E8F0',
           borderBottom: isMobile ? '1px dashed #E2E8F0' : 'none'
         }}>
@@ -233,7 +231,7 @@ const LoginPage = () => {
             </button>
 
             {/* Logo / Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
               <div style={{
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 padding: '8px',
@@ -244,27 +242,30 @@ const LoginPage = () => {
               }}>
                 <FileText size={24} color="#FFFFFF" />
               </div>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-                Elevate Resume
+              <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+                Elevate
               </h1>
             </div>
 
-            <p style={{ fontSize: '1rem', color: '#1E293B', margin: '0 0 1.5rem 0', fontWeight: 600, lineHeight: 1.5 }}>
-              Upload your old document and let our AI transform it into a professional, high-impact resume in seconds.
+            <p style={{ fontSize: '0.95rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
+              Upload your old document and let our AI transform it into a professional, job-ready resume in seconds.
             </p>
           </div>
         </div>
 
-        {/* ── RIGHT PANEL: MAIN LOGIN FORM (Takes 58% width) ── */}
+        {/* ── COLUMN 2: CREDENTIALS FORM (Middle, 40% width) ── */}
         <div style={{
-          flex: isMobile ? '1' : '0 0 58%',
-          padding: '3.5rem 3rem'
+          flex: isMobile ? '1' : '0 0 40%',
+          padding: isMobile ? '2rem' : '3.5rem 2.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
         }}>
-          <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.5rem 0' }}>
-            {isSignUp ? 'Create your Account' : 'Welcome Back'}
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.4rem 0' }}>
+            {isSignUp ? 'Create Account' : 'Sign In'}
           </h2>
-          <p style={{ fontSize: '0.95rem', color: '#334155', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
-            {isSignUp ? 'Fill in your details below to get started.' : 'Sign in to sync your saved resumes.'}
+          <p style={{ fontSize: '0.9rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
+            {isSignUp ? 'Fill in details to get started.' : 'Sign in to access saved resumes.'}
           </p>
 
           {/* Alerts */}
@@ -291,9 +292,9 @@ const LoginPage = () => {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {/* Email input (Paint Drips grow when focused / entering details) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* Email input */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Email Address
               </label>
@@ -326,8 +327,8 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Password input (Paint Drips grow when focused / entering details) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {/* Password input */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Password
               </label>
@@ -402,25 +403,28 @@ const LoginPage = () => {
               </span>
             </button>
           </form>
+        </div>
 
-          {/* Large Creative Callout Block for switching account modes */}
+        {/* ── COLUMN 3: CALLOUT BLOCK / SWITCH MODE (Right, 32% width) ── */}
+        <div style={{
+          flex: isMobile ? 'none' : '0 0 32%',
+          padding: isMobile ? '1.5rem 2rem 2.5rem 2rem' : '3.5rem 2.5rem',
+          background: '#F8FAFC',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          gap: '1rem',
+          borderLeft: isMobile ? 'none' : '1px dashed #E2E8F0',
+          borderTop: isMobile ? '1px dashed #E2E8F0' : 'none'
+        }}>
           {isSignUp ? (
-            <div style={{
-              background: '#F8FAFC',
-              border: '2px dashed #CBD5E1',
-              borderRadius: '8px',
-              padding: '1.25rem',
-              textAlign: 'center',
-              marginTop: '2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-              alignItems: 'center'
-            }}>
-              <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0F172A' }}>
+            <>
+              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A' }}>
                 Already have an account?
               </span>
-              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.4 }}>
+              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.45 }}>
                 Sign in with your email to load and continue editing your saved resumes.
               </span>
               <button
@@ -432,15 +436,17 @@ const LoginPage = () => {
                   background: '#FFFFFF',
                   color: '#475569',
                   border: '2.5px solid #475569',
-                  padding: '0.6rem 1.5rem',
+                  padding: '0.75rem 1.5rem',
                   borderRadius: '8px',
                   fontWeight: 800,
-                  fontSize: '0.9rem',
+                  fontSize: '0.95rem',
                   cursor: 'pointer',
                   boxShadow: toggleHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
                   transform: toggleHover ? 'translate(3px, 3px)' : 'none',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  position: 'relative'
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '220px'
                 }}
               >
                 <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#64748b" secondaryColor="#475569" />
@@ -449,24 +455,13 @@ const LoginPage = () => {
                   Sign In Instead
                 </span>
               </button>
-            </div>
+            </>
           ) : (
-            <div style={{
-              background: '#F8FAFC',
-              border: '2px dashed #E2E8F0',
-              borderRadius: '8px',
-              padding: '1.25rem',
-              textAlign: 'center',
-              marginTop: '2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
-              alignItems: 'center'
-            }}>
-              <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0F172A' }}>
+            <>
+              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A' }}>
                 New to Elevate Resume?
               </span>
-              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.4 }}>
+              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.45 }}>
                 Create a free account to securely save and back up your resumes in the cloud.
               </span>
               <button
@@ -478,15 +473,17 @@ const LoginPage = () => {
                   background: '#FFFFFF',
                   color: '#2563EB',
                   border: '2.5px solid #2563EB',
-                  padding: '0.6rem 1.5rem',
+                  padding: '0.75rem 1.5rem',
                   borderRadius: '8px',
                   fontWeight: 800,
-                  fontSize: '0.9rem',
+                  fontSize: '0.95rem',
                   cursor: 'pointer',
                   boxShadow: toggleHover ? '1px 1px 0px #2563EB' : '4px 4px 0px #2563EB',
                   transform: toggleHover ? 'translate(3px, 3px)' : 'none',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  position: 'relative'
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '220px'
                 }}
               >
                 <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#3b82f6" secondaryColor="#8b5cf6" />
@@ -495,7 +492,7 @@ const LoginPage = () => {
                   Create an Account
                 </span>
               </button>
-            </div>
+            </>
           )}
         </div>
       </motion.div>
