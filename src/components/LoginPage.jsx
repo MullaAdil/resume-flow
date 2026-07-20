@@ -57,7 +57,10 @@ const LoginPage = () => {
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
   const [submitHover, setSubmitHover] = useState(false);
-  const [toggleHover, setToggleHover] = useState(false);
+
+  // Header Tab Hover states
+  const [signInHover, setSignInHover] = useState(false);
+  const [signUpHover, setSignUpHover] = useState(false);
 
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
@@ -118,7 +121,7 @@ const LoginPage = () => {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'visible',
-        height: isMobile ? 'auto' : '490px' // Keep height balanced for smooth page flips
+        height: isMobile ? 'auto' : '490px'
       }}>
         
         {/* Layer 1: Bottom Colorful Artist Cover (Static backing) */}
@@ -229,11 +232,64 @@ const LoginPage = () => {
                 flexDirection: 'column',
                 justifyContent: 'center'
               }}>
-                <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.4rem 0' }}>
-                  {isSignUp ? 'Create Account' : 'Welcome Back'}
-                </h2>
+                
+                {/* ── NEW DUAL-TAB TOGGLE SELECTOR (HIGHLY VISIBLE / BIG BLOCKS) ── */}
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '12px', 
+                  marginBottom: '1.25rem', 
+                  width: '100%',
+                  position: 'relative'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => { if (isSignUp) { setIsSignUp(false); setError(''); setMessage(''); } }}
+                    onMouseEnter={() => setSignInHover(true)}
+                    onMouseLeave={() => setSignInHover(false)}
+                    style={{
+                      flex: 1,
+                      padding: '0.85rem',
+                      borderRadius: '8px',
+                      background: !isSignUp ? '#FFFFFF' : '#F8FAFC',
+                      color: '#0F172A',
+                      border: !isSignUp ? '2.5px solid #0F172A' : '1.5px solid #E2E8F0',
+                      fontWeight: 800,
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      position: 'relative'
+                    }}
+                  >
+                    {!isSignUp && <PaintDrips isHovered={signInHover} offset="-10px" height="12px" />}
+                    <span style={{ position: 'relative', zIndex: 1 }}>Sign In</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => { if (!isSignUp) { setIsSignUp(true); setError(''); setMessage(''); } }}
+                    onMouseEnter={() => setSignUpHover(true)}
+                    onMouseLeave={() => setSignUpHover(false)}
+                    style={{
+                      flex: 1,
+                      padding: '0.85rem',
+                      borderRadius: '8px',
+                      background: isSignUp ? '#FFFFFF' : '#F8FAFC',
+                      color: '#0F172A',
+                      border: isSignUp ? '2.5px solid #0F172A' : '1.5px solid #E2E8F0',
+                      fontWeight: 800,
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      position: 'relative'
+                    }}
+                  >
+                    {isSignUp && <PaintDrips isHovered={signUpHover} offset="-10px" height="12px" />}
+                    <span style={{ position: 'relative', zIndex: 1 }}>Create Account</span>
+                  </button>
+                </div>
+
                 <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
-                  {isSignUp ? 'Fill in details to get started.' : 'Sign in to access saved resumes.'}
+                  {isSignUp ? 'Fill in your email and password to register.' : 'Sign in to access saved resumes.'}
                 </p>
 
                 {/* Alerts */}
@@ -424,50 +480,6 @@ const LoginPage = () => {
                     </span>
                   </button>
                 </form>
-
-                {/* Inline Compact Switch Mode Callout Block */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  background: '#F8FAFC',
-                  border: '1.5px solid #E2E8F0',
-                  borderRadius: '8px',
-                  padding: '0.85rem 1.25rem',
-                  marginTop: '1.5rem',
-                  width: '100%',
-                  gap: '1rem'
-                }}>
-                  <span style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
-                    {isSignUp ? 'Already have an account?' : 'New to Elevate Resume?'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-                    onMouseEnter={() => setToggleHover(true)}
-                    onMouseLeave={() => setToggleHover(false)}
-                    style={{
-                      background: '#FFFFFF',
-                      color: isSignUp ? '#475569' : '#2563EB',
-                      border: isSignUp ? '1.5px solid #CBD5E1' : '1.5px solid #2563EB',
-                      padding: '0.4rem 1rem',
-                      borderRadius: '6px',
-                      fontWeight: 800,
-                      fontSize: '0.85rem',
-                      cursor: 'pointer',
-                      boxShadow: 'none',
-                      transform: 'none',
-                      transition: 'all 0.15s ease',
-                      position: 'relative'
-                    }}
-                  >
-                    {/* Bottom Growing Paint Drips */}
-                    <PaintDrips isHovered={toggleHover} offset="-10px" height="12px" />
-                    <span style={{ position: 'relative', zIndex: 1 }}>
-                      {isSignUp ? 'Sign In' : 'Create Account'}
-                    </span>
-                  </button>
-                </div>
               </div>
             </motion.div>
           </AnimatePresence>
