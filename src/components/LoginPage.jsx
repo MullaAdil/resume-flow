@@ -182,10 +182,8 @@ const LoginPage = () => {
           width: '100%',
           maxWidth: '960px',
           background: '#FFFFFF',
-          borderLeft: '4px solid #059669',
-          borderRight: '1.5px solid #CBD5E1',
-          borderTop: 'none',
-          borderBottom: 'none',
+          border: '1.5px solid #E2E8F0',
+          borderRadius: '12px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.06)',
           position: 'relative',
           zIndex: 10,
@@ -311,8 +309,8 @@ const LoginPage = () => {
                     outline: 'none',
                     fontSize: '1rem',
                     color: '#0F172A',
-                    boxShadow: emailFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                    borderColor: emailFocus ? '#059669' : '#CBD5E1',
+                    boxShadow: 'none',
+                    borderColor: emailFocus ? '#94A3B8' : '#CBD5E1',
                     transition: 'all 0.15s ease'
                   }}
                   onFocus={() => setEmailFocus(true)}
@@ -346,8 +344,8 @@ const LoginPage = () => {
                     outline: 'none',
                     fontSize: '1rem',
                     color: '#0F172A',
-                    boxShadow: passFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                    borderColor: passFocus ? '#059669' : '#CBD5E1',
+                    boxShadow: 'none',
+                    borderColor: passFocus ? '#94A3B8' : '#CBD5E1',
                     transition: 'all 0.15s ease'
                   }}
                   onFocus={() => setPassFocus(true)}
@@ -370,8 +368,8 @@ const LoginPage = () => {
               onMouseLeave={() => setSubmitHover(false)}
               style={{
                 background: '#FFFFFF',
-                color: '#059669',
-                border: '2.5px solid #059669',
+                color: '#0F172A',
+                border: '2.5px solid #0F172A',
                 padding: '0.9rem',
                 borderRadius: '8px',
                 fontWeight: 800,
@@ -382,7 +380,7 @@ const LoginPage = () => {
                 justifyContent: 'center',
                 gap: '8px',
                 marginTop: '0.5rem',
-                boxShadow: submitHover ? '1px 1px 0px #059669' : '4px 4px 0px #059669',
+                boxShadow: submitHover ? '1px 1px 0px #0F172A' : '4px 4px 0px #0F172A',
                 transform: submitHover ? 'translate(3px, 3px)' : 'none',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 opacity: isLoading ? 0.8 : 1,
