@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'auth_token';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Helper function to perform fetch requests with JWT token automatically attached
 async function request(url, options = {}) {
@@ -13,7 +14,7 @@ async function request(url, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, {
+  const response = await fetch(`${API_BASE_URL}${url}`, {
     ...options,
     headers,
   });
