@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
+import { FileText, ArrowLeft, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 
 // ── CREATIVE ANIMATED PAINT DRIPS (FULL WIDTH CONTINUOUS WAVE) ──
 const PaintDrips = ({ isHovered, offset = "-12px", height = "14px" }) => {
@@ -54,20 +54,46 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  // Hover & Focus states
-  const [submitHover, setSubmitHover] = useState(false);
-  const [toggleHover, setToggleHover] = useState(false);
+  // 3D Flip Card state (true = password stage, false = email stage)
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  // Focus & Hover states
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
+  const [emailBtnHover, setEmailBtnHover] = useState(false);
+  const [submitHover, setSubmitHover] = useState(false);
+  const [toggleHover, setToggleHover] = useState(false);
 
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
+  const passwordInputRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Focus password input automatically when flipped to password stage
+  useEffect(() => {
+    if (isFlipped) {
+      setTimeout(() => {
+        passwordInputRef.current?.focus();
+      }, 300);
+    }
+  }, [isFlipped]);
+
+  const handleNextStage = (e) => {
+    e.preventDefault();
+    setError('');
+    
+    // Simple Email validation
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    setIsFlipped(true);
+  };
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -110,366 +136,539 @@ const LoginPage = () => {
       <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(55px)', zIndex: 0 }} />
       <div style={{ position: 'absolute', top: '30%', left: '30%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(45px)', zIndex: 0 }} />
 
-      {/* ── STACKED PAGES WRAPPER (70% width) ── */}
+      {/* ── STACKED 3D FLIPPING PAGES CONTAINER (70% width) ── */}
       <div style={{
-        position: 'relative',
+        perspective: '1500px',
         width: isMobile ? '95%' : '70%',
         maxWidth: '1000px',
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'visible'
+        overflow: 'visible',
+        height: isMobile ? 'auto' : '450px' // Keep height fixed on desktop for seamless 3D flips
       }}>
         
-        {/* Layer 1: Bottom Colorful Artist Cover */}
-        <div style={{
-          position: 'absolute',
-          inset: isMobile ? '-6px -3px' : '-10px -5px',
-          background: 'linear-gradient(135deg, #10B981 0%, #3B82F6 25%, #8B5CF6 50%, #EC4899 75%, #F59E0B 100%)',
-          borderRadius: '16px',
-          transform: isMobile ? 'rotate(1.2deg) translateY(3px)' : 'rotate(2.2deg) translateY(6px)',
-          zIndex: 1,
-          boxShadow: '0 15px 35px rgba(0,0,0,0.06)',
-          opacity: 0.95
-        }} />
-
-        {/* Layer 2: Middle Stacked Document Page */}
-        <div style={{
-          position: 'absolute',
-          inset: '0',
-          background: '#FFFFFF',
-          border: '1.5px solid #E2E8F0',
-          borderRadius: '12px',
-          transform: isMobile ? 'rotate(-0.8deg) translateY(-2px)' : 'rotate(-1.6deg) translateY(-4px)',
-          zIndex: 2,
-          boxShadow: '0 8px 25px rgba(0,0,0,0.02)'
-        }} />
-
-        {/* Layer 3: Top Main Card Container (Containing the formal login layout) */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={{ duration: 0.65, ease: [0.2, 0.8, 0.2, 1] }}
           style={{
             width: '100%',
-            background: '#FFFFFF',
-            border: '1.5px solid #CBD5E1',
-            borderRadius: '12px',
+            height: '100%',
             position: 'relative',
-            zIndex: 3,
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-            overflow: 'hidden',
-            boxShadow: '0 20px 45px rgba(0, 0, 0, 0.04)'
+            transformStyle: 'preserve-3d',
+            overflow: 'visible'
           }}
         >
-          {/* ── LEFT PANEL: BRANDING (40% width) ── */}
+          {/* ──────────────────────────────────────────────────────── */}
+          {/* ── FRONT FACE: EMAIL STAGE ───────────────────────────── */}
+          {/* ──────────────────────────────────────────────────────── */}
           <div style={{
-            flex: isMobile ? 'none' : '0 0 40%',
-            padding: isMobile ? '2.5rem 2rem 1.5rem 2rem' : '3.5rem 3rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            gap: '1.5rem',
-            borderRight: isMobile ? 'none' : '1px dashed #E2E8F0',
-            borderBottom: isMobile ? '1px dashed #E2E8F0' : 'none'
+            backfaceVisibility: 'hidden',
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+            zIndex: isFlipped ? 1 : 2
           }}>
-            <div>
-              {/* Back Button */}
-              <button 
-                onClick={() => navigate('/')} 
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#475569',
-                  fontSize: '0.95rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  marginBottom: '2rem',
-                  padding: 0
-                }}
-              >
-                <ArrowLeft size={16} /> Back to home
-              </button>
+            {/* Layer 1: Bottom Colorful Artist Cover */}
+            <div style={{
+              position: 'absolute',
+              inset: isMobile ? '-6px -3px' : '-10px -5px',
+              background: 'linear-gradient(135deg, #10B981 0%, #3B82F6 25%, #8B5CF6 50%, #EC4899 75%, #F59E0B 100%)',
+              borderRadius: '16px',
+              transform: isMobile ? 'rotate(1.2deg) translateY(3px)' : 'rotate(2.2deg) translateY(6px)',
+              zIndex: 1,
+              boxShadow: '0 15px 35px rgba(0,0,0,0.06)',
+              opacity: 0.95
+            }} />
 
-              {/* Logo / Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
-                <div style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  padding: '8px',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <FileText size={24} color="#FFFFFF" />
+            {/* Layer 2: Middle Stacked Document Page */}
+            <div style={{
+              position: 'absolute',
+              inset: '0',
+              background: '#FFFFFF',
+              border: '1.5px solid #E2E8F0',
+              borderRadius: '12px',
+              transform: isMobile ? 'rotate(-0.8deg) translateY(-2px)' : 'rotate(-1.6deg) translateY(-4px)',
+              zIndex: 2,
+              boxShadow: '0 8px 25px rgba(0,0,0,0.02)'
+            }} />
+
+            {/* Layer 3: Top Main Card Container */}
+            <div style={{
+              width: '100%',
+              height: '100%',
+              background: '#FFFFFF',
+              border: '1.5px solid #CBD5E1',
+              borderRadius: '12px',
+              position: 'relative',
+              zIndex: 3,
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              overflow: 'hidden',
+              boxShadow: '0 20px 45px rgba(0, 0, 0, 0.04)'
+            }}>
+              {/* Left Branding Panel */}
+              <div style={{
+                flex: isMobile ? 'none' : '0 0 40%',
+                padding: isMobile ? '2rem' : '3.5rem 3rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                gap: '1.5rem',
+                borderRight: isMobile ? 'none' : '1px dashed #E2E8F0',
+                borderBottom: isMobile ? '1px dashed #E2E8F0' : 'none'
+              }}>
+                <div>
+                  <button 
+                    onClick={() => navigate('/')} 
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#475569',
+                      fontSize: '0.95rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      marginBottom: '2rem',
+                      padding: 0
+                    }}
+                  >
+                    <ArrowLeft size={16} /> Back to home
+                  </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      padding: '8px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FileText size={24} color="#FFFFFF" />
+                    </div>
+                    <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+                      Elevate Resume
+                    </h1>
+                  </div>
+                  <p style={{ fontSize: '1rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
+                    Upload your old document and let our AI transform it into a professional, job-ready resume in seconds.
+                  </p>
                 </div>
-                <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-                  Elevate Resume
-                </h1>
               </div>
 
-              <p style={{ fontSize: '1rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
-                Upload your old document and let our AI transform it into a professional, job-ready resume in seconds.
-              </p>
+              {/* Right Form Panel (Email stage) */}
+              <div style={{
+                flex: isMobile ? '1' : '0 0 60%',
+                padding: isMobile ? '2rem' : '3.5rem 3rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}>
+                <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.4rem 0' }}>
+                  {isSignUp ? 'Create Account' : 'Welcome Back'}
+                </h2>
+                <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
+                  Enter your email address to get started.
+                </p>
+
+                {error && (
+                  <div style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 600 }}>
+                    ⚠️ {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleNextStage} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Email Address
+                    </label>
+                    <div style={{ position: 'relative', overflow: 'visible' }}>
+                      <motion.div
+                        animate={{
+                          transform: emailFocus ? 'rotate(1.2deg) translateY(2px)' : 'rotate(0.8deg) translateY(1.5px)',
+                          opacity: emailFocus ? 1 : 0.7
+                        }}
+                        style={{
+                          position: 'absolute',
+                          inset: '1px -1px -3px -1px',
+                          background: 'linear-gradient(135deg, #10B981, #3B82F6, #EC4899)',
+                          borderRadius: '8px',
+                          zIndex: 1,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <motion.div
+                        animate={{
+                          transform: emailFocus ? 'rotate(-0.8deg) translateY(-1px)' : 'rotate(-0.5deg) translateY(-0.5px)'
+                        }}
+                        style={{
+                          position: 'absolute',
+                          inset: '0',
+                          background: '#FFFFFF',
+                          border: '1.5px solid #E2E8F0',
+                          borderRadius: '8px',
+                          zIndex: 2,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569', zIndex: 4 }}><Mail size={18} /></span>
+                      <input 
+                        type="email" 
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem 0.75rem 2.75rem',
+                          borderRadius: '8px',
+                          border: '2.5px solid #CBD5E1',
+                          outline: 'none',
+                          fontSize: '1rem',
+                          color: '#0F172A',
+                          boxShadow: 'none',
+                          borderColor: emailFocus ? '#0F172A' : '#CBD5E1',
+                          background: '#FFFFFF',
+                          position: 'relative',
+                          zIndex: 3,
+                          transition: 'all 0.15s ease'
+                        }}
+                        onFocus={() => setEmailFocus(true)}
+                        onBlur={() => setEmailFocus(false)}
+                        placeholder="name@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    onMouseEnter={() => setEmailBtnHover(true)}
+                    onMouseLeave={() => setEmailBtnHover(false)}
+                    style={{
+                      background: '#FFFFFF',
+                      color: '#0F172A',
+                      border: '2.5px solid #0F172A',
+                      padding: '0.9rem',
+                      borderRadius: '8px',
+                      fontWeight: 800,
+                      fontSize: '1.05rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      marginTop: '0.5rem',
+                      boxShadow: 'none',
+                      transform: 'none',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      position: 'relative'
+                    }}
+                  >
+                    <PaintDrips isHovered={emailBtnHover} offset="-12px" height="16px" />
+                    <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      Continue <ArrowRight size={18} />
+                    </span>
+                  </button>
+                </form>
+
+                {/* Inline Compact Toggle Switch */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1.25rem',
+                  marginTop: '1.5rem',
+                  width: '100%',
+                  gap: '1rem'
+                }}>
+                  <span style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
+                    {isSignUp ? 'Already have an account?' : 'New to Elevate Resume?'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { setIsSignUp(!isSignUp); setError(''); }}
+                    onMouseEnter={() => setToggleHover(true)}
+                    onMouseLeave={() => setToggleHover(false)}
+                    style={{
+                      background: '#FFFFFF',
+                      color: isSignUp ? '#475569' : '#2563EB',
+                      border: isSignUp ? '1.5px solid #CBD5E1' : '1.5px solid #2563EB',
+                      padding: '0.4rem 1rem',
+                      borderRadius: '6px',
+                      fontWeight: 800,
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      boxShadow: 'none',
+                      transform: 'none',
+                      transition: 'all 0.15s ease',
+                      position: 'relative'
+                    }}
+                  >
+                    <PaintDrips isHovered={toggleHover} offset="-10px" height="12px" />
+                    <span style={{ position: 'relative', zIndex: 1 }}>
+                      {isSignUp ? 'Sign In' : 'Create Account'}
+                    </span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* ── RIGHT PANEL: MAIN FORM & COMPACT SWITCH (60% width) ── */}
+          {/* ──────────────────────────────────────────────────────── */}
+          {/* ── BACK FACE: PASSWORD STAGE ─────────────────────────── */}
+          {/* ──────────────────────────────────────────────────────── */}
           <div style={{
-            flex: isMobile ? '1' : '0 0 60%',
-            padding: isMobile ? '2rem' : '3.5rem 3rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center'
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: isFlipped ? 2 : 1
           }}>
-            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.4rem 0' }}>
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
-            </h2>
-            <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
-              {isSignUp ? 'Fill in details to get started.' : 'Sign in to access saved resumes.'}
-            </p>
-
-            {/* Alerts */}
-            <AnimatePresence mode="wait">
-              {error && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 600 }}
-                >
-                  ⚠️ {error}
-                </motion.div>
-              )}
-              {message && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  style={{ background: '#ECFDF5', border: '2px solid #6EE7B7', color: '#047857', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 600 }}
-                >
-                  ✨ {message}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              {/* Email input */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Email Address
-                </label>
-                <div style={{ position: 'relative', overflow: 'visible' }}>
-                  {/* Stacked Sheet 1 (Bottom colorful cover layer) */}
-                  <motion.div
-                    animate={{
-                      transform: emailFocus ? 'rotate(1.2deg) translateY(2px)' : 'rotate(0.8deg) translateY(1.5px)',
-                      opacity: emailFocus ? 1 : 0.7
-                    }}
-                    style={{
-                      position: 'absolute',
-                      inset: '1px -1px -3px -1px',
-                      background: 'linear-gradient(135deg, #10B981, #3B82F6, #EC4899)',
-                      borderRadius: '8px',
-                      zIndex: 1,
-                      pointerEvents: 'none'
-                    }}
-                  />
-                  {/* Stacked Sheet 2 (Middle white sheet layer) */}
-                  <motion.div
-                    animate={{
-                      transform: emailFocus ? 'rotate(-0.8deg) translateY(-1px)' : 'rotate(-0.5deg) translateY(-0.5px)'
-                    }}
-                    style={{
-                      position: 'absolute',
-                      inset: '0',
-                      background: '#FFFFFF',
-                      border: '1.5px solid #E2E8F0',
-                      borderRadius: '8px',
-                      zIndex: 2,
-                      pointerEvents: 'none'
-                    }}
-                  />
-
-                  <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569', zIndex: 4 }}><Mail size={18} /></span>
-                  <input 
-                    type="email" 
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem 0.75rem 2.75rem',
-                      borderRadius: '8px',
-                      border: '2.5px solid #CBD5E1',
-                      outline: 'none',
-                      fontSize: '1rem',
-                      color: '#0F172A',
-                      boxShadow: 'none',
-                      borderColor: emailFocus ? '#0F172A' : '#CBD5E1',
-                      background: '#FFFFFF',
-                      position: 'relative',
-                      zIndex: 3,
-                      transition: 'all 0.15s ease'
-                    }}
-                    onFocus={() => setEmailFocus(true)}
-                    onBlur={() => setEmailFocus(false)}
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Password input */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Password
-                </label>
-                <div style={{ position: 'relative', overflow: 'visible' }}>
-                  {/* Stacked Sheet 1 (Bottom colorful cover layer) */}
-                  <motion.div
-                    animate={{
-                      transform: passFocus ? 'rotate(1.2deg) translateY(2px)' : 'rotate(0.8deg) translateY(1.5px)',
-                      opacity: passFocus ? 1 : 0.7
-                    }}
-                    style={{
-                      position: 'absolute',
-                      inset: '1px -1px -3px -1px',
-                      background: 'linear-gradient(135deg, #8B5CF6, #EC4899, #F59E0B)',
-                      borderRadius: '8px',
-                      zIndex: 1,
-                      pointerEvents: 'none'
-                    }}
-                  />
-                  {/* Stacked Sheet 2 (Middle white sheet layer) */}
-                  <motion.div
-                    animate={{
-                      transform: passFocus ? 'rotate(-0.8deg) translateY(-1px)' : 'rotate(-0.5deg) translateY(-0.5px)'
-                    }}
-                    style={{
-                      position: 'absolute',
-                      inset: '0',
-                      background: '#FFFFFF',
-                      border: '1.5px solid #E2E8F0',
-                      borderRadius: '8px',
-                      zIndex: 2,
-                      pointerEvents: 'none'
-                    }}
-                  />
-
-                  <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569', zIndex: 4 }}><Lock size={18} /></span>
-                  <input 
-                    type="password" 
-                    required
-                    minLength={6}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem 0.75rem 2.75rem',
-                      borderRadius: '8px',
-                      border: '2.5px solid #CBD5E1',
-                      outline: 'none',
-                      fontSize: '1rem',
-                      color: '#0F172A',
-                      boxShadow: 'none',
-                      borderColor: passFocus ? '#0F172A' : '#CBD5E1',
-                      background: '#FFFFFF',
-                      position: 'relative',
-                      zIndex: 3,
-                      transition: 'all 0.15s ease'
-                    }}
-                    onFocus={() => setPassFocus(true)}
-                    onBlur={() => setPassFocus(false)}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                onMouseEnter={() => setSubmitHover(true)}
-                onMouseLeave={() => setSubmitHover(false)}
-                style={{
-                  background: '#FFFFFF',
-                  color: '#0F172A',
-                  border: '2.5px solid #0F172A',
-                  padding: '0.9rem',
-                  borderRadius: '8px',
-                  fontWeight: 800,
-                  fontSize: '1.05rem',
-                  cursor: isLoading ? 'wait' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  marginTop: '0.5rem',
-                  boxShadow: 'none',
-                  transform: 'none',
-                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  opacity: isLoading ? 0.8 : 1,
-                  position: 'relative'
-                }}
-              >
-                {/* Bottom Growing Paint Drips (stretches full width) */}
-                <PaintDrips isHovered={submitHover} offset="-12px" height="16px" />
-
-                <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {isLoading && (
-                    <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                  )}
-                  {isSignUp ? 'Create Account' : 'Sign In'}
-                </span>
-              </button>
-            </form>
-
-            {/* Inline Compact Switch Mode Callout Block */}
+            {/* Layer 1: Bottom Colorful Artist Cover */}
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: '#F8FAFC',
+              position: 'absolute',
+              inset: isMobile ? '-6px -3px' : '-10px -5px',
+              background: 'linear-gradient(135deg, #10B981 0%, #3B82F6 25%, #8B5CF6 50%, #EC4899 75%, #F59E0B 100%)',
+              borderRadius: '16px',
+              transform: isMobile ? 'rotate(1.2deg) translateY(3px)' : 'rotate(2.2deg) translateY(6px)',
+              zIndex: 1,
+              boxShadow: '0 15px 35px rgba(0,0,0,0.06)',
+              opacity: 0.95
+            }} />
+
+            {/* Layer 2: Middle Stacked Document Page */}
+            <div style={{
+              position: 'absolute',
+              inset: '0',
+              background: '#FFFFFF',
               border: '1.5px solid #E2E8F0',
-              borderRadius: '8px',
-              padding: '0.85rem 1.25rem',
-              marginTop: '1.5rem',
+              borderRadius: '12px',
+              transform: isMobile ? 'rotate(-0.8deg) translateY(-2px)' : 'rotate(-1.6deg) translateY(-4px)',
+              zIndex: 2,
+              boxShadow: '0 8px 25px rgba(0,0,0,0.02)'
+            }} />
+
+            {/* Layer 3: Top Main Card Container */}
+            <div style={{
               width: '100%',
-              gap: '1rem'
+              height: '100%',
+              background: '#FFFFFF',
+              border: '1.5px solid #CBD5E1',
+              borderRadius: '12px',
+              position: 'relative',
+              zIndex: 3,
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              overflow: 'hidden',
+              boxShadow: '0 20px 45px rgba(0, 0, 0, 0.04)'
             }}>
-              <span style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
-                {isSignUp ? 'Already have an account?' : 'New to Elevate Resume?'}
-              </span>
-              <button
-                type="button"
-                onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-                onMouseEnter={() => setToggleHover(true)}
-                onMouseLeave={() => setToggleHover(false)}
-                style={{
-                  background: '#FFFFFF',
-                  color: isSignUp ? '#475569' : '#2563EB',
-                  border: isSignUp ? '1.5px solid #CBD5E1' : '1.5px solid #2563EB',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '6px',
-                  fontWeight: 800,
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  boxShadow: 'none',
-                  transform: 'none',
-                  transition: 'all 0.15s ease',
-                  position: 'relative'
-                }}
-              >
-                {/* Bottom Growing Paint Drips (stretches full width) */}
-                <PaintDrips isHovered={toggleHover} offset="-10px" height="12px" />
-                <span style={{ position: 'relative', zIndex: 1 }}>
-                  {isSignUp ? 'Sign In' : 'Create Account'}
-                </span>
-              </button>
+              {/* Left Branding Panel */}
+              <div style={{
+                flex: isMobile ? 'none' : '0 0 40%',
+                padding: isMobile ? '2rem' : '3.5rem 3rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                gap: '1.5rem',
+                borderRight: isMobile ? 'none' : '1px dashed #E2E8F0',
+                borderBottom: isMobile ? '1px dashed #E2E8F0' : 'none'
+              }}>
+                <div>
+                  <button 
+                    onClick={() => setIsFlipped(false)} 
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#475569',
+                      fontSize: '0.95rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      marginBottom: '2rem',
+                      padding: 0
+                    }}
+                  >
+                    <ArrowLeft size={16} /> Edit Email
+                  </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      padding: '8px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FileText size={24} color="#FFFFFF" />
+                    </div>
+                    <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+                      Elevate Resume
+                    </h1>
+                  </div>
+                  <p style={{ fontSize: '1rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
+                    Upload your old document and let our AI transform it into a professional, job-ready resume in seconds.
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Form Panel (Password stage) */}
+              <div style={{
+                flex: isMobile ? '1' : '0 0 60%',
+                padding: isMobile ? '2rem' : '3.5rem 3rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}>
+                <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.4rem 0' }}>
+                  Enter Password
+                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1.5rem' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#64748B', fontWeight: 600 }}>Account:</span>
+                  <span style={{ fontSize: '0.85rem', color: '#0F172A', fontWeight: 700, textDecoration: 'underline' }}>{email}</span>
+                  <button
+                    onClick={() => setIsFlipped(false)}
+                    style={{ background: 'transparent', border: 'none', color: '#2563EB', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer', padding: '2px 6px', textDecoration: 'underline' }}
+                  >
+                    Change
+                  </button>
+                </div>
+
+                {/* Alerts */}
+                <AnimatePresence mode="wait">
+                  {error && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 600 }}
+                    >
+                      ⚠️ {error}
+                    </motion.div>
+                  )}
+                  {message && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      style={{ background: '#ECFDF5', border: '2px solid #6EE7B7', color: '#047857', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 600 }}
+                    >
+                      ✨ {message}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Password
+                    </label>
+                    <div style={{ position: 'relative', overflow: 'visible' }}>
+                      <motion.div
+                        animate={{
+                          transform: passFocus ? 'rotate(1.2deg) translateY(2px)' : 'rotate(0.8deg) translateY(1.5px)',
+                          opacity: passFocus ? 1 : 0.7
+                        }}
+                        style={{
+                          position: 'absolute',
+                          inset: '1px -1px -3px -1px',
+                          background: 'linear-gradient(135deg, #8B5CF6, #EC4899, #F59E0B)',
+                          borderRadius: '8px',
+                          zIndex: 1,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <motion.div
+                        animate={{
+                          transform: passFocus ? 'rotate(-0.8deg) translateY(-1px)' : 'rotate(-0.5deg) translateY(-0.5px)'
+                        }}
+                        style={{
+                          position: 'absolute',
+                          inset: '0',
+                          background: '#FFFFFF',
+                          border: '1.5px solid #E2E8F0',
+                          borderRadius: '8px',
+                          zIndex: 2,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569', zIndex: 4 }}><Lock size={18} /></span>
+                      <input 
+                        ref={passwordInputRef}
+                        type="password" 
+                        required
+                        minLength={6}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem 0.75rem 2.75rem',
+                          borderRadius: '8px',
+                          border: '2.5px solid #CBD5E1',
+                          outline: 'none',
+                          fontSize: '1rem',
+                          color: '#0F172A',
+                          boxShadow: 'none',
+                          borderColor: passFocus ? '#0F172A' : '#CBD5E1',
+                          background: '#FFFFFF',
+                          position: 'relative',
+                          zIndex: 3,
+                          transition: 'all 0.15s ease'
+                        }}
+                        onFocus={() => setPassFocus(true)}
+                        onBlur={() => setPassFocus(false)}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    onMouseEnter={() => setSubmitHover(true)}
+                    onMouseLeave={() => setSubmitHover(false)}
+                    style={{
+                      background: '#FFFFFF',
+                      color: '#0F172A',
+                      border: '2.5px solid #0F172A',
+                      padding: '0.9rem',
+                      borderRadius: '8px',
+                      fontWeight: 800,
+                      fontSize: '1.05rem',
+                      cursor: isLoading ? 'wait' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      marginTop: '0.5rem',
+                      boxShadow: 'none',
+                      transform: 'none',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      opacity: isLoading ? 0.8 : 1,
+                      position: 'relative'
+                    }}
+                  >
+                    <PaintDrips isHovered={submitHover} offset="-12px" height="16px" />
+                    <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {isLoading && (
+                        <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                      )}
+                      {isSignUp ? 'Create Account' : 'Sign In'}
+                    </span>
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </motion.div>
