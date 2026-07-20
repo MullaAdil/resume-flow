@@ -2,49 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, CheckCircle, Zap, Briefcase, Award, ArrowRightLeft } from 'lucide-react';
-
-// ── DECKLED TORN PAPER EDGES (HORIZONTAL) ──
-const TornEdge = ({ isBottom }) => {
-  const gradientId = isBottom ? "paint-gradient-bottom" : "paint-gradient-top";
-  
-  const d_white_top = "M0,18 L15,4 L35,22 L50,6 L70,24 L85,9 L100,19 L120,4 L138,22 L155,7 L175,20 L190,5 L210,24 L225,8 L245,17 L260,3 L280,21 L295,6 L315,24 L330,9 L350,18 L365,4 L385,22 L400,7 L420,20 L435,5 L455,24 L470,8 L490,17 L505,3 L525,21 L540,6 L560,24 L575,9 L595,18 L610,4 L630,22 L645,7 L665,20 L680,5 L700,24 L715,8 L735,17 L750,3 L770,21 L785,6 L805,24 L820,9 L840,18 L855,4 L875,22 L890,7 L910,20 L925,5 L945,24 L960,8 L980,17 L995,3 L1015,21 L1030,6 L1050,24 L1065,9 L1085,18 L1100,4 L1120,22 L1135,7 L1155,20 L1170,5 L1190,24 L1200,9 L1200,35 L0,35 Z";
-  const d_paint_top = "M0,14 L15,0 L35,18 L50,2 L70,20 L85,5 L100,15 L120,0 L138,18 L155,3 L175,16 L190,1 L210,20 L225,4 L245,13 L260,0 L280,17 L295,2 L315,20 L330,5 L350,14 L365,0 L385,18 L400,3 L420,16 L435,1 L455,20 L470,4 L490,13 L505,0 L525,17 L540,2 L560,20 L575,5 L595,14 L610,0 L630,18 L645,3 L665,16 L680,1 L700,20 L715,4 L735,13 L750,0 L770,17 L785,2 L805,20 L820,5 L840,14 L855,0 L875,18 L890,3 L910,16 L925,1 L945,20 L960,4 L980,13 L995,0 L1015,17 L1030,2 L1050,20 L1065,5 L1085,14 L1100,0 L1120,18 L1135,3 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
-  
-  const d_white_bottom = "M0,12 L15,26 L35,8 L50,24 L70,6 L85,21 L100,11 L120,26 L138,8 L155,23 L175,10 L190,25 L210,6 L225,22 L245,13 L260,27 L280,9 L295,24 L315,6 L330,21 L350,12 L365,26 L385,8 L400,23 L420,10 L435,25 L455,6 L470,22 L490,13 L505,27 L525,9 L540,24 L560,6 L575,21 L595,12 L610,26 L630,8 L645,23 L665,10 L680,25 L700,6 L715,22 L735,13 L750,27 L770,9 L785,24 L805,6 L820,21 L840,12 L855,26 L875,8 L890,23 L910,10 L925,25 L945,6 L960,22 L980,13 L995,27 L1015,9 L1030,24 L1050,6 L1065,21 L1085,12 L1100,26 L1120,8 L1135,23 L1155,10 L1170,25 L1190,6 L1200,21 L1200,0 L0,0 Z";
-  const d_paint_bottom = "M0,16 L15,30 L35,12 L50,28 L70,10 L85,25 L100,15 L120,30 L138,12 L155,27 L175,14 L190,29 L210,10 L225,26 L245,17 L260,31 L280,13 L295,28 L315,10 L330,25 L350,16 L365,30 L385,12 L400,27 L420,14 L435,29 L455,10 L470,26 L490,17 L505,31 L525,13 L540,28 L560,10 L575,25 L595,16 L610,30 L630,12 L645,27 L665,14 L680,29 L700,10 L715,26 L735,17 L750,31 L770,13 L785,28 L805,10 L820,25 L840,16 L855,30 L875,12 L890,27 L910,14 L925,29 L945,10 L960,26 L980,17 L995,31 L1015,13 L1030,28 L1050,10 L1065,25 L1085,16 L1100,30 L1120,12 L1135,27 L1155,14 L1170,29 L1190,10 L1200,25 L1200,0 L0,0 Z";
-
-  return (
-    <svg 
-      width="100%" 
-      height="35" 
-      viewBox="0 0 1200 35" 
-      preserveAspectRatio="none"
-      style={{ 
-        position: 'absolute', 
-        left: 0, 
-        right: 0, 
-        [isBottom ? 'bottom' : 'top']: '-18px', 
-        zIndex: 10,
-        pointerEvents: 'none'
-      }}
-    >
-      <defs>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#10B981" />
-          <stop offset="20%" stopColor="#3B82F6" />
-          <stop offset="40%" stopColor="#8B5CF6" />
-          <stop offset="60%" stopColor="#EC4899" />
-          <stop offset="80%" stopColor="#F59E0B" />
-          <stop offset="100%" stopColor="#EF4444" />
-        </linearGradient>
-      </defs>
-      <path d={isBottom ? d_paint_bottom : d_paint_top} fill={`url(#${gradientId})`} opacity="0.85" />
-      <path d={isBottom ? d_white_bottom : d_white_top} fill="#FFFFFF" />
-      <path d={isBottom ? d_white_bottom : d_white_top} fill="none" stroke="#E2E8F0" strokeWidth="1.5" />
-    </svg>
-  );
-};
+import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, Briefcase, Award } from 'lucide-react';
 
 // ── DECKLED TORN PAPER EDGES (VERTICAL) ──
 const VerticalTornEdge = ({ isFlipped }) => {
@@ -95,6 +53,15 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [flipped, setFlipped] = useState(false);
+  
+  // Custom Hover States for Creative Neo-Brutalist Buttons
+  const [submitHover, setSubmitHover] = useState(false);
+  const [guestHover, setGuestHover] = useState(false);
+
+  // Focus states for sketch outline inputs
+  const [emailFocus, setEmailFocus] = useState(false);
+  const [passFocus, setPassFocus] = useState(false);
+
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
 
@@ -163,7 +130,7 @@ const LoginPage = () => {
         {/* Draw vertical torn edge dividing the panels on desktop */}
         {!isMobile && <VerticalTornEdge isFlipped={flipped} />}
 
-        {/* Top Control Bar (Back & Flip Buttons) */}
+        {/* Top Control Bar (Back Button only, flip happens by clicking resume) */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -190,31 +157,6 @@ const LoginPage = () => {
           >
             <ArrowLeft size={16} /> Back to home
           </button>
-
-          {/* Flip Layout Button (Only visible on Desktop) */}
-          {!isMobile && (
-            <button
-              onClick={() => setFlipped(!flipped)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(241, 245, 249, 0.8)',
-                border: '1px solid #E2E8F0',
-                color: '#475569',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                padding: '6px 12px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.borderColor = '#CBD5E1'; }}
-              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(241, 245, 249, 0.8)'; e.currentTarget.style.borderColor = '#E2E8F0'; }}
-            >
-              <ArrowRightLeft size={13} /> Flip Layout
-            </button>
-          )}
         </div>
 
         <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
@@ -246,7 +188,7 @@ const LoginPage = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 500 }}
+                style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
               >
                 ⚠️ {error}
               </motion.div>
@@ -256,7 +198,7 @@ const LoginPage = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                style={{ background: '#ECFDF5', border: '1px solid #6EE7B7', color: '#047857', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
+                style={{ background: '#ECFDF5', border: '2px solid #6EE7B7', color: '#047857', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
               >
                 ✨ {message}
               </motion.div>
@@ -277,15 +219,17 @@ const LoginPage = () => {
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem 0.75rem 2.75rem',
-                    borderRadius: '10px',
-                    border: '1.5px solid #E2E8F0',
+                    borderRadius: '8px',
+                    border: '2px solid #E2E8F0',
                     outline: 'none',
                     fontSize: '1rem',
                     color: '#1E293B',
+                    boxShadow: emailFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
+                    borderColor: emailFocus ? '#059669' : '#E2E8F0',
                     transition: 'all 0.15s ease'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#059669'}
-                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+                  onFocus={() => setEmailFocus(true)}
+                  onBlur={() => setEmailFocus(false)}
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -307,15 +251,17 @@ const LoginPage = () => {
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem 0.75rem 2.75rem',
-                    borderRadius: '10px',
-                    border: '1.5px solid #E2E8F0',
+                    borderRadius: '8px',
+                    border: '2px solid #E2E8F0',
                     outline: 'none',
                     fontSize: '1rem',
                     color: '#1E293B',
+                    boxShadow: passFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
+                    borderColor: passFocus ? '#059669' : '#E2E8F0',
                     transition: 'all 0.15s ease'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#059669'}
-                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+                  onFocus={() => setPassFocus(true)}
+                  onBlur={() => setPassFocus(false)}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -323,16 +269,19 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* Submit Button (Creative Sketched Border Style) */}
             <button
               type="submit"
               disabled={isLoading}
+              onMouseEnter={() => setSubmitHover(true)}
+              onMouseLeave={() => setSubmitHover(false)}
               style={{
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: '#FFFFFF',
-                border: 'none',
+                background: submitHover ? '#059669' : '#FFFFFF',
+                color: submitHover ? '#FFFFFF' : '#059669',
+                border: '2.5px solid #059669',
                 padding: '0.9rem',
-                borderRadius: '10px',
-                fontWeight: 700,
+                borderRadius: '8px',
+                fontWeight: 800,
                 fontSize: '1.05rem',
                 cursor: isLoading ? 'wait' : 'pointer',
                 display: 'flex',
@@ -340,8 +289,9 @@ const LoginPage = () => {
                 justifyContent: 'center',
                 gap: '8px',
                 marginTop: '0.5rem',
-                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
-                transition: 'all 0.15s ease',
+                boxShadow: submitHover ? '1px 1px 0px #059669' : '4px 4px 0px #059669',
+                transform: submitHover ? 'translate(3px, 3px)' : 'none',
+                transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
                 opacity: isLoading ? 0.8 : 1
               }}
             >
@@ -380,23 +330,25 @@ const LoginPage = () => {
             <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
           </div>
 
-          {/* Guest Mode */}
+          {/* Guest Mode Button (Creative Sketched Border Style) */}
           <button
             onClick={handleGuestMode}
+            onMouseEnter={() => setGuestHover(true)}
+            onMouseLeave={() => setGuestHover(false)}
             style={{
               width: '100%',
-              background: 'transparent',
-              border: '2px dashed #CBD5E1',
-              color: '#475569',
+              background: guestHover ? '#475569' : '#FFFFFF',
+              color: guestHover ? '#FFFFFF' : '#475569',
+              border: '2.5px solid #475569',
               padding: '0.85rem',
-              borderRadius: '10px',
+              borderRadius: '8px',
               fontSize: '0.95rem',
-              fontWeight: 700,
+              fontWeight: 800,
               cursor: 'pointer',
-              transition: 'all 0.15s ease'
+              boxShadow: guestHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
+              transform: guestHover ? 'translate(3px, 3px)' : 'none',
+              transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
-            onMouseOver={(e) => { e.currentTarget.style.borderColor = '#059669'; e.currentTarget.style.color = '#059669'; }}
-            onMouseOut={(e) => { e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.color = '#475569'; }}
           >
             Continue as Guest (No Cloud Save)
           </button>
@@ -406,66 +358,66 @@ const LoginPage = () => {
       {/* ── RIGHT/LEFT PANEL: INTERACTIVE THEME & SHOWCASE (Light Multicolor Pastel Canvas) ── */}
       <motion.div 
         layout
+        onClick={() => !isMobile && setFlipped(!flipped)}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
           flex: isMobile ? 'none' : '1',
-          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(59, 130, 246, 0.03) 25%, rgba(139, 92, 246, 0.03) 55%, rgba(236, 72, 153, 0.03) 80%, rgba(245, 158, 11, 0.02) 100%)',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(59, 130, 246, 0.02) 25%, rgba(139, 92, 246, 0.02) 55%, rgba(236, 72, 153, 0.02) 80%, rgba(245, 158, 11, 0.01) 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '3rem 2rem',
+          padding: '2.5rem 2rem',
           position: 'relative',
           overflow: 'hidden',
-          minHeight: isMobile ? '400px' : '100vh',
-          zIndex: 1
+          minHeight: isMobile ? '360px' : '100vh',
+          zIndex: 1,
+          cursor: isMobile ? 'default' : 'pointer'
         }}
       >
         {/* Soft Watercolor Radial Ambient Lights */}
-        <div style={{ position: 'absolute', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(55px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '15%', left: '10%', width: '450px', height: '450px', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: '40%', left: '35%', width: '350px', height: '350px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: '15%', right: '15%', width: '350px', height: '350px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '20%', left: '15%', width: '380px', height: '380px', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.04) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
 
         <div style={{
-          maxWidth: '540px',
+          maxWidth: '480px',
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
-          gap: '2.5rem',
+          gap: '2rem',
           zIndex: 10
         }}>
           {/* Header Texts */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1 }}
               style={{
-                background: 'rgba(16, 185, 129, 0.06)',
-                border: '1.5px solid rgba(16, 185, 129, 0.15)',
+                background: 'rgba(16, 185, 129, 0.05)',
+                border: '1.5px solid rgba(16, 185, 129, 0.1)',
                 color: '#047857',
-                padding: '0.4rem 1rem',
+                padding: '0.35rem 0.9rem',
                 borderRadius: '30px',
-                fontSize: '0.85rem',
+                fontSize: '0.8rem',
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 alignSelf: 'center',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '5px'
               }}
             >
-              <Sparkles size={14} /> AI-Powered Resume Builder
+              <Sparkles size={12} /> AI Resume Builder
             </motion.div>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
               Create Resumes That <br />
               <span style={{ background: 'linear-gradient(135deg, #059669 0%, #3b82f6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Get You Shortlisted
               </span>
             </h2>
-            <p style={{ color: '#475569', fontSize: '1rem', fontWeight: 500, margin: 0, maxWidth: '440px', alignSelf: 'center' }}>
+            <p style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 500, margin: 0, maxWidth: '380px', alignSelf: 'center', lineHeight: 1.4 }}>
               Upload your old document and let our AI transform it into a gorgeous, job-winning resume in seconds.
             </p>
           </div>
@@ -474,15 +426,16 @@ const LoginPage = () => {
           <div style={{
             position: 'relative',
             width: '100%',
-            height: '240px',
+            height: '210px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            marginTop: '0.5rem'
           }}>
             {/* Background Sheet 1 */}
             <motion.div
               animate={{ 
-                y: [0, -10, 0],
+                y: [0, -8, 0],
                 rotate: [-6, -4, -6]
               }}
               transition={{
@@ -492,35 +445,34 @@ const LoginPage = () => {
               }}
               style={{
                 position: 'absolute',
-                width: '160px',
-                height: '210px',
+                width: '140px',
+                height: '180px',
                 background: '#FFFFFF',
                 borderRadius: '8px',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                boxShadow: '0 6px 20px rgba(0,0,0,0.04)',
                 border: '1px solid #F1F5F9',
-                transform: 'rotate(-6deg) translateX(-110px)',
+                transform: 'rotate(-6deg) translateX(-95px)',
                 zIndex: 2,
-                opacity: 0.7,
-                padding: '12px',
+                opacity: 0.65,
+                padding: '10px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px'
+                gap: '6px'
               }}
             >
-              <div style={{ height: '14px', width: '60%', background: '#E2E8F0', borderRadius: '4px' }} />
-              <div style={{ height: '8px', width: '40%', background: '#F1F5F9', borderRadius: '2px' }} />
-              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '4px 0' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ height: '6px', width: '90%', background: '#F8FAFC', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '80%', background: '#F8FAFC', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '85%', background: '#F8FAFC', borderRadius: '2px' }} />
+              <div style={{ height: '10px', width: '60%', background: '#E2E8F0', borderRadius: '3px' }} />
+              <div style={{ height: '6px', width: '40%', background: '#F1F5F9', borderRadius: '2px' }} />
+              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '2px 0' }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div style={{ height: '4px', width: '90%', background: '#F8FAFC', borderRadius: '1px' }} />
+                <div style={{ height: '4px', width: '80%', background: '#F8FAFC', borderRadius: '1px' }} />
               </div>
             </motion.div>
 
             {/* Background Sheet 2 */}
             <motion.div
               animate={{ 
-                y: [0, -12, 0],
+                y: [0, -10, 0],
                 rotate: [6, 4, 6]
               }}
               transition={{
@@ -531,35 +483,34 @@ const LoginPage = () => {
               }}
               style={{
                 position: 'absolute',
-                width: '160px',
-                height: '210px',
+                width: '140px',
+                height: '180px',
                 background: '#FFFFFF',
                 borderRadius: '8px',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                boxShadow: '0 6px 20px rgba(0,0,0,0.04)',
                 border: '1px solid #F1F5F9',
-                transform: 'rotate(6deg) translateX(110px)',
+                transform: 'rotate(6deg) translateX(95px)',
                 zIndex: 2,
-                opacity: 0.7,
-                padding: '12px',
+                opacity: 0.65,
+                padding: '10px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px'
+                gap: '6px'
               }}
             >
-              <div style={{ height: '14px', width: '70%', background: '#D1FAE5', borderRadius: '4px' }} />
-              <div style={{ height: '8px', width: '30%', background: '#ECFDF5', borderRadius: '2px' }} />
-              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '4px 0' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ height: '6px', width: '80%', background: '#F8FAFC', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '90%', background: '#F8FAFC', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '75%', background: '#F8FAFC', borderRadius: '2px' }} />
+              <div style={{ height: '10px', width: '70%', background: '#D1FAE5', borderRadius: '3px' }} />
+              <div style={{ height: '6px', width: '30%', background: '#ECFDF5', borderRadius: '2px' }} />
+              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '2px 0' }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div style={{ height: '4px', width: '80%', background: '#F8FAFC', borderRadius: '1px' }} />
+                <div style={{ height: '4px', width: '85%', background: '#F8FAFC', borderRadius: '1px' }} />
               </div>
             </motion.div>
 
             {/* Main Interactive Resume Card */}
             <motion.div
               animate={{ 
-                y: [0, -15, 0]
+                y: [0, -12, 0]
               }}
               transition={{
                 duration: 5,
@@ -567,57 +518,56 @@ const LoginPage = () => {
                 ease: 'easeInOut'
               }}
               style={{
-                width: '210px',
-                height: '240px',
+                width: '180px',
+                height: '210px',
                 background: '#FFFFFF',
-                borderRadius: '10px',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
+                borderRadius: '8px',
+                boxShadow: '0 15px 35px rgba(0, 0, 0, 0.06)',
                 border: '1px solid #E2E8F0',
-                padding: '16px',
+                padding: '14px',
                 zIndex: 5,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '10px',
+                gap: '8px',
                 textAlign: 'left',
                 position: 'relative'
               }}
             >
               {/* Mini Resume Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#475569' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 800, color: '#475569' }}>
                   AM
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>Alex Morgan</div>
-                  <div style={{ fontSize: '0.65rem', fontWeight: 600, color: '#059669' }}>AI Product Designer</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.1 }}>Alex Morgan</div>
+                  <div style={{ fontSize: '0.55rem', fontWeight: 600, color: '#059669' }}>AI Product Designer</div>
                 </div>
               </div>
 
               {/* Decorative Resume Sections */}
               <div style={{ borderBottom: '1.5px solid #F1F5F9', margin: '2px 0' }} />
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Briefcase size={10} color="#64748B" />
-                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Experience</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <Briefcase size={8} color="#64748B" />
+                  <span style={{ fontSize: '0.55rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Experience</span>
                 </div>
-                <div style={{ paddingLeft: '6px', borderLeft: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ paddingLeft: '5px', borderLeft: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: '3px' }}>
                   <div>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#1E293B', lineHeight: 1.1 }}>Senior Lead at Google</div>
-                    <div style={{ fontSize: '0.6rem', color: '#94A3B8' }}>2024 - Present</div>
+                    <div style={{ fontSize: '0.6rem', fontWeight: 800, color: '#1E293B', lineHeight: 1.1 }}>Senior Lead at Google</div>
+                    <div style={{ fontSize: '0.5rem', color: '#94A3B8' }}>2024 - Present</div>
                   </div>
-                  <div style={{ height: '4px', width: '90%', background: '#F1F5F9', borderRadius: '1px' }} />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Award size={10} color="#64748B" />
-                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Skills</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                  <Award size={8} color="#64748B" />
+                  <span style={{ fontSize: '0.55rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Skills</span>
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-                  {['React', 'UI/UX', 'Figma', 'Node'].map((skill, i) => (
-                    <span key={i} style={{ fontSize: '0.55rem', fontWeight: 700, padding: '2px 5px', borderRadius: '4px', background: i === 1 ? '#ECFDF5' : '#F1F5F9', color: i === 1 ? '#059669' : '#475569' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px' }}>
+                  {['React', 'UI/UX', 'Node'].map((skill, i) => (
+                    <span key={i} style={{ fontSize: '0.5rem', fontWeight: 700, padding: '1px 4px', borderRadius: '3px', background: i === 1 ? '#ECFDF5' : '#F1F5F9', color: i === 1 ? '#059669' : '#475569' }}>
                       {skill}
                     </span>
                   ))}
@@ -627,56 +577,42 @@ const LoginPage = () => {
               {/* Floating Badge on Main Card */}
               <div style={{
                 position: 'absolute',
-                top: '-8px',
-                right: '-8px',
+                top: '-6px',
+                right: '-6px',
                 background: '#10B981',
                 color: '#FFFFFF',
-                fontSize: '0.6rem',
+                fontSize: '0.5rem',
                 fontWeight: 800,
-                padding: '3px 8px',
+                padding: '2px 6px',
                 borderRadius: '20px',
-                boxShadow: '0 4px 8px rgba(16,185,129,0.15)',
+                boxShadow: '0 3px 6px rgba(16,185,129,0.1)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '2px'
+                gap: '1px'
               }}>
-                <Sparkles size={8} /> AI Active
+                <Sparkles size={6} /> AI Active
               </div>
             </motion.div>
           </div>
 
-          {/* Feature Bullets */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '1rem',
-            width: '100%',
-            textAlign: 'left'
+          {/* Interactive Flip Hint */}
+          <span style={{
+            fontSize: '0.75rem',
+            color: '#94A3B8',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            background: 'rgba(241, 245, 249, 0.6)',
+            border: '1.5px dashed #E2E8F0',
+            padding: '5px 12px',
+            borderRadius: '20px',
+            marginTop: '0.5rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            {[
-              { icon: <Zap size={16} color="#059669" />, title: "Instant AI Parsing", desc: "Upload PDF/Word doc" },
-              { icon: <Sparkles size={16} color="#2563eb" />, title: "10+ Pro Templates", desc: "Tailored to roles" },
-              { icon: <CheckCircle size={16} color="#10b981" />, title: "Secure Cloud Sync", desc: "Save & edit anywhere" },
-              { icon: <FileText size={16} color="#d97706" />, title: "A4 PDF Export", desc: "Perfect PDF alignment" }
-            ].map((feature, i) => (
-              <div key={i} style={{
-                display: 'flex',
-                gap: '10px',
-                background: '#FFFFFF',
-                border: '1px solid #E2E8F0',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
-                padding: '0.8rem 1rem',
-                borderRadius: '12px',
-                alignItems: 'flex-start'
-              }}>
-                <div style={{ marginTop: '2px' }}>{feature.icon}</div>
-                <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B' }}>{feature.title}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>{feature.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+            <ArrowRightLeft size={10} /> Click anywhere on this panel to flip layout
+          </span>
 
         </div>
       </motion.div>
