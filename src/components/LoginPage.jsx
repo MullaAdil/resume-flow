@@ -6,8 +6,8 @@ import { FileText, ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
 
 // ── CREATIVE ANIMATED PAINT DRIPS (FULL WIDTH CONTINUOUS WAVE) ──
 const PaintDrips = ({ isHovered, offset = "-12px", height = "14px" }) => {
-  // SVG path for a continuous wave of 10 dripping paint drops from x=0 to x=100
-  const path = "M 0,0 C 2,0 3,10 5,10 C 7,10 8,0 10,0 C 12,0 13,15 15,15 C 17,15 18,0 20,0 C 22,0 23,8 25,8 C 27,8 28,0 30,0 C 32,0 33,18 35,18 C 37,18 38,0 40,0 C 42,0 43,12 45,12 C 47,12 48,0 50,0 C 52,0 53,16 55,16 C 57,16 58,0 60,0 C 62,0 63,10 65,10 C 67,10 68,0 70,0 C 72,0 73,14 75,14 C 77,14 78,0 80,0 C 82,0 83,8 85,8 C 87,8 88,0 90,0 C 92,0 93,15 95,15 C 97,15 98,0 100,0 Z";
+  // SVG path for a continuous melting paint/water wave: baseline level of 4px connecting all drips smoothly
+  const path = "M 0,0 L 0,4 C 2,4 3,10 5,10 C 7,10 8,4 10,4 C 12,4 13,15 15,15 C 17,15 18,4 20,4 C 22,4 23,8 25,8 C 27,8 28,4 30,4 C 32,4 33,18 35,18 C 37,18 38,4 40,4 C 42,4 43,12 45,12 C 47,12 48,4 50,4 C 52,4 53,16 55,16 C 57,16 58,4 60,4 C 62,4 63,10 65,10 C 67,10 68,4 70,4 C 72,4 73,14 75,14 C 77,14 78,4 80,4 C 82,4 83,8 85,8 C 87,8 88,4 90,4 C 92,4 93,15 95,15 C 97,15 98,4 100,4 L 100,0 Z";
 
   return (
     <div style={{ 
@@ -44,46 +44,6 @@ const PaintDrips = ({ isHovered, offset = "-12px", height = "14px" }) => {
     </div>
   );
 };
-
-// ── CREATIVE ANIMATED PAINT SLASHES ──
-const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
-  <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', borderRadius: '6px' }}>
-    <motion.svg
-      width="100%"
-      height="100%"
-      viewBox="0 0 100 40"
-      preserveAspectRatio="none"
-      style={{ position: 'absolute', top: 0, left: 0 }}
-    >
-      <motion.path
-        d="M-10,5 L110,35"
-        stroke={primaryColor}
-        strokeWidth="10"
-        strokeLinecap="round"
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.25 : 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-      />
-    </motion.svg>
-    <motion.svg
-      width="100%"
-      height="100%"
-      viewBox="0 0 100 40"
-      preserveAspectRatio="none"
-      style={{ position: 'absolute', top: 0, left: 0 }}
-    >
-      <motion.path
-        d="M-10,35 L110,5"
-        stroke={secondaryColor}
-        strokeWidth="10"
-        strokeLinecap="round"
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.25 : 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 }}
-      />
-    </motion.svg>
-  </div>
-);
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -394,9 +354,6 @@ const LoginPage = () => {
                   position: 'relative'
                 }}
               >
-                {/* Background Crossed Paint Slashes */}
-                <CrossedPaintSlashes isHovered={submitHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
-                
                 {/* Bottom Growing Paint Drips (stretches full width) */}
                 <PaintDrips isHovered={submitHover} offset="-12px" height="16px" />
 
@@ -445,8 +402,6 @@ const LoginPage = () => {
                   position: 'relative'
                 }}
               >
-                {/* Background Crossed Paint Slashes */}
-                <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
                 {/* Bottom Growing Paint Drips (stretches full width) */}
                 <PaintDrips isHovered={toggleHover} offset="-10px" height="12px" />
                 <span style={{ position: 'relative', zIndex: 1 }}>
