@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, Briefcase, Award } from 'lucide-react';
+import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, Briefcase, Award, ArrowRightLeft } from 'lucide-react';
 
 // ── DECKLED TORN PAPER EDGES (VERTICAL) ──
 const VerticalTornEdge = ({ isFlipped }) => {
