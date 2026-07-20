@@ -12,7 +12,7 @@ const TornEdge = ({ isBottom }) => {
   const d_paint_top = "M0,14 L15,0 L35,18 L50,2 L70,20 L85,5 L100,15 L120,0 L138,18 L155,3 L175,16 L190,1 L210,20 L225,4 L245,13 L260,0 L280,17 L295,2 L315,20 L330,5 L350,14 L365,0 L385,18 L400,3 L420,16 L435,1 L455,20 L470,4 L490,13 L505,0 L525,17 L540,2 L560,20 L575,5 L595,14 L610,0 L630,18 L645,3 L665,16 L680,1 L700,20 L715,4 L735,13 L750,0 L770,17 L785,2 L805,20 L820,5 L840,14 L855,0 L875,18 L890,3 L910,16 L925,1 L945,20 L960,4 L980,13 L995,0 L1015,17 L1030,2 L1050,20 L1065,5 L1085,14 L1100,0 L1120,18 L1135,3 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
   
   const d_white_bottom = "M0,12 L15,26 L35,8 L50,24 L70,6 L85,21 L100,11 L120,26 L138,8 L155,23 L175,10 L190,25 L210,6 L225,22 L245,13 L260,27 L280,9 L295,24 L315,6 L330,21 L350,12 L365,26 L385,8 L400,23 L420,10 L435,25 L455,6 L470,22 L490,13 L505,27 L525,9 L540,24 L560,6 L575,21 L595,12 L610,26 L630,8 L645,23 L665,10 L680,25 L700,6 L715,22 L735,13 L750,27 L770,9 L785,24 L805,6 L820,21 L840,12 L855,26 L875,8 L890,23 L910,10 L925,25 L945,6 L960,22 L980,13 L995,27 L1015,9 L1030,24 L1050,6 L1065,21 L1085,12 L1100,26 L1120,8 L1135,23 L1155,10 L1170,25 L1190,6 L1200,21 L1200,0 L0,0 Z";
-  const d_paint_bottom = "M0,16 L15,30 L35,12 L50,28 L70,10 L85,25 L100,15 L120,30 L138,12 L155,27 L175,14 L190,29 L210,10 L225,26 L245,17 L260,31 L280,13 L295,28 L315,10 L330,25 L350,16 L365,30 L385,12 L400,27 L420,14 L435,29 L455,10 L470,26 L490,17 L505,31 L525,13 L540,28 L560,10 L575,25 L595,16 L610,30 L630,12 L645,27 L665,14 L680,29 L700,10 L715,26 L735,17 L750,31 L770,13 L785,28 L805,10 L820,25 L840,16 L855,30 L875,12 L890,27 L910,14 L925,29 L945,10 L960,26 L980,17 L995,31 L1015,13 L1030,28 L1050,10 L1065,25 L1085,16 L1100,30 L1120,12 L1135,27 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
+  const d_paint_bottom = "M0,16 L15,30 L35,12 L50,28 L70,10 L85,25 L100,15 L120,30 L138,12 L155,27 L175,14 L190,29 L210,10 L225,26 L245,17 L260,31 L280,13 L295,28 L315,10 L330,25 L350,16 L365,30 L385,12 L400,27 L420,14 L435,29 L455,10 L470,26 L490,17 L505,31 L525,13 L540,28 L560,10 L575,25 L595,16 L610,30 L630,12 L645,27 L665,14 L680,29 L700,10 L715,26 L735,17 L750,31 L770,13 L785,28 L805,10 L820,25 L840,16 L855,30 L875,12 L890,27 L910,14 L925,29 L945,10 L960,26 L980,17 L995,31 L1015,13 L1030,28 L1050,10 L1065,25 L1085,16 L1100,30 L1120,12 L1135,27 L1155,14 L1170,29 L1190,10 L1200,25 L1200,0 L0,0 Z";
 
   return (
     <svg 
@@ -88,21 +88,21 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
   </div>
 );
 
-const PaintDrips = ({ isHovered, colors }) => (
-  <div style={{ position: 'absolute', bottom: '-12px', left: 0, right: 0, height: '14px', display: 'flex', justifyContent: 'center', gap: '22px', pointerEvents: 'none', zIndex: 2 }}>
+const PaintDrips = ({ isHovered, colors, offset = "-12px", height = "14px" }) => (
+  <div style={{ position: 'absolute', bottom: offset, left: 0, right: 0, height: height, display: 'flex', justifyContent: 'center', gap: '22px', pointerEvents: 'none', zIndex: 2 }}>
     {colors.map((color, idx) => (
       <motion.svg
         key={idx}
         width="16"
-        height="14"
-        viewBox="0 0 16 14"
+        height={height.replace('px', '')}
+        viewBox={`0 0 16 ${height.replace('px', '')}`}
         initial={{ scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: isHovered ? 1.2 : 0, opacity: isHovered ? 1 : 0 }}
+        animate={{ scaleY: isHovered ? 1.25 : 0, opacity: isHovered ? 1 : 0 }}
         transition={{ delay: idx * 0.05, duration: 0.25, ease: 'easeOut' }}
         style={{ originY: 0 }}
       >
         <path
-          d="M0,0 C1.5,0 1.5,14 8,14 C14.5,14 14.5,0 16,0 Z"
+          d={`M0,0 C1.5,0 1.5,${height.replace('px', '')} 8,${height.replace('px', '')} C14.5,${height.replace('px', '')} 14.5,0 16,0 Z`}
           fill={color}
         />
       </motion.svg>
@@ -224,9 +224,9 @@ const LoginPage = () => {
                 gap: '6px',
                 background: 'transparent',
                 border: 'none',
-                color: '#64748B',
-                fontSize: '0.9rem',
-                fontWeight: 600,
+                color: '#475569',
+                fontSize: '0.95rem',
+                fontWeight: 700,
                 cursor: 'pointer',
                 marginBottom: '2rem',
                 padding: 0
@@ -247,19 +247,19 @@ const LoginPage = () => {
               }}>
                 <FileText size={24} color="#FFFFFF" />
               </div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
                 Elevate Resume
               </h1>
             </div>
 
-            <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500, lineHeight: 1.45 }}>
+            <p style={{ fontSize: '1rem', color: '#1E293B', margin: '0 0 1.5rem 0', fontWeight: 600, lineHeight: 1.5 }}>
               Upload your old document and let our AI transform it into a professional, high-impact resume in seconds.
             </p>
           </div>
 
           {/* Guest Mode Option on Left Column */}
           <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               No Account Required?
             </span>
             <button
@@ -300,10 +300,10 @@ const LoginPage = () => {
           flex: isMobile ? '1' : '0 0 58%',
           padding: '3.5rem 3rem'
         }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.5rem 0' }}>
+          <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.5rem 0' }}>
             {isSignUp ? 'Create your Account' : 'Welcome Back'}
           </h2>
-          <p style={{ fontSize: '0.9rem', color: '#64748B', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
+          <p style={{ fontSize: '0.95rem', color: '#334155', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
             {isSignUp ? 'Fill in your details below to get started.' : 'Sign in to sync your saved resumes.'}
           </p>
 
@@ -331,14 +331,14 @@ const LoginPage = () => {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Email input */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Email input (Paint Drips grow when focused / entering details) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Email Address
               </label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Mail size={18} /></span>
+                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569' }}><Mail size={18} /></span>
                 <input 
                   type="email" 
                   required
@@ -346,12 +346,12 @@ const LoginPage = () => {
                     width: '100%',
                     padding: '0.75rem 1rem 0.75rem 2.75rem',
                     borderRadius: '8px',
-                    border: '2px solid #E2E8F0',
+                    border: '2px solid #CBD5E1',
                     outline: 'none',
                     fontSize: '1rem',
-                    color: '#1E293B',
+                    color: '#0F172A',
                     boxShadow: emailFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                    borderColor: emailFocus ? '#059669' : '#E2E8F0',
+                    borderColor: emailFocus ? '#059669' : '#CBD5E1',
                     transition: 'all 0.15s ease'
                   }}
                   onFocus={() => setEmailFocus(true)}
@@ -360,16 +360,19 @@ const LoginPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+
+                {/* Paint Drips under input field when focused */}
+                <PaintDrips isHovered={emailFocus} colors={['#10b981', '#3b82f6', '#ec4899']} offset="-8px" height="10px" />
               </div>
             </div>
 
-            {/* Password input */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            {/* Password input (Paint Drips grow when focused / entering details) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Password
               </label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Lock size={18} /></span>
+                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569' }}><Lock size={18} /></span>
                 <input 
                   type="password" 
                   required
@@ -378,12 +381,12 @@ const LoginPage = () => {
                     width: '100%',
                     padding: '0.75rem 1rem 0.75rem 2.75rem',
                     borderRadius: '8px',
-                    border: '2px solid #E2E8F0',
+                    border: '2px solid #CBD5E1',
                     outline: 'none',
                     fontSize: '1rem',
-                    color: '#1E293B',
+                    color: '#0F172A',
                     boxShadow: passFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                    borderColor: passFocus ? '#059669' : '#E2E8F0',
+                    borderColor: passFocus ? '#059669' : '#CBD5E1',
                     transition: 'all 0.15s ease'
                   }}
                   onFocus={() => setPassFocus(true)}
@@ -392,6 +395,9 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+
+                {/* Paint Drips under input field when focused */}
+                <PaintDrips isHovered={passFocus} colors={['#8b5cf6', '#ec4899', '#f59e0b']} offset="-8px" height="10px" />
               </div>
             </div>
 
@@ -440,7 +446,7 @@ const LoginPage = () => {
           </form>
 
           {/* Toggle between login and signup */}
-          <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#475569' }}>
+          <div style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.95rem', color: '#334155', fontWeight: 500 }}>
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
@@ -460,8 +466,12 @@ const LoginPage = () => {
         </div>
       </motion.div>
 
-      {/* Basic rotating spinner animation */}
+      {/* Styled placeholder color injector for cross-browser contrast */}
       <style>{`
+        input::placeholder {
+          color: #64748B !important;
+          opacity: 1 !important;
+        }
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
