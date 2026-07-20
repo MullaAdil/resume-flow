@@ -109,16 +109,16 @@ const LoginPage = () => {
       <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(55px)', zIndex: 0 }} />
       <div style={{ position: 'absolute', top: '30%', left: '30%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(45px)', zIndex: 0 }} />
 
-      {/* ── STACKED PAGES WRAPPER (70% viewport width) ── */}
+      {/* ── STACKED PAGES WRAPPER (80% viewport width) ── */}
       <div style={{
         position: 'relative',
-        width: isMobile ? '95%' : '70%',
-        maxWidth: '1000px',
+        width: isMobile ? '95%' : '80%',
+        maxWidth: '1200px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'visible',
-        height: isMobile ? 'auto' : '450px' // Keep height balanced for smooth page flips
+        height: isMobile ? 'auto' : '490px' // Keep height balanced for smooth page flips
       }}>
         
         {/* Layer 1: Bottom Colorful Artist Cover (Static backing) */}
