@@ -2,9 +2,50 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
+import { FileText, ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
 
-// ── CREATIVE ANIMATED PAINT DRIPS & SLASHES ──
+// ── CREATIVE ANIMATED PAINT DRIPS (FULL WIDTH CONTINUOUS WAVE) ──
+const PaintDrips = ({ isHovered, offset = "-12px", height = "14px" }) => {
+  // SVG path for a continuous wave of 10 dripping paint drops from x=0 to x=100
+  const path = "M 0,0 C 2,0 3,10 5,10 C 7,10 8,0 10,0 C 12,0 13,15 15,15 C 17,15 18,0 20,0 C 22,0 23,8 25,8 C 27,8 28,0 30,0 C 32,0 33,18 35,18 C 37,18 38,0 40,0 C 42,0 43,12 45,12 C 47,12 48,0 50,0 C 52,0 53,16 55,16 C 57,16 58,0 60,0 C 62,0 63,10 65,10 C 67,10 68,0 70,0 C 72,0 73,14 75,14 C 77,14 78,0 80,0 C 82,0 83,8 85,8 C 87,8 88,0 90,0 C 92,0 93,15 95,15 C 97,15 98,0 100,0 Z";
+
+  return (
+    <div style={{ 
+      position: 'absolute', 
+      bottom: offset, 
+      left: 0, 
+      right: 0, 
+      height: height, 
+      pointerEvents: 'none', 
+      zIndex: 2,
+      overflow: 'visible'
+    }}>
+      <motion.svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 100 18"
+        preserveAspectRatio="none"
+        initial={{ scaleY: 0, opacity: 0 }}
+        animate={{ scaleY: isHovered ? 1 : 0, opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.28, ease: 'easeOut' }}
+        style={{ originY: 0 }}
+      >
+        <defs>
+          <linearGradient id="full-drips-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#10B981" />
+            <stop offset="25%" stopColor="#3B82F6" />
+            <stop offset="50%" stopColor="#8B5CF6" />
+            <stop offset="75%" stopColor="#EC4899" />
+            <stop offset="100%" stopColor="#F59E0B" />
+          </linearGradient>
+        </defs>
+        <path d={path} fill="url(#full-drips-gradient)" />
+      </motion.svg>
+    </div>
+  );
+};
+
+// ── CREATIVE ANIMATED PAINT SLASHES ──
 const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
   <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden', borderRadius: '6px' }}>
     <motion.svg
@@ -20,7 +61,7 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
         strokeWidth="10"
         strokeLinecap="round"
         initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.18 : 0 }}
+        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.25 : 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       />
     </motion.svg>
@@ -37,32 +78,10 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
         strokeWidth="10"
         strokeLinecap="round"
         initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.18 : 0 }}
+        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.25 : 0 }}
         transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 }}
       />
     </motion.svg>
-  </div>
-);
-
-const PaintDrips = ({ isHovered, colors, offset = "-12px", height = "14px" }) => (
-  <div style={{ position: 'absolute', bottom: offset, left: 0, right: 0, height: height, display: 'flex', justifyContent: 'center', gap: '22px', pointerEvents: 'none', zIndex: 2 }}>
-    {colors.map((color, idx) => (
-      <motion.svg
-        key={idx}
-        width="16"
-        height={height.replace('px', '')}
-        viewBox={`0 0 16 ${height.replace('px', '')}`}
-        initial={{ scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: isHovered ? 1.25 : 0, opacity: isHovered ? 1 : 0 }}
-        transition={{ delay: idx * 0.05, duration: 0.25, ease: 'easeOut' }}
-        style={{ originY: 0 }}
-      >
-        <path
-          d={`M0,0 C1.5,0 1.5,${height.replace('px', '')} 8,${height.replace('px', '')} C14.5,${height.replace('px', '')} 14.5,0 16,0 Z`}
-          fill={color}
-        />
-      </motion.svg>
-    ))}
   </div>
 );
 
@@ -308,8 +327,8 @@ const LoginPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
 
-                  {/* Paint Drips under input field when focused */}
-                  <PaintDrips isHovered={emailFocus} colors={['#10b981', '#3b82f6', '#ec4899']} offset="-8px" height="10px" />
+                  {/* Paint Drips under input field when focused (stretches full width) */}
+                  <PaintDrips isHovered={emailFocus} offset="-10px" height="14px" />
                 </div>
               </div>
 
@@ -343,8 +362,8 @@ const LoginPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
 
-                  {/* Paint Drips under input field when focused */}
-                  <PaintDrips isHovered={passFocus} colors={['#8b5cf6', '#ec4899', '#f59e0b']} offset="-8px" height="10px" />
+                  {/* Paint Drips under input field when focused (stretches full width) */}
+                  <PaintDrips isHovered={passFocus} offset="-10px" height="14px" />
                 </div>
               </div>
 
@@ -378,8 +397,8 @@ const LoginPage = () => {
                 {/* Background Crossed Paint Slashes */}
                 <CrossedPaintSlashes isHovered={submitHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
                 
-                {/* Bottom Growing Paint Drips */}
-                <PaintDrips isHovered={submitHover} colors={['#10b981', '#3b82f6', '#ec4899']} />
+                {/* Bottom Growing Paint Drips (stretches full width) */}
+                <PaintDrips isHovered={submitHover} offset="-12px" height="16px" />
 
                 <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {isLoading && (
@@ -428,8 +447,8 @@ const LoginPage = () => {
               >
                 {/* Background Crossed Paint Slashes */}
                 <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
-                {/* Bottom Growing Paint Drips */}
-                <PaintDrips isHovered={toggleHover} colors={['#3b82f6', '#ec4899']} offset="-6px" height="8px" />
+                {/* Bottom Growing Paint Drips (stretches full width) */}
+                <PaintDrips isHovered={toggleHover} offset="-10px" height="12px" />
                 <span style={{ position: 'relative', zIndex: 1 }}>
                   {isSignUp ? 'Sign In' : 'Create Account'}
                 </span>
