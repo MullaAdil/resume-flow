@@ -121,7 +121,6 @@ const LoginPage = () => {
 
   // Hover & Focus states
   const [submitHover, setSubmitHover] = useState(false);
-  const [guestHover, setGuestHover] = useState(false);
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
 
@@ -156,10 +155,6 @@ const LoginPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGuestMode = () => {
-    navigate('/templates');
   };
 
   return (
@@ -207,10 +202,11 @@ const LoginPage = () => {
         {/* ── LEFT PANEL: LOGO & WELCOME (Takes 42% width) ── */}
         <div style={{
           flex: isMobile ? 'none' : '0 0 42%',
-          padding: isMobile ? '2.5rem 2rem 1rem 2rem' : '3.5rem 3rem',
+          padding: isMobile ? '2.5rem 2rem 2rem 2rem' : '3.5rem 3rem',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
+          gap: '1rem',
           borderRight: isMobile ? 'none' : '1px dashed #E2E8F0',
           borderBottom: isMobile ? '1px dashed #E2E8F0' : 'none'
         }}>
@@ -255,43 +251,6 @@ const LoginPage = () => {
             <p style={{ fontSize: '1rem', color: '#1E293B', margin: '0 0 1.5rem 0', fontWeight: 600, lineHeight: 1.5 }}>
               Upload your old document and let our AI transform it into a professional, high-impact resume in seconds.
             </p>
-          </div>
-
-          {/* Guest Mode Option on Left Column */}
-          <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              No Account Required?
-            </span>
-            <button
-              onClick={handleGuestMode}
-              onMouseEnter={() => setGuestHover(true)}
-              onMouseLeave={() => setGuestHover(false)}
-              style={{
-                width: '100%',
-                background: '#FFFFFF',
-                color: '#475569',
-                border: '2.5px solid #475569',
-                padding: '0.85rem',
-                borderRadius: '8px',
-                fontSize: '0.95rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                boxShadow: guestHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
-                transform: guestHover ? 'translate(3px, 3px)' : 'none',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                position: 'relative'
-              }}
-            >
-              {/* Background Crossed Paint Slashes */}
-              <CrossedPaintSlashes isHovered={guestHover} primaryColor="#f59e0b" secondaryColor="#ef4444" />
-              
-              {/* Bottom Growing Paint Drips */}
-              <PaintDrips isHovered={guestHover} colors={['#64748b', '#f59e0b', '#ef4444']} />
-
-              <span style={{ position: 'relative', zIndex: 1 }}>
-                Continue as Guest
-              </span>
-            </button>
           </div>
         </div>
 
