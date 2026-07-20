@@ -368,8 +368,8 @@ const LoginPage = () => {
                   justifyContent: 'center',
                   gap: '8px',
                   marginTop: '0.5rem',
-                  boxShadow: submitHover ? '1px 1px 0px #0F172A' : '4px 4px 0px #0F172A',
-                  transform: submitHover ? 'translate(3px, 3px)' : 'none',
+                  boxShadow: 'none',
+                  transform: 'none',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                   opacity: isLoading ? 0.8 : 1,
                   position: 'relative'
@@ -420,8 +420,8 @@ const LoginPage = () => {
                   fontWeight: 800,
                   fontSize: '0.85rem',
                   cursor: 'pointer',
-                  boxShadow: toggleHover ? '1px 1px 0px currentColor' : '3px 3px 0px currentColor',
-                  transform: toggleHover ? 'translate(2px, 2px)' : 'none',
+                  boxShadow: 'none',
+                  transform: 'none',
                   transition: 'all 0.15s ease',
                   position: 'relative'
                 }}
