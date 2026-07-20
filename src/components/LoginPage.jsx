@@ -72,10 +72,10 @@ const LoginPage = () => {
       overflow: 'hidden',
       padding: '3rem 2rem'
     }}>
-      {/* Background Soft Watercolor Lighting Blobs */}
-      <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(55px)', zIndex: 0 }} />
-      <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(55px)', zIndex: 0 }} />
-      <div style={{ position: 'absolute', top: '30%', left: '30%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(45px)', zIndex: 0 }} />
+      {/* Background Soft Watercolor Lighting Blobs (Multicolor Mesh style) */}
+      <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '800px', height: '800px', background: 'radial-gradient(circle, rgba(67, 56, 202, 0.15) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(65px)', zIndex: 0 }} />
+      <div style={{ position: 'absolute', bottom: '-10%', right: '10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(65px)', zIndex: 0 }} />
+      <div style={{ position: 'absolute', top: '20%', left: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(65px)', zIndex: 0 }} />
 
       {/* ── STACKED PAGES WRAPPER (80% viewport width) ── */}
       <div style={{
