@@ -121,6 +121,7 @@ const LoginPage = () => {
 
   // Hover & Focus states
   const [submitHover, setSubmitHover] = useState(false);
+  const [toggleHover, setToggleHover] = useState(false);
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
 
@@ -394,34 +395,108 @@ const LoginPage = () => {
               <PaintDrips isHovered={submitHover} colors={['#10b981', '#3b82f6', '#ec4899']} />
 
               <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {isLoading ? (
+                {isLoading && (
                   <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                ) : (
-                  <Sparkles size={18} />
                 )}
                 {isSignUp ? 'Create Account' : 'Sign In'}
               </span>
             </button>
           </form>
 
-          {/* Toggle between login and signup */}
-          <div style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.95rem', color: '#334155', fontWeight: 500 }}>
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#059669',
-                fontWeight: 700,
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                padding: 0
-              }}
-            >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
-            </button>
-          </div>
+          {/* Large Creative Callout Block for switching account modes */}
+          {isSignUp ? (
+            <div style={{
+              background: '#F8FAFC',
+              border: '2px dashed #CBD5E1',
+              borderRadius: '8px',
+              padding: '1.25rem',
+              textAlign: 'center',
+              marginTop: '2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              alignItems: 'center'
+            }}>
+              <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0F172A' }}>
+                Already have an account?
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.4 }}>
+                Sign in with your email to load and continue editing your saved resumes.
+              </span>
+              <button
+                type="button"
+                onClick={() => { setIsSignUp(false); setError(''); setMessage(''); }}
+                onMouseEnter={() => setToggleHover(true)}
+                onMouseLeave={() => setToggleHover(false)}
+                style={{
+                  background: '#FFFFFF',
+                  color: '#475569',
+                  border: '2.5px solid #475569',
+                  padding: '0.6rem 1.5rem',
+                  borderRadius: '8px',
+                  fontWeight: 800,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  boxShadow: toggleHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
+                  transform: toggleHover ? 'translate(3px, 3px)' : 'none',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  position: 'relative'
+                }}
+              >
+                <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#64748b" secondaryColor="#475569" />
+                <PaintDrips isHovered={toggleHover} colors={['#64748b', '#475569', '#334155']} />
+                <span style={{ position: 'relative', zIndex: 1 }}>
+                  Sign In Instead
+                </span>
+              </button>
+            </div>
+          ) : (
+            <div style={{
+              background: '#F8FAFC',
+              border: '2px dashed #E2E8F0',
+              borderRadius: '8px',
+              padding: '1.25rem',
+              textAlign: 'center',
+              marginTop: '2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              alignItems: 'center'
+            }}>
+              <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0F172A' }}>
+                New to Elevate Resume?
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.4 }}>
+                Create a free account to securely save and back up your resumes in the cloud.
+              </span>
+              <button
+                type="button"
+                onClick={() => { setIsSignUp(true); setError(''); setMessage(''); }}
+                onMouseEnter={() => setToggleHover(true)}
+                onMouseLeave={() => setToggleHover(false)}
+                style={{
+                  background: '#FFFFFF',
+                  color: '#2563EB',
+                  border: '2.5px solid #2563EB',
+                  padding: '0.6rem 1.5rem',
+                  borderRadius: '8px',
+                  fontWeight: 800,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  boxShadow: toggleHover ? '1px 1px 0px #2563EB' : '4px 4px 0px #2563EB',
+                  transform: toggleHover ? 'translate(3px, 3px)' : 'none',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  position: 'relative'
+                }}
+              >
+                <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#3b82f6" secondaryColor="#8b5cf6" />
+                <PaintDrips isHovered={toggleHover} colors={['#3b82f6', '#8b5cf6', '#ec4899']} />
+                <span style={{ position: 'relative', zIndex: 1 }}>
+                  Create an Account
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </motion.div>
 
