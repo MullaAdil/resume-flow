@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, ArrowRightLeft } from 'lucide-react';
+import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2 } from 'lucide-react';
 
 // ── DECKLED TORN PAPER EDGES (HORIZONTAL) ──
 const TornEdge = ({ isBottom }) => {
@@ -12,7 +12,7 @@ const TornEdge = ({ isBottom }) => {
   const d_paint_top = "M0,14 L15,0 L35,18 L50,2 L70,20 L85,5 L100,15 L120,0 L138,18 L155,3 L175,16 L190,1 L210,20 L225,4 L245,13 L260,0 L280,17 L295,2 L315,20 L330,5 L350,14 L365,0 L385,18 L400,3 L420,16 L435,1 L455,20 L470,4 L490,13 L505,0 L525,17 L540,2 L560,20 L575,5 L595,14 L610,0 L630,18 L645,3 L665,16 L680,1 L700,20 L715,4 L735,13 L750,0 L770,17 L785,2 L805,20 L820,5 L840,14 L855,0 L875,18 L890,3 L910,16 L925,1 L945,20 L960,4 L980,13 L995,0 L1015,17 L1030,2 L1050,20 L1065,5 L1085,14 L1100,0 L1120,18 L1135,3 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
   
   const d_white_bottom = "M0,12 L15,26 L35,8 L50,24 L70,6 L85,21 L100,11 L120,26 L138,8 L155,23 L175,10 L190,25 L210,6 L225,22 L245,13 L260,27 L280,9 L295,24 L315,6 L330,21 L350,12 L365,26 L385,8 L400,23 L420,10 L435,25 L455,6 L470,22 L490,13 L505,27 L525,9 L540,24 L560,6 L575,21 L595,12 L610,26 L630,8 L645,23 L665,10 L680,25 L700,6 L715,22 L735,13 L750,27 L770,9 L785,24 L805,6 L820,21 L840,12 L855,26 L875,8 L890,23 L910,10 L925,25 L945,6 L960,22 L980,13 L995,27 L1015,9 L1030,24 L1050,6 L1065,21 L1085,12 L1100,26 L1120,8 L1135,23 L1155,10 L1170,25 L1190,6 L1200,21 L1200,0 L0,0 Z";
-  const d_paint_bottom = "M0,16 L15,30 L35,12 L50,28 L70,10 L85,25 L100,15 L120,30 L138,12 L155,27 L175,14 L190,29 L210,10 L225,26 L245,17 L260,31 L280,13 L295,28 L315,10 L330,25 L350,16 L365,30 L385,12 L400,27 L420,14 L435,29 L455,10 L470,26 L490,17 L505,31 L525,13 L540,28 L560,10 L575,25 L595,16 L610,30 L630,12 L645,27 L665,14 L680,29 L700,10 L715,26 L735,17 L750,31 L770,13 L785,28 L805,10 L820,25 L840,16 L855,30 L875,12 L890,27 L910,14 L925,29 L945,10 L960,26 L980,17 L995,31 L1015,13 L1030,28 L1050,10 L1065,25 L1085,16 L1100,30 L1120,12 L1135,27 L1155,14 L1170,29 L1190,10 L1200,25 L1200,0 L0,0 Z";
+  const d_paint_bottom = "M0,16 L15,30 L35,12 L50,28 L70,10 L85,25 L100,15 L120,30 L138,12 L155,27 L175,14 L190,29 L210,10 L225,26 L245,17 L260,31 L280,13 L295,28 L315,10 L330,25 L350,16 L365,30 L385,12 L400,27 L420,14 L435,29 L455,10 L470,26 L490,17 L505,31 L525,13 L540,28 L560,10 L575,25 L595,16 L610,30 L630,12 L645,27 L665,14 L680,29 L700,10 L715,26 L735,17 L750,31 L770,13 L785,28 L805,10 L820,25 L840,16 L855,30 L875,12 L890,27 L910,14 L925,29 L945,10 L960,26 L980,17 L995,31 L1015,13 L1030,28 L1050,10 L1065,25 L1085,16 L1100,30 L1120,12 L1135,27 L1155,16 L1170,1 L1190,20 L1200,5 L1200,35 L0,35 Z";
 
   return (
     <svg 
@@ -173,14 +173,14 @@ const LoginPage = () => {
       <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(55px)', zIndex: 0 }} />
       <div style={{ position: 'absolute', top: '30%', left: '30%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(45px)', zIndex: 0 }} />
 
-      {/* ── CARD CONTAINER (Tri-fold Horizontal Landscape, 960px wide) ── */}
+      {/* ── CARD CONTAINER (Covering 70% viewport width, Horizontal Layout) ── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         style={{
-          width: '100%',
-          maxWidth: '960px',
+          width: isMobile ? '90%' : '70%',
+          maxWidth: '1000px',
           background: '#FFFFFF',
           border: '1.5px solid #E2E8F0',
           borderRadius: '12px',
@@ -196,10 +196,10 @@ const LoginPage = () => {
         <TornEdge />
         <TornEdge isBottom />
 
-        {/* ── COLUMN 1: BRANDING (Left, 28% width) ── */}
+        {/* ── LEFT PANEL: BRANDING (40% width) ── */}
         <div style={{
-          flex: isMobile ? 'none' : '0 0 28%',
-          padding: isMobile ? '2.5rem 2rem 1.5rem 2rem' : '3.5rem 2.5rem',
+          flex: isMobile ? 'none' : '0 0 40%',
+          padding: isMobile ? '2.5rem 2rem 1.5rem 2rem' : '3.5rem 3rem',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
@@ -240,29 +240,29 @@ const LoginPage = () => {
               }}>
                 <FileText size={24} color="#FFFFFF" />
               </div>
-              <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-                Elevate
+              <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+                Elevate Resume
               </h1>
             </div>
 
-            <p style={{ fontSize: '0.95rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontSize: '1rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
               Upload your old document and let our AI transform it into a professional, job-ready resume in seconds.
             </p>
           </div>
         </div>
 
-        {/* ── COLUMN 2: CREDENTIALS FORM (Middle, 40% width) ── */}
+        {/* ── RIGHT PANEL: MAIN FORM & COMPACT SWITCH (60% width) ── */}
         <div style={{
-          flex: isMobile ? '1' : '0 0 40%',
-          padding: isMobile ? '2rem' : '3.5rem 2.5rem',
+          flex: isMobile ? '1' : '0 0 60%',
+          padding: isMobile ? '2rem' : '3.5rem 3rem',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center'
         }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.4rem 0' }}>
-            {isSignUp ? 'Create Account' : 'Sign In'}
+          <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.4rem 0' }}>
+            {isSignUp ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p style={{ fontSize: '0.9rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
+          <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
             {isSignUp ? 'Fill in details to get started.' : 'Sign in to access saved resumes.'}
           </p>
 
@@ -360,7 +360,7 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Submit Button (White background on hover so green doesn't hide slashes & drips) */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -401,97 +401,52 @@ const LoginPage = () => {
               </span>
             </button>
           </form>
-        </div>
 
-        {/* ── COLUMN 3: CALLOUT BLOCK / SWITCH MODE (Right, 32% width) ── */}
-        <div style={{
-          flex: isMobile ? 'none' : '0 0 32%',
-          padding: isMobile ? '1.5rem 2rem 2.5rem 2rem' : '3.5rem 2.5rem',
-          background: '#F8FAFC',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          textAlign: 'center',
-          gap: '1rem',
-          borderLeft: isMobile ? 'none' : '1px dashed #E2E8F0',
-          borderTop: isMobile ? '1px dashed #E2E8F0' : 'none'
-        }}>
-          {isSignUp ? (
-            <>
-              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A' }}>
-                Already have an account?
+          {/* Inline Compact Switch Mode Callout Block */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: '#F8FAFC',
+            border: '1.5px solid #E2E8F0',
+            borderRadius: '8px',
+            padding: '0.85rem 1.25rem',
+            marginTop: '1.5rem',
+            width: '100%',
+            gap: '1rem'
+          }}>
+            <span style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
+              {isSignUp ? 'Already have an account?' : 'New to Elevate Resume?'}
+            </span>
+            <button
+              type="button"
+              onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
+              onMouseEnter={() => setToggleHover(true)}
+              onMouseLeave={() => setToggleHover(false)}
+              style={{
+                background: '#FFFFFF',
+                color: isSignUp ? '#475569' : '#2563EB',
+                border: isSignUp ? '1.5px solid #CBD5E1' : '1.5px solid #2563EB',
+                padding: '0.4rem 1rem',
+                borderRadius: '6px',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                boxShadow: toggleHover ? '1px 1px 0px currentColor' : '3px 3px 0px currentColor',
+                transform: toggleHover ? 'translate(2px, 2px)' : 'none',
+                transition: 'all 0.15s ease',
+                position: 'relative'
+              }}
+            >
+              {/* Background Crossed Paint Slashes */}
+              <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
+              {/* Bottom Growing Paint Drips */}
+              <PaintDrips isHovered={toggleHover} colors={['#3b82f6', '#ec4899']} offset="-6px" height="8px" />
+              <span style={{ position: 'relative', zIndex: 1 }}>
+                {isSignUp ? 'Sign In' : 'Create Account'}
               </span>
-              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.45 }}>
-                Sign in with your email to load and continue editing your saved resumes.
-              </span>
-              <button
-                type="button"
-                onClick={() => { setIsSignUp(false); setError(''); setMessage(''); }}
-                onMouseEnter={() => setToggleHover(true)}
-                onMouseLeave={() => setToggleHover(false)}
-                style={{
-                  background: '#FFFFFF',
-                  color: '#475569',
-                  border: '2.5px solid #475569',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '8px',
-                  fontWeight: 800,
-                  fontSize: '0.95rem',
-                  cursor: 'pointer',
-                  boxShadow: toggleHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
-                  transform: toggleHover ? 'translate(3px, 3px)' : 'none',
-                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  position: 'relative',
-                  width: '100%',
-                  maxWidth: '220px'
-                }}
-              >
-                <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#64748b" secondaryColor="#475569" />
-                <PaintDrips isHovered={toggleHover} colors={['#64748b', '#475569', '#334155']} />
-                <span style={{ position: 'relative', zIndex: 1 }}>
-                  Sign In Instead
-                </span>
-              </button>
-            </>
-          ) : (
-            <>
-              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A' }}>
-                New to Elevate Resume?
-              </span>
-              <span style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 500, lineHeight: 1.45 }}>
-                Create a free account to securely save and back up your resumes in the cloud.
-              </span>
-              <button
-                type="button"
-                onClick={() => { setIsSignUp(true); setError(''); setMessage(''); }}
-                onMouseEnter={() => setToggleHover(true)}
-                onMouseLeave={() => setToggleHover(false)}
-                style={{
-                  background: '#FFFFFF',
-                  color: '#2563EB',
-                  border: '2.5px solid #2563EB',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '8px',
-                  fontWeight: 800,
-                  fontSize: '0.95rem',
-                  cursor: 'pointer',
-                  boxShadow: toggleHover ? '1px 1px 0px #2563EB' : '4px 4px 0px #2563EB',
-                  transform: toggleHover ? 'translate(3px, 3px)' : 'none',
-                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  position: 'relative',
-                  width: '100%',
-                  maxWidth: '220px'
-                }}
-              >
-                <CrossedPaintSlashes isHovered={toggleHover} primaryColor="#3b82f6" secondaryColor="#8b5cf6" />
-                <PaintDrips isHovered={toggleHover} colors={['#3b82f6', '#8b5cf6', '#ec4899']} />
-                <span style={{ position: 'relative', zIndex: 1 }}>
-                  Create an Account
-                </span>
-              </button>
-            </>
-          )}
+            </button>
+          </div>
         </div>
       </motion.div>
 
