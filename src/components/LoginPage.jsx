@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { FileText, ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
 
 const LoginPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { signUp, signIn } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(location.state?.mode === 'signup');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -17,8 +21,14 @@ const LoginPage = () => {
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
 
-  const navigate = useNavigate();
-  const { signUp, signIn } = useAuth();
+  // Sync mode state when location changes
+  useEffect(() => {
+    if (location.state?.mode === 'signup') {
+      setIsSignUp(true);
+    } else if (location.state?.mode === 'signin') {
+      setIsSignUp(false);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);

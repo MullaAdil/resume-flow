@@ -125,10 +125,10 @@ const LandingPage = () => {
             </>
           ) : (
             <>
-              <button onClick={() => navigate('/login')} style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', padding: '0.5rem', fontSize: '1.05rem' }}>Login</button>
+              <button onClick={() => navigate('/login', { state: { mode: 'signin' } })} style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', padding: '0.5rem', fontSize: '1.05rem' }}>Login</button>
               <button 
                 className="btn-primary" 
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/login', { state: { mode: 'signup' } })}
                 style={{ padding: '0.5rem 1.25rem', borderRadius: '6px', fontSize: '0.95rem' }}
               >
                 Sign Up
