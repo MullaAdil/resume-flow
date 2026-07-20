@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -60,10 +60,10 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
       <motion.path
         d="M-10,5 L110,35"
         stroke={primaryColor}
-        strokeWidth="8"
+        strokeWidth="10"
         strokeLinecap="round"
         initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.12 : 0 }}
+        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.18 : 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       />
     </motion.svg>
@@ -78,10 +78,10 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
       <motion.path
         d="M-10,35 L110,5"
         stroke={secondaryColor}
-        strokeWidth="8"
+        strokeWidth="10"
         strokeLinecap="round"
         initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.12 : 0 }}
+        animate={{ pathLength: isHovered ? 1 : 0, opacity: isHovered ? 0.18 : 0 }}
         transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 }}
       />
     </motion.svg>
@@ -89,20 +89,20 @@ const CrossedPaintSlashes = ({ isHovered, primaryColor, secondaryColor }) => (
 );
 
 const PaintDrips = ({ isHovered, colors }) => (
-  <div style={{ position: 'absolute', bottom: '-9px', left: 0, right: 0, height: '10px', display: 'flex', justifyContent: 'center', gap: '22px', pointerEvents: 'none', zIndex: 2 }}>
+  <div style={{ position: 'absolute', bottom: '-12px', left: 0, right: 0, height: '14px', display: 'flex', justifyContent: 'center', gap: '22px', pointerEvents: 'none', zIndex: 2 }}>
     {colors.map((color, idx) => (
       <motion.svg
         key={idx}
-        width="14"
-        height="10"
-        viewBox="0 0 14 10"
+        width="16"
+        height="14"
+        viewBox="0 0 16 14"
         initial={{ scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: isHovered ? 1 : 0, opacity: isHovered ? 1 : 0 }}
-        transition={{ delay: idx * 0.05, duration: 0.2, ease: 'easeOut' }}
+        animate={{ scaleY: isHovered ? 1.2 : 0, opacity: isHovered ? 1 : 0 }}
+        transition={{ delay: idx * 0.05, duration: 0.25, ease: 'easeOut' }}
         style={{ originY: 0 }}
       >
         <path
-          d="M0,0 C1.5,0 1.5,10 7,10 C12.5,10 12.5,0 14,0 Z"
+          d="M0,0 C1.5,0 1.5,14 8,14 C14.5,14 14.5,0 16,0 Z"
           fill={color}
         />
       </motion.svg>
@@ -117,7 +117,8 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   // Hover & Focus states
   const [submitHover, setSubmitHover] = useState(false);
   const [guestHover, setGuestHover] = useState(false);
@@ -126,6 +127,12 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -172,258 +179,285 @@ const LoginPage = () => {
       <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(29, 78, 216, 0.04) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(50px)', zIndex: 0 }} />
       <div style={{ position: 'absolute', top: '30%', left: '30%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(45px)', zIndex: 0 }} />
 
-      {/* ── CARD CONTAINER (Centered, Creative Sketched & Torn Edges) ── */}
+      {/* ── CARD CONTAINER (Big & Horizontal, 800px wide) ── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         style={{
           width: '100%',
-          maxWidth: '440px',
+          maxWidth: '820px',
           background: '#FFFFFF',
           borderLeft: '4px solid #059669',
           borderRight: '1.5px solid #CBD5E1',
           borderTop: 'none',
           borderBottom: 'none',
-          padding: '3.5rem 2.5rem',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.06)',
           position: 'relative',
-          zIndex: 10
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          overflow: 'visible'
         }}
       >
         {/* Horizontal Torn Edges with Watercolor Paint Backing */}
         <TornEdge />
         <TornEdge isBottom />
 
-        {/* Back Button */}
-        <button 
-          onClick={() => navigate('/')} 
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'transparent',
-            border: 'none',
-            color: '#64748B',
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            marginBottom: '1.5rem',
-            padding: 0
-          }}
-        >
-          <ArrowLeft size={16} /> Back to home
-        </button>
-
-        {/* Logo / Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            padding: '8px',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <FileText size={24} color="#FFFFFF" />
-          </div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-            Elevate Resume
-          </h1>
-        </div>
-        <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 2rem 0', fontWeight: 500 }}>
-          {isSignUp ? 'Create your free account to sync resumes.' : 'Sign in to access your saved resumes.'}
-        </p>
-
-        {/* Alerts */}
-        <AnimatePresence mode="wait">
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
+        {/* ── LEFT PANEL: LOGO & WELCOME (Takes 42% width) ── */}
+        <div style={{
+          flex: isMobile ? 'none' : '0 0 42%',
+          padding: isMobile ? '2.5rem 2rem 1rem 2rem' : '3.5rem 3rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          borderRight: isMobile ? 'none' : '1px dashed #E2E8F0',
+          borderBottom: isMobile ? '1px dashed #E2E8F0' : 'none'
+        }}>
+          <div>
+            {/* Back Button */}
+            <button 
+              onClick={() => navigate('/')} 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'transparent',
+                border: 'none',
+                color: '#64748B',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                marginBottom: '2rem',
+                padding: 0
+              }}
             >
-              ⚠️ {error}
-            </motion.div>
-          )}
-          {message && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              style={{ background: '#ECFDF5', border: '2px solid #6EE7B7', color: '#047857', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
-            >
-              ✨ {message}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <ArrowLeft size={16} /> Back to home
+            </button>
 
-        <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Email input */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Email Address
-            </label>
-            <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Mail size={18} /></span>
-              <input 
-                type="email" 
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem 0.75rem 2.75rem',
-                  borderRadius: '8px',
-                  border: '2px solid #E2E8F0',
-                  outline: 'none',
-                  fontSize: '1rem',
-                  color: '#1E293B',
-                  boxShadow: emailFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                  borderColor: emailFocus ? '#059669' : '#E2E8F0',
-                  transition: 'all 0.15s ease'
-                }}
-                onFocus={() => setEmailFocus(true)}
-                onBlur={() => setEmailFocus(false)}
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+            {/* Logo / Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                padding: '8px',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <FileText size={24} color="#FFFFFF" />
+              </div>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+                Elevate Resume
+              </h1>
             </div>
+
+            <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500, lineHeight: 1.45 }}>
+              Upload your old document and let our AI transform it into a professional, high-impact resume in seconds.
+            </p>
           </div>
 
-          {/* Password input */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Password
-            </label>
-            <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Lock size={18} /></span>
-              <input 
-                type="password" 
-                required
-                minLength={6}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem 0.75rem 2.75rem',
-                  borderRadius: '8px',
-                  border: '2px solid #E2E8F0',
-                  outline: 'none',
-                  fontSize: '1rem',
-                  color: '#1E293B',
-                  boxShadow: passFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
-                  borderColor: passFocus ? '#059669' : '#E2E8F0',
-                  transition: 'all 0.15s ease'
-                }}
-                onFocus={() => setPassFocus(true)}
-                onBlur={() => setPassFocus(false)}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Submit Button (Creative Sketched Border Style with Slashes & Drips) */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            onMouseEnter={() => setSubmitHover(true)}
-            onMouseLeave={() => setSubmitHover(false)}
-            style={{
-              background: submitHover ? '#059669' : '#FFFFFF',
-              color: submitHover ? '#FFFFFF' : '#059669',
-              border: '2.5px solid #059669',
-              padding: '0.9rem',
-              borderRadius: '8px',
-              fontWeight: 800,
-              fontSize: '1.05rem',
-              cursor: isLoading ? 'wait' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              marginTop: '0.5rem',
-              boxShadow: submitHover ? '1px 1px 0px #059669' : '4px 4px 0px #059669',
-              transform: submitHover ? 'translate(3px, 3px)' : 'none',
-              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-              opacity: isLoading ? 0.8 : 1,
-              position: 'relative'
-            }}
-          >
-            {/* Background Crossed Paint Slashes */}
-            <CrossedPaintSlashes isHovered={submitHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
-            
-            {/* Bottom Growing Paint Drips */}
-            <PaintDrips isHovered={submitHover} colors={['#10b981', '#3b82f6', '#ec4899']} />
-
-            <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {isLoading ? (
-                <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-              ) : (
-                <Sparkles size={18} />
-              )}
-              {isSignUp ? 'Create Account' : 'Sign In'}
+          {/* Guest Mode Option on Left Column */}
+          <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              No Account Required?
             </span>
-          </button>
-        </form>
+            <button
+              onClick={handleGuestMode}
+              onMouseEnter={() => setGuestHover(true)}
+              onMouseLeave={() => setGuestHover(false)}
+              style={{
+                width: '100%',
+                background: '#FFFFFF',
+                color: '#475569',
+                border: '2.5px solid #475569',
+                padding: '0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                boxShadow: guestHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
+                transform: guestHover ? 'translate(3px, 3px)' : 'none',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                position: 'relative'
+              }}
+            >
+              {/* Background Crossed Paint Slashes */}
+              <CrossedPaintSlashes isHovered={guestHover} primaryColor="#f59e0b" secondaryColor="#ef4444" />
+              
+              {/* Bottom Growing Paint Drips */}
+              <PaintDrips isHovered={guestHover} colors={['#64748b', '#f59e0b', '#ef4444']} />
 
-        {/* Toggle between login and signup */}
-        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#475569' }}>
-          {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button
-            onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#059669',
-              fontWeight: 700,
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              padding: 0
-            }}
-          >
-            {isSignUp ? 'Sign In' : 'Sign Up'}
-          </button>
+              <span style={{ position: 'relative', zIndex: 1 }}>
+                Continue as Guest
+              </span>
+            </button>
+          </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0' }}>
-          <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
-          <span style={{ padding: '0 0.75rem', fontSize: '0.8rem', color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase' }}>Or</span>
-          <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
+        {/* ── RIGHT PANEL: MAIN LOGIN FORM (Takes 58% width) ── */}
+        <div style={{
+          flex: isMobile ? '1' : '0 0 58%',
+          padding: '3.5rem 3rem'
+        }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.5rem 0' }}>
+            {isSignUp ? 'Create your Account' : 'Welcome Back'}
+          </h2>
+          <p style={{ fontSize: '0.9rem', color: '#64748B', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
+            {isSignUp ? 'Fill in your details below to get started.' : 'Sign in to sync your saved resumes.'}
+          </p>
+
+          {/* Alerts */}
+          <AnimatePresence mode="wait">
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#B91C1C', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 600 }}
+              >
+                ⚠️ {error}
+              </motion.div>
+            )}
+            {message && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                style={{ background: '#ECFDF5', border: '2px solid #6EE7B7', color: '#047857', borderRadius: '8px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.25rem', fontWeight: 600 }}
+              >
+                ✨ {message}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* Email input */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Email Address
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Mail size={18} /></span>
+                <input 
+                  type="email" 
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.75rem',
+                    borderRadius: '8px',
+                    border: '2px solid #E2E8F0',
+                    outline: 'none',
+                    fontSize: '1rem',
+                    color: '#1E293B',
+                    boxShadow: emailFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
+                    borderColor: emailFocus ? '#059669' : '#E2E8F0',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onFocus={() => setEmailFocus(true)}
+                  onBlur={() => setEmailFocus(false)}
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Password input */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Password
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#94A3B8' }}><Lock size={18} /></span>
+                <input 
+                  type="password" 
+                  required
+                  minLength={6}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.75rem',
+                    borderRadius: '8px',
+                    border: '2px solid #E2E8F0',
+                    outline: 'none',
+                    fontSize: '1rem',
+                    color: '#1E293B',
+                    boxShadow: passFocus ? '3px 3px 0px #059669' : '2px 2px 0px rgba(0,0,0,0.02)',
+                    borderColor: passFocus ? '#059669' : '#E2E8F0',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onFocus={() => setPassFocus(true)}
+                  onBlur={() => setPassFocus(false)}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Submit Button (White background on hover so green doesn't hide slashes & drips) */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              onMouseEnter={() => setSubmitHover(true)}
+              onMouseLeave={() => setSubmitHover(false)}
+              style={{
+                background: '#FFFFFF',
+                color: '#059669',
+                border: '2.5px solid #059669',
+                padding: '0.9rem',
+                borderRadius: '8px',
+                fontWeight: 800,
+                fontSize: '1.05rem',
+                cursor: isLoading ? 'wait' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '0.5rem',
+                boxShadow: submitHover ? '1px 1px 0px #059669' : '4px 4px 0px #059669',
+                transform: submitHover ? 'translate(3px, 3px)' : 'none',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                opacity: isLoading ? 0.8 : 1,
+                position: 'relative'
+              }}
+            >
+              {/* Background Crossed Paint Slashes */}
+              <CrossedPaintSlashes isHovered={submitHover} primaryColor="#3b82f6" secondaryColor="#ec4899" />
+              
+              {/* Bottom Growing Paint Drips */}
+              <PaintDrips isHovered={submitHover} colors={['#10b981', '#3b82f6', '#ec4899']} />
+
+              <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {isLoading ? (
+                  <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <Sparkles size={18} />
+                )}
+                {isSignUp ? 'Create Account' : 'Sign In'}
+              </span>
+            </button>
+          </form>
+
+          {/* Toggle between login and signup */}
+          <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#475569' }}>
+            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#059669',
+                fontWeight: 700,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                padding: 0
+              }}
+            >
+              {isSignUp ? 'Sign In' : 'Sign Up'}
+            </button>
+          </div>
         </div>
-
-        {/* Guest Mode Button (Creative Sketched Border Style with Slashes & Drips) */}
-        <button
-          onClick={handleGuestMode}
-          onMouseEnter={() => setGuestHover(true)}
-          onMouseLeave={() => setGuestHover(false)}
-          style={{
-            width: '100%',
-            background: guestHover ? '#475569' : '#FFFFFF',
-            color: guestHover ? '#FFFFFF' : '#475569',
-            border: '2.5px solid #475569',
-            padding: '0.85rem',
-            borderRadius: '8px',
-            fontSize: '0.95rem',
-            fontWeight: 800,
-            cursor: 'pointer',
-            boxShadow: guestHover ? '1px 1px 0px #475569' : '4px 4px 0px #475569',
-            transform: guestHover ? 'translate(3px, 3px)' : 'none',
-            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-            position: 'relative'
-          }}
-        >
-          {/* Background Crossed Paint Slashes */}
-          <CrossedPaintSlashes isHovered={guestHover} primaryColor="#f59e0b" secondaryColor="#ef4444" />
-          
-          {/* Bottom Growing Paint Drips */}
-          <PaintDrips isHovered={guestHover} colors={['#64748b', '#f59e0b', '#ef4444']} />
-
-          <span style={{ position: 'relative', zIndex: 1 }}>
-            Continue as Guest (No Cloud Save)
-          </span>
-        </button>
       </motion.div>
 
       {/* Basic rotating spinner animation */}
