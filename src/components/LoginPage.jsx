@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, CheckCircle, Zap, Briefcase, Award } from 'lucide-react';
+import { FileText, ArrowLeft, Mail, Lock, Sparkles, Loader2, CheckCircle, Zap, Briefcase, Award, ArrowRightLeft } from 'lucide-react';
 
 // ── DECKLED TORN PAPER EDGES (HORIZONTAL) ──
 const TornEdge = ({ isBottom }) => {
@@ -47,7 +47,7 @@ const TornEdge = ({ isBottom }) => {
 };
 
 // ── DECKLED TORN PAPER EDGES (VERTICAL) ──
-const VerticalTornEdge = () => {
+const VerticalTornEdge = ({ isFlipped }) => {
   const gradientId = "vertical-paint-gradient";
   const d_white_vertical = "M0,0 L20,15 L6,35 L22,55 L8,75 L24,95 L9,115 L23,135 L7,155 L21,175 L5,195 L22,215 L8,235 L24,255 L9,275 L23,295 L6,315 L22,335 L8,355 L24,375 L9,395 L21,415 L5,435 L22,455 L8,475 L24,495 L9,515 L23,535 L7,555 L21,575 L5,595 L22,615 L8,635 L24,655 L9,675 L23,695 L6,715 L22,735 L8,755 L24,775 L9,795 L21,815 L5,835 L22,855 L8,875 L24,895 L9,915 L23,935 L7,955 L21,975 L5,995 L22,1015 L8,1035 L24,1055 L9,1075 L23,1095 L6,1115 L22,1135 L8,1155 L24,1175 L9,1190 L20,1200 L0,1200 Z";
   const d_paint_vertical = "M0,0 L24,15 L10,35 L26,55 L12,75 L28,95 L13,115 L27,135 L11,155 L25,175 L9,195 L26,215 L12,235 L28,255 L13,275 L27,295 L10,315 L26,335 L12,355 L28,375 L13,395 L25,415 L9,435 L26,455 L12,475 L28,495 L13,515 L27,535 L11,555 L25,575 L9,595 L26,615 L12,635 L28,655 L13,675 L27,695 L10,715 L26,735 L12,755 L28,775 L13,795 L25,815 L9,835 L26,855 L12,875 L28,895 L13,915 L27,935 L11,955 L25,975 L9,995 L26,1015 L12,1035 L28,1055 L13,1075 L27,1095 L10,1115 L26,1135 L12,1155 L28,1175 L13,1190 L24,1200 L0,1200 Z";
@@ -61,11 +61,12 @@ const VerticalTornEdge = () => {
       style={{ 
         position: 'absolute', 
         top: 0,
-        right: '-18px', 
+        [isFlipped ? 'left' : 'right']: '-18px', 
         height: '100%',
         width: '35px',
         zIndex: 10,
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        transform: isFlipped ? 'scaleX(-1)' : 'none'
       }}
     >
       <defs>
@@ -93,6 +94,7 @@ const LoginPage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [flipped, setFlipped] = useState(false);
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
 
@@ -135,48 +137,85 @@ const LoginPage = () => {
       minHeight: '100vh',
       width: '100vw',
       display: 'flex',
-      flexDirection: isMobile ? 'column' : 'row',
+      flexDirection: isMobile ? 'column' : (flipped ? 'row-reverse' : 'row'),
       background: 'var(--bg-color)',
       overflowX: 'hidden',
       position: 'relative'
     }}>
       
-      {/* ── LEFT PANEL: AUTH FORM (White Canvas) ── */}
-      <div style={{
-        flex: isMobile ? '1' : '0 0 42%',
-        background: '#FFFFFF',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: isMobile ? '2.5rem 1.5rem' : '4rem 4.5rem',
-        position: 'relative',
-        zIndex: 5,
-        minHeight: isMobile ? 'auto' : '100vh',
-        boxShadow: isMobile ? 'none' : '10px 0 30px rgba(0, 0, 0, 0.02)'
-      }}>
+      {/* ── LEFT/RIGHT PANEL: AUTH FORM (White Canvas) ── */}
+      <motion.div 
+        layout
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          flex: isMobile ? '1' : '0 0 42%',
+          background: '#FFFFFF',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: isMobile ? '2.5rem 1.5rem' : '4rem 4.5rem',
+          position: 'relative',
+          zIndex: 5,
+          minHeight: isMobile ? 'auto' : '100vh',
+          boxShadow: isMobile ? 'none' : (flipped ? '-10px 0 30px rgba(0, 0, 0, 0.015)' : '10px 0 30px rgba(0, 0, 0, 0.015)')
+        }}
+      >
         {/* Draw vertical torn edge dividing the panels on desktop */}
-        {!isMobile && <VerticalTornEdge />}
+        {!isMobile && <VerticalTornEdge isFlipped={flipped} />}
 
-        {/* Back Button */}
-        <button 
-          onClick={() => navigate('/')} 
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'transparent',
-            border: 'none',
-            color: '#64748B',
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            marginBottom: '2rem',
-            padding: 0,
-            alignSelf: 'flex-start'
-          }}
-        >
-          <ArrowLeft size={16} /> Back to home
-        </button>
+        {/* Top Control Bar (Back & Flip Buttons) */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%',
+          marginBottom: '2.5rem',
+          alignSelf: 'flex-start'
+        }}>
+          {/* Back Button */}
+          <button 
+            onClick={() => navigate('/')} 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'transparent',
+              border: 'none',
+              color: '#64748B',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              padding: 0
+            }}
+          >
+            <ArrowLeft size={16} /> Back to home
+          </button>
+
+          {/* Flip Layout Button (Only visible on Desktop) */}
+          {!isMobile && (
+            <button
+              onClick={() => setFlipped(!flipped)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(241, 245, 249, 0.8)',
+                border: '1px solid #E2E8F0',
+                color: '#475569',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                padding: '6px 12px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.borderColor = '#CBD5E1'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(241, 245, 249, 0.8)'; e.currentTarget.style.borderColor = '#E2E8F0'; }}
+            >
+              <ArrowRightLeft size={13} /> Flip Layout
+            </button>
+          )}
+        </div>
 
         <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
           {/* Logo / Header */}
@@ -201,24 +240,28 @@ const LoginPage = () => {
           </p>
 
           {/* Alerts */}
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 500 }}
-            >
-              ⚠️ {error}
-            </motion.div>
-          )}
-          {message && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{ background: '#ECFDF5', border: '1px solid #6EE7B7', color: '#047857', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
-            >
-              ✨ {message}
-            </motion.div>
-          )}
+          <AnimatePresence mode="wait">
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 500 }}
+              >
+                ⚠️ {error}
+              </motion.div>
+            )}
+            {message && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                style={{ background: '#ECFDF5', border: '1px solid #6EE7B7', color: '#047857', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}
+              >
+                ✨ {message}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Email input */}
@@ -358,24 +401,29 @@ const LoginPage = () => {
             Continue as Guest (No Cloud Save)
           </button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── RIGHT PANEL: INTERACTIVE THEME & SHOWCASE ── */}
-      <div style={{
-        flex: isMobile ? 'none' : '1',
-        background: 'linear-gradient(135deg, #091320 0%, #032b21 50%, #00120d 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '3rem 2rem',
-        position: 'relative',
-        overflow: 'hidden',
-        minHeight: isMobile ? '400px' : '100vh',
-        zIndex: 1
-      }}>
-        {/* Soft Radial Ambient Lights */}
-        <div style={{ position: 'absolute', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(0,0,0,0) 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '15%', left: '10%', width: '450px', height: '450px', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(0,0,0,0) 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
+      {/* ── RIGHT/LEFT PANEL: INTERACTIVE THEME & SHOWCASE (Light Multicolor Pastel Canvas) ── */}
+      <motion.div 
+        layout
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          flex: isMobile ? 'none' : '1',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(59, 130, 246, 0.03) 25%, rgba(139, 92, 246, 0.03) 55%, rgba(236, 72, 153, 0.03) 80%, rgba(245, 158, 11, 0.02) 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '3rem 2rem',
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: isMobile ? '400px' : '100vh',
+          zIndex: 1
+        }}
+      >
+        {/* Soft Watercolor Radial Ambient Lights */}
+        <div style={{ position: 'absolute', top: '10%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(55px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '15%', left: '10%', width: '450px', height: '450px', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: '40%', left: '35%', width: '350px', height: '350px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(50px)', pointerEvents: 'none' }} />
 
         <div style={{
           maxWidth: '540px',
@@ -394,9 +442,9 @@ const LoginPage = () => {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
               style={{
-                background: 'rgba(16, 185, 129, 0.08)',
-                border: '1.5px solid rgba(16, 185, 129, 0.25)',
-                color: '#34d399',
+                background: 'rgba(16, 185, 129, 0.06)',
+                border: '1.5px solid rgba(16, 185, 129, 0.15)',
+                color: '#047857',
                 padding: '0.4rem 1rem',
                 borderRadius: '30px',
                 fontSize: '0.85rem',
@@ -411,13 +459,13 @@ const LoginPage = () => {
             >
               <Sparkles size={14} /> AI-Powered Resume Builder
             </motion.div>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#F8FAFC', margin: 0, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#0F172A', margin: 0, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
               Create Resumes That <br />
-              <span style={{ background: 'linear-gradient(135deg, #34d399 0%, #60a5fa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(135deg, #059669 0%, #3b82f6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Get You Shortlisted
               </span>
             </h2>
-            <p style={{ color: '#94A3B8', fontSize: '1rem', fontWeight: 500, margin: 0, maxWidth: '440px', alignSelf: 'center' }}>
+            <p style={{ color: '#475569', fontSize: '1rem', fontWeight: 500, margin: 0, maxWidth: '440px', alignSelf: 'center' }}>
               Upload your old document and let our AI transform it into a gorgeous, job-winning resume in seconds.
             </p>
           </div>
@@ -448,23 +496,24 @@ const LoginPage = () => {
                 height: '210px',
                 background: '#FFFFFF',
                 borderRadius: '8px',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                border: '1px solid #F1F5F9',
                 transform: 'rotate(-6deg) translateX(-110px)',
                 zIndex: 2,
-                opacity: 0.55,
+                opacity: 0.7,
                 padding: '12px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px'
               }}
             >
-              <div style={{ height: '14px', width: '60%', background: '#CBD5E1', borderRadius: '4px' }} />
-              <div style={{ height: '8px', width: '40%', background: '#E2E8F0', borderRadius: '2px' }} />
-              <div style={{ borderBottom: '1px solid #F1F5F9', margin: '4px 0' }} />
+              <div style={{ height: '14px', width: '60%', background: '#E2E8F0', borderRadius: '4px' }} />
+              <div style={{ height: '8px', width: '40%', background: '#F1F5F9', borderRadius: '2px' }} />
+              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '4px 0' }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ height: '6px', width: '90%', background: '#F1F5F9', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '80%', background: '#F1F5F9', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '85%', background: '#F1F5F9', borderRadius: '2px' }} />
+                <div style={{ height: '6px', width: '90%', background: '#F8FAFC', borderRadius: '2px' }} />
+                <div style={{ height: '6px', width: '80%', background: '#F8FAFC', borderRadius: '2px' }} />
+                <div style={{ height: '6px', width: '85%', background: '#F8FAFC', borderRadius: '2px' }} />
               </div>
             </motion.div>
 
@@ -486,23 +535,24 @@ const LoginPage = () => {
                 height: '210px',
                 background: '#FFFFFF',
                 borderRadius: '8px',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                border: '1px solid #F1F5F9',
                 transform: 'rotate(6deg) translateX(110px)',
                 zIndex: 2,
-                opacity: 0.55,
+                opacity: 0.7,
                 padding: '12px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px'
               }}
             >
-              <div style={{ height: '14px', width: '70%', background: '#A7F3D0', borderRadius: '4px' }} />
+              <div style={{ height: '14px', width: '70%', background: '#D1FAE5', borderRadius: '4px' }} />
               <div style={{ height: '8px', width: '30%', background: '#ECFDF5', borderRadius: '2px' }} />
-              <div style={{ borderBottom: '1px solid #F1F5F9', margin: '4px 0' }} />
+              <div style={{ borderBottom: '1px solid #F8FAFC', margin: '4px 0' }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ height: '6px', width: '80%', background: '#F1F5F9', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '90%', background: '#F1F5F9', borderRadius: '2px' }} />
-                <div style={{ height: '6px', width: '75%', background: '#F1F5F9', borderRadius: '2px' }} />
+                <div style={{ height: '6px', width: '80%', background: '#F8FAFC', borderRadius: '2px' }} />
+                <div style={{ height: '6px', width: '90%', background: '#F8FAFC', borderRadius: '2px' }} />
+                <div style={{ height: '6px', width: '75%', background: '#F8FAFC', borderRadius: '2px' }} />
               </div>
             </motion.div>
 
@@ -521,8 +571,8 @@ const LoginPage = () => {
                 height: '240px',
                 background: '#FFFFFF',
                 borderRadius: '10px',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.45)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
+                border: '1px solid #E2E8F0',
                 padding: '16px',
                 zIndex: 5,
                 display: 'flex',
@@ -534,7 +584,7 @@ const LoginPage = () => {
             >
               {/* Mini Resume Header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#475569' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, color: '#475569' }}>
                   AM
                 </div>
                 <div>
@@ -585,7 +635,7 @@ const LoginPage = () => {
                 fontWeight: 800,
                 padding: '3px 8px',
                 borderRadius: '20px',
-                boxShadow: '0 4px 8px rgba(16,185,129,0.3)',
+                boxShadow: '0 4px 8px rgba(16,185,129,0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '2px'
@@ -604,23 +654,24 @@ const LoginPage = () => {
             textAlign: 'left'
           }}>
             {[
-              { icon: <Zap size={16} color="#34d399" />, title: "Instant AI Parsing", desc: "Upload PDF/Word doc" },
-              { icon: <Sparkles size={16} color="#60a5fa" />, title: "10+ Pro Templates", desc: "Tailored to roles" },
-              { icon: <CheckCircle size={16} color="#a7f3d0" />, title: "Secure Cloud Sync", desc: "Save & edit anywhere" },
-              { icon: <FileText size={16} color="#fbbf24" />, title: "A4 PDF Export", desc: "Perfect PDF alignment" }
+              { icon: <Zap size={16} color="#059669" />, title: "Instant AI Parsing", desc: "Upload PDF/Word doc" },
+              { icon: <Sparkles size={16} color="#2563eb" />, title: "10+ Pro Templates", desc: "Tailored to roles" },
+              { icon: <CheckCircle size={16} color="#10b981" />, title: "Secure Cloud Sync", desc: "Save & edit anywhere" },
+              { icon: <FileText size={16} color="#d97706" />, title: "A4 PDF Export", desc: "Perfect PDF alignment" }
             ].map((feature, i) => (
               <div key={i} style={{
                 display: 'flex',
                 gap: '10px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
                 padding: '0.8rem 1rem',
                 borderRadius: '12px',
                 alignItems: 'flex-start'
               }}>
                 <div style={{ marginTop: '2px' }}>{feature.icon}</div>
                 <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#E2E8F0' }}>{feature.title}</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B' }}>{feature.title}</div>
                   <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>{feature.desc}</div>
                 </div>
               </div>
@@ -628,7 +679,7 @@ const LoginPage = () => {
           </div>
 
         </div>
-      </div>
+      </motion.div>
 
       {/* Basic rotating spinner animation */}
       <style>{`
