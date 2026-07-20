@@ -4,46 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { FileText, ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
 
-// ── CREATIVE ANIMATED PAINT DRIPS (FULL WIDTH CONTINUOUS WAVE) ──
-const PaintDrips = ({ isHovered, offset = "-12px", height = "14px" }) => {
-  const path = "M 0,0 L 0,4 C 2,4 3,10 5,10 C 7,10 8,4 10,4 C 12,4 13,15 15,15 C 17,15 18,4 20,4 C 22,4 23,8 25,8 C 27,8 28,4 30,4 C 32,4 33,18 35,18 C 37,18 38,4 40,4 C 42,4 43,12 45,12 C 47,12 48,4 50,4 C 52,4 53,16 55,16 C 57,16 58,4 60,4 C 62,4 63,10 65,10 C 67,10 68,4 70,4 C 72,4 73,14 75,14 C 77,14 78,4 80,4 C 82,4 83,8 85,8 C 87,8 88,4 90,4 C 92,4 93,15 95,15 C 97,15 98,4 100,4 L 100,0 Z";
-
-  return (
-    <div style={{ 
-      position: 'absolute', 
-      bottom: offset, 
-      left: 0, 
-      right: 0, 
-      height: height, 
-      pointerEvents: 'none', 
-      zIndex: 2,
-      overflow: 'visible'
-    }}>
-      <motion.svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 100 18"
-        preserveAspectRatio="none"
-        initial={{ scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: isHovered ? 1 : 0, opacity: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.28, ease: 'easeOut' }}
-        style={{ originY: 0 }}
-      >
-        <defs>
-          <linearGradient id="full-drips-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#10B981" />
-            <stop offset="25%" stopColor="#3B82F6" />
-            <stop offset="50%" stopColor="#8B5CF6" />
-            <stop offset="75%" stopColor="#EC4899" />
-            <stop offset="100%" stopColor="#F59E0B" />
-          </linearGradient>
-        </defs>
-        <path d={path} fill="url(#full-drips-gradient)" />
-      </motion.svg>
-    </div>
-  );
-};
-
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,14 +13,9 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  // Focus & Hover states
+  // Focus states for the inputs (drives the page-on-page rotation under fields)
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
-  const [submitHover, setSubmitHover] = useState(false);
-
-  // Header Tab Hover states
-  const [signInHover, setSignInHover] = useState(false);
-  const [signUpHover, setSignUpHover] = useState(false);
 
   const navigate = useNavigate();
   const { signUp, signIn } = useAuth();
@@ -233,58 +188,52 @@ const LoginPage = () => {
                 justifyContent: 'center'
               }}>
                 
-                {/* ── NEW DUAL-TAB TOGGLE SELECTOR (HIGHLY VISIBLE / BIG BLOCKS) ── */}
+                {/* ── NEW DUAL-TAB TOGGLE SELECTOR (NORMAL SEGMENTED TABS) ── */}
                 <div style={{ 
                   display: 'flex', 
-                  gap: '12px', 
+                  gap: '8px', 
                   marginBottom: '1.25rem', 
                   width: '100%',
-                  position: 'relative'
+                  background: '#F1F5F9',
+                  padding: '6px',
+                  borderRadius: '10px'
                 }}>
                   <button
                     type="button"
                     onClick={() => { if (isSignUp) { setIsSignUp(false); setError(''); setMessage(''); } }}
-                    onMouseEnter={() => setSignInHover(true)}
-                    onMouseLeave={() => setSignInHover(false)}
                     style={{
                       flex: 1,
-                      padding: '0.85rem',
+                      padding: '0.75rem',
                       borderRadius: '8px',
-                      background: !isSignUp ? '#FFFFFF' : '#F8FAFC',
-                      color: '#0F172A',
-                      border: !isSignUp ? '2.5px solid #0F172A' : '1.5px solid #E2E8F0',
+                      background: !isSignUp ? '#0F172A' : 'transparent',
+                      color: !isSignUp ? '#FFFFFF' : '#475569',
+                      border: 'none',
                       fontWeight: 800,
-                      fontSize: '1rem',
+                      fontSize: '0.95rem',
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      position: 'relative'
+                      transition: 'all 0.15s ease'
                     }}
                   >
-                    {!isSignUp && <PaintDrips isHovered={signInHover} offset="-10px" height="12px" />}
-                    <span style={{ position: 'relative', zIndex: 1 }}>Sign In</span>
+                    Sign In
                   </button>
 
                   <button
                     type="button"
                     onClick={() => { if (!isSignUp) { setIsSignUp(true); setError(''); setMessage(''); } }}
-                    onMouseEnter={() => setSignUpHover(true)}
-                    onMouseLeave={() => setSignUpHover(false)}
                     style={{
                       flex: 1,
-                      padding: '0.85rem',
+                      padding: '0.75rem',
                       borderRadius: '8px',
-                      background: isSignUp ? '#FFFFFF' : '#F8FAFC',
-                      color: '#0F172A',
-                      border: isSignUp ? '2.5px solid #0F172A' : '1.5px solid #E2E8F0',
+                      background: isSignUp ? '#0F172A' : 'transparent',
+                      color: isSignUp ? '#FFFFFF' : '#475569',
+                      border: 'none',
                       fontWeight: 800,
-                      fontSize: '1rem',
+                      fontSize: '0.95rem',
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      position: 'relative'
+                      transition: 'all 0.15s ease'
                     }}
                   >
-                    {isSignUp && <PaintDrips isHovered={signUpHover} offset="-10px" height="12px" />}
-                    <span style={{ position: 'relative', zIndex: 1 }}>Create Account</span>
+                    Create Account
                   </button>
                 </div>
 
@@ -442,16 +391,14 @@ const LoginPage = () => {
                     </div>
                   </div>
 
-                  {/* Submit Button */}
+                  {/* ── NEW NORMAL SUBMIT BUTTON (NO PAINT ANIMATIONS) ── */}
                   <button
                     type="submit"
                     disabled={isLoading}
-                    onMouseEnter={() => setSubmitHover(true)}
-                    onMouseLeave={() => setSubmitHover(false)}
                     style={{
-                      background: '#FFFFFF',
-                      color: '#0F172A',
-                      border: '2.5px solid #0F172A',
+                      background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                      color: '#FFFFFF',
+                      border: 'none',
                       padding: '0.9rem',
                       borderRadius: '8px',
                       fontWeight: 800,
@@ -462,22 +409,27 @@ const LoginPage = () => {
                       justifyContent: 'center',
                       gap: '8px',
                       marginTop: '0.5rem',
-                      boxShadow: 'none',
-                      transform: 'none',
-                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                      opacity: isLoading ? 0.8 : 1,
-                      position: 'relative'
+                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12)',
+                      transition: 'all 0.2s ease',
+                      opacity: isLoading ? 0.8 : 1
+                    }}
+                    onMouseOver={(e) => {
+                      if (!isLoading) {
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(15, 23, 42, 0.22)';
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (!isLoading) {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.12)';
+                      }
                     }}
                   >
-                    {/* Bottom Growing Paint Drips */}
-                    <PaintDrips isHovered={submitHover} offset="-12px" height="16px" />
-
-                    <span style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {isLoading && (
-                        <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                      )}
-                      {isSignUp ? 'Create Account' : 'Sign In'}
-                    </span>
+                    {isLoading && (
+                      <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                    )}
+                    {isSignUp ? 'Create Account' : 'Sign In'}
                   </button>
                 </form>
               </div>
