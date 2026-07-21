@@ -439,6 +439,14 @@ const FlaskIcon = ({ spilled }) => (
   </svg>
 );
 
+// --- CUSTOM SVG GITHUB ICON ---
+const GithubIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
+
 const LoginPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -573,10 +581,10 @@ const LoginPage = () => {
               {/* ── LEFT PANEL: BRANDING (40% width) ── */}
               <div style={{
                 flex: isMobile ? 'none' : '0 0 40%',
-                padding: isMobile ? '2.5rem 2rem 1.5rem 2rem' : '3.5rem 3rem',
+                padding: isMobile ? '2.5rem 2rem 2.5rem 2rem' : '3.5rem 3rem',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'flex-start',
+                justifyContent: isMobile ? 'flex-start' : 'space-between',
                 gap: '1.5rem',
                 borderRight: isMobile ? 'none' : '1px dashed #E2E8F0',
                 borderBottom: isMobile ? '1px dashed #E2E8F0' : 'none'
@@ -622,6 +630,96 @@ const LoginPage = () => {
                   <p style={{ fontSize: '1rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
                     Upload your old document and let our AI transform it into a professional, job-ready resume in seconds.
                   </p>
+                </div>
+
+                {/* ── OAUTH LOGIN OPTIONS ── */}
+                <div style={{ marginTop: isMobile ? '1.5rem' : 'auto' }}>
+                  <div style={{ 
+                    fontSize: '0.75rem', 
+                    fontWeight: 800, 
+                    color: '#64748B', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.05em', 
+                    marginBottom: '0.75rem' 
+                  }}>
+                    Or continue with
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                    {/* Google OAuth Button */}
+                    <button
+                      type="button"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '0.65rem',
+                        borderRadius: '8px',
+                        background: '#FFFFFF',
+                        border: '1.5px solid #E2E8F0',
+                        color: '#334155',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = '#F8FAFC';
+                        e.currentTarget.style.borderColor = '#CBD5E1';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = '#FFFFFF';
+                        e.currentTarget.style.borderColor = '#E2E8F0';
+                        e.currentTarget.style.transform = 'none';
+                      }}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 18 18" style={{ flexShrink: 0 }}>
+                        <path fill="#EA4335" d="M9 3.6c1.6 0 3 .6 4.1 1.6l3.1-3.1C14.3.7 11.8 0 9 0 5.5 0 2.4 2 1 5l3.5 2.7C5.4 5.3 7 3.6 9 3.6z" />
+                        <path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.7H9v3.4h4.8c-.2 1.1-.8 2-1.8 2.6l2.8 2.2c1.7-1.6 2.8-3.9 2.8-6.5z" />
+                        <path fill="#FBBC05" d="M4.5 10.3c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2L1 3.6C.3 5 .0 6.5.0 8s.3 3 1 4.4l3.5-2.7z" />
+                        <path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.8-2.2c-.8.5-1.9.8-3.2.8-2 0-3.6-1.7-4.2-4.1L1.3 13C2.7 16 5.6 18 9 18z" />
+                      </svg>
+                      Google
+                    </button>
+
+                    {/* GitHub OAuth Button */}
+                    <button
+                      type="button"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '0.65rem',
+                        borderRadius: '8px',
+                        background: '#181717',
+                        border: '1.5px solid #181717',
+                        color: '#FFFFFF',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = '#272626';
+                        e.currentTarget.style.borderColor = '#272626';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = '#181717';
+                        e.currentTarget.style.borderColor = '#181717';
+                        e.currentTarget.style.transform = 'none';
+                      }}
+                    >
+                      <GithubIcon />
+                      GitHub
+                    </button>
+                  </div>
                 </div>
               </div>
 
