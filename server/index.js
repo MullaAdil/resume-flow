@@ -164,13 +164,21 @@ const getClientOrigin = (req) => {
   return CLIENT_URL;
 };
 
+// Helper to get server's own URL dynamically (protocol + host)
+const getServerUrl = (req) => {
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  return `${proto}://${host}`;
+};
+
 // Initiate Google Login
 app.get('/api/auth/google', (req, res) => {
   if (!GOOGLE_CLIENT_ID) {
     return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('Google Client ID is not configured on the server.')}`);
   }
   const clientOrigin = getClientOrigin(req);
-  const redirectUri = `${SERVER_URL}/api/auth/google/callback`;
+  const serverUrl = getServerUrl(req);
+  const redirectUri = `${serverUrl}/api/auth/google/callback`;
   const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&state=${encodeURIComponent(clientOrigin)}`;
   res.redirect(url);
 });
@@ -179,7 +187,8 @@ app.get('/api/auth/google', (req, res) => {
 app.get('/api/auth/google/callback', async (req, res) => {
   const { code, state } = req.query;
   const clientOrigin = state || CLIENT_URL;
-  const redirectUri = `${SERVER_URL}/api/auth/google/callback`;
+  const serverUrl = getServerUrl(req);
+  const redirectUri = `${serverUrl}/api/auth/google/callback`;
   
   if (!code) {
     console.log('[Google Auth] Missing code parameter');
@@ -250,7 +259,8 @@ app.get('/api/auth/github', (req, res) => {
     return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('GitHub Client ID is not configured on the server.')}`);
   }
   const clientOrigin = getClientOrigin(req);
-  const redirectUri = `${SERVER_URL}/api/auth/github/callback`;
+  const serverUrl = getServerUrl(req);
+  const redirectUri = `${serverUrl}/api/auth/github/callback`;
   const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email&state=${encodeURIComponent(clientOrigin)}`;
   res.redirect(url);
 });
