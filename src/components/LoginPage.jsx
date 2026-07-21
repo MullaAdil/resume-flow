@@ -498,12 +498,12 @@ const LoginPage = () => {
   }, [location]);
 
   const handleGoogleLogin = () => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || '';
     window.location.href = `${apiBase}/api/auth/google`;
   };
 
   const handleGithubLogin = () => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || '';
     window.location.href = `${apiBase}/api/auth/github`;
   };
 

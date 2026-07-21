@@ -18,6 +18,12 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/resume
 app.use(cors());
 app.use(express.json());
 
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`[HTTP] ${req.method} ${req.url}`);
+  next();
+});
+
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB successfully'))
@@ -413,4 +419,6 @@ app.get('/api/health', (req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('Google Client ID Loaded:', GOOGLE_CLIENT_ID ? 'YES' : 'NO');
+  console.log('GitHub Client ID Loaded:', GITHUB_CLIENT_ID ? 'YES' : 'NO');
 });
