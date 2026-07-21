@@ -39,10 +39,8 @@ const TornEdge = ({ isBottom }) => (
 );
 
 const LandingPage = () => {
-  const [showProfileModal, setShowProfileModal] = React.useState(false);
-  const [pendingNavigation, setPendingNavigation] = React.useState(null);
   const navigate = useNavigate();
-  const { setSelectedTemplate, setProfileType } = useResume();
+  const { setSelectedTemplate } = useResume();
   const { user, signOut } = useAuth();
   const templatesRef = useRef(null);
 
@@ -53,19 +51,6 @@ const LandingPage = () => {
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
     navigate('/choose');
-  };
-
-  const handleActionClick = (targetRoute, skipPath) => {
-    setPendingNavigation({ route: targetRoute, state: { skipPathSelection: skipPath } });
-    setShowProfileModal(true);
-  };
-
-  const handleSelectProfile = (type) => {
-    setProfileType(type);
-    setShowProfileModal(false);
-    if (pendingNavigation) {
-      navigate(pendingNavigation.route, { state: pendingNavigation.state });
-    }
   };
 
   return (
@@ -104,7 +89,7 @@ const LandingPage = () => {
               </span>
               <button 
                 className="btn-primary" 
-                onClick={() => handleActionClick('/templates', true)}
+                onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
                 style={{ padding: '0.5rem 1.25rem', borderRadius: '6px', fontSize: '0.95rem' }}
               >
                 Dashboard
@@ -168,13 +153,13 @@ const LandingPage = () => {
             <div className="hero-actions" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
               <button 
                 className="btn-primary" 
-                onClick={() => handleActionClick('/templates', true)}
+                onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
                 style={{ fontSize: '1.2rem', padding: '1.1rem 2.5rem', borderRadius: '24px 12px 24px 12px', background: '#059669', color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(5,150,105,0.3)' }}
               >
                 Build Your Resume
               </button>
               <button 
-                onClick={() => handleActionClick('/import', false)}
+                onClick={() => navigate('/import', { state: { skipPathSelection: false } })}
                 style={{ 
                   fontSize: '1.1rem', padding: '1rem 2.5rem', borderRadius: '8px', 
                   backgroundColor: 'transparent', color: 'var(--text-main)', border: '2px solid var(--text-main)',
@@ -349,43 +334,7 @@ const LandingPage = () => {
       {/* Clean Formal Login Modal */}
 
 
-      {/* Profile Selection Modal */}
-      {showProfileModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowProfileModal(false)}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '3rem 2.5rem', maxWidth: '500px', width: '90%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative' }}>
-            <TornEdge />
-            <TornEdge isBottom />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800, color: '#111827' }}>What describes you best?</h3>
-              <button onClick={() => setShowProfileModal(false)} style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', fontSize: '1.25rem' }}>×</button>
-            </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', marginTop: '-0.5rem' }}>
-              We tailor the resume builder experience based on your background.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <button 
-                onClick={() => handleSelectProfile('student')}
-                style={{ padding: '1.5rem', borderRadius: '12px', border: '2px solid #CBD5E1', background: '#FFFFFF', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s ease', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}
-                onMouseOver={(e) => { e.currentTarget.style.borderColor = '#059669'; e.currentTarget.style.background = '#F0FDF4'; }}
-                onMouseOut={(e) => { e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.background = '#FFFFFF'; }}
-              >
-                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#111827' }}>🎓 Student / Graduate</span>
-                <span style={{ fontSize: '0.95rem', color: '#475569' }}>I want to highlight my education, projects, and skills.</span>
-              </button>
 
-              <button 
-                onClick={() => handleSelectProfile('employee')}
-                style={{ padding: '1.5rem', borderRadius: '12px', border: '2px solid #CBD5E1', background: '#FFFFFF', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s ease', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}
-                onMouseOver={(e) => { e.currentTarget.style.borderColor = '#1D4ED8'; e.currentTarget.style.background = '#EFF6FF'; }}
-                onMouseOut={(e) => { e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.background = '#FFFFFF'; }}
-              >
-                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#111827' }}>💼 Professional / Employee</span>
-                <span style={{ fontSize: '0.95rem', color: '#475569' }}>I want to highlight my work experience and career impact.</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </motion.div>
   );
 };
