@@ -167,8 +167,17 @@ const getClientOrigin = (req) => {
 
 // Helper to get server's own URL dynamically (protocol + host)
 const getServerUrl = (req) => {
-  const host = req.headers['x-forwarded-host'] || req.headers.host;
-  const proto = req.headers['x-forwarded-proto'] || req.protocol;
+  if (process.env.SERVER_URL) {
+    return process.env.SERVER_URL;
+  }
+  let host = req.headers['x-forwarded-host'] || req.headers.host || '';
+  if (host.includes(',')) {
+    host = host.split(',')[0].trim();
+  }
+  let proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  if (proto.includes(',')) {
+    proto = proto.split(',')[0].trim();
+  }
   return `${proto}://${host}`;
 };
 
