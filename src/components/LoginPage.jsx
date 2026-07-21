@@ -565,7 +565,7 @@ const LoginPage = () => {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'visible',
-        height: isMobile ? 'auto' : '490px'
+        height: isMobile ? 'auto' : '560px'
       }}>
         
         {/* Layer 1: Bottom Colorful Artist Cover (Static backing) */}
@@ -635,34 +635,34 @@ const LoginPage = () => {
                       background: 'transparent',
                       border: 'none',
                       color: '#475569',
-                      fontSize: '0.95rem',
+                      fontSize: '1.05rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      marginBottom: '2rem',
+                      marginBottom: '2.5rem',
                       padding: 0
                     }}
                   >
-                    <ArrowLeft size={16} /> Back to home
+                    <ArrowLeft size={18} /> Back to home
                   </button>
 
                   {/* Logo / Header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
                     <div style={{
                       background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      padding: '8px',
-                      borderRadius: '10px',
+                      padding: '10px',
+                      borderRadius: '12px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}>
-                      <FileText size={24} color="#FFFFFF" />
+                      <FileText size={28} color="#FFFFFF" />
                     </div>
-                    <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+                    <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
                       Elevate Resume
                     </h1>
                   </div>
 
-                  <p style={{ fontSize: '1rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
+                  <p style={{ fontSize: '1.1rem', color: '#1E293B', fontWeight: 600, lineHeight: 1.5, margin: 0 }}>
                     Upload your old document and let our AI transform it into a professional, job-ready resume in seconds.
                   </p>
                 </div>
@@ -670,16 +670,16 @@ const LoginPage = () => {
                 {/* ── OAUTH LOGIN OPTIONS ── */}
                 <div style={{ marginTop: isMobile ? '1.5rem' : 'auto' }}>
                   <div style={{ 
-                    fontSize: '0.75rem', 
-                    fontWeight: 800, 
-                    color: '#64748B', 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '0.05em', 
-                    marginBottom: '0.75rem' 
+                    fontSize: '0.85rem',
+                    fontWeight: 800,
+                    color: '#64748B',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    marginBottom: '1rem'
                   }}>
                     Or continue with
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {/* Google OAuth Button */}
                     <button
                       type="button"
@@ -688,15 +688,15 @@ const LoginPage = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         width: '100%',
-                        padding: '0.65rem',
+                        padding: '0.85rem',
                         borderRadius: '8px',
                         background: '#FFFFFF',
                         border: '1.5px solid #E2E8F0',
                         color: '#334155',
                         fontWeight: 700,
-                        fontSize: '0.9rem',
+                        fontSize: '1.05rem',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                         boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
@@ -712,7 +712,7 @@ const LoginPage = () => {
                         e.currentTarget.style.transform = 'none';
                       }}
                     >
-                      <svg width="18" height="18" viewBox="0 0 18 18" style={{ flexShrink: 0 }}>
+                      <svg width="20" height="20" viewBox="0 0 18 18" style={{ flexShrink: 0 }}>
                         <path fill="#EA4335" d="M9 3.6c1.6 0 3 .6 4.1 1.6l3.1-3.1C14.3.7 11.8 0 9 0 5.5 0 2.4 2 1 5l3.5 2.7C5.4 5.3 7 3.6 9 3.6z" />
                         <path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.7H9v3.4h4.8c-.2 1.1-.8 2-1.8 2.6l2.8 2.2c1.7-1.6 2.8-3.9 2.8-6.5z" />
                         <path fill="#FBBC05" d="M4.5 10.3c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2L1 3.6C.3 5 .0 6.5.0 8s.3 3 1 4.4l3.5-2.7z" />
@@ -729,15 +729,15 @@ const LoginPage = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         width: '100%',
-                        padding: '0.65rem',
+                        padding: '0.85rem',
                         borderRadius: '8px',
                         background: '#181717',
                         border: '1.5px solid #181717',
                         color: '#FFFFFF',
                         fontWeight: 700,
-                        fontSize: '0.9rem',
+                        fontSize: '1.05rem',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                         boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
@@ -773,7 +773,7 @@ const LoginPage = () => {
                 <div style={{ 
                   display: 'flex', 
                   gap: '8px', 
-                  marginBottom: '1.25rem', 
+                  marginBottom: '1.5rem', 
                   width: '100%',
                   background: '#F1F5F9',
                   padding: '6px',
@@ -784,7 +784,7 @@ const LoginPage = () => {
                     onClick={() => { if (isSignUp) { setIsSignUp(false); setError(''); setMessage(''); } }}
                     style={{
                       flex: 1,
-                      padding: '0.75rem',
+                      padding: '0.85rem',
                       borderRadius: '8px',
                       background: !isSignUp ? 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)' : 'transparent',
                       backgroundSize: '400% 400%',
@@ -793,7 +793,7 @@ const LoginPage = () => {
                       border: 'none',
                       boxShadow: !isSignUp ? '0 4px 12px rgba(234, 88, 12, 0.25)' : 'none',
                       fontWeight: 800,
-                      fontSize: '0.95rem',
+                      fontSize: '1.05rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
@@ -810,7 +810,7 @@ const LoginPage = () => {
                     onClick={() => { if (!isSignUp) { setIsSignUp(true); setError(''); setMessage(''); } }}
                     style={{
                       flex: 1,
-                      padding: '0.75rem',
+                      padding: '0.85rem',
                       borderRadius: '8px',
                       background: isSignUp ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' : 'transparent',
                       backgroundSize: '400% 400%',
@@ -819,7 +819,7 @@ const LoginPage = () => {
                       border: 'none',
                       boxShadow: isSignUp ? '0 4px 12px rgba(125, 211, 252, 0.2)' : 'none',
                       fontWeight: 800,
-                      fontSize: '0.95rem',
+                      fontSize: '1.05rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
@@ -831,8 +831,8 @@ const LoginPage = () => {
                     <span style={{ position: 'relative', zIndex: 2 }}>Create Account</span>
                   </button>
                 </div>
-
-                <p style={{ fontSize: '0.95rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
+ 
+                <p style={{ fontSize: '1.05rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
                   {isSignUp ? 'Fill in your email and password to register.' : 'Sign in to access saved resumes.'}
                 </p>
 
@@ -860,26 +860,26 @@ const LoginPage = () => {
                   )}
                 </AnimatePresence>
 
-                <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   {/* Email input */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#4A3B32', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.9rem', fontWeight: 800, color: '#4A3B32', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       Email Address
                     </label>
                     <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
-                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: emailFocus ? '#8B7E66' : '#8C8273', zIndex: 6 }}>
-                        <Mail size={18} />
+                      <span style={{ position: 'absolute', left: '14px', top: '16px', color: emailFocus ? '#8B7E66' : '#8C8273', zIndex: 6 }}>
+                        <Mail size={20} />
                       </span>
                       <input 
                         type="email" 
                         required
                         style={{
                           width: '100%',
-                          padding: '0.75rem 1rem 0.75rem 2.75rem',
+                          padding: '0.9rem 1rem 0.9rem 2.85rem',
                           borderRadius: '8px',
                           border: '1.5px solid',
                           outline: 'none',
-                          fontSize: '1rem',
+                          fontSize: '1.05rem',
                           color: '#4A3B32',
                           boxShadow: 'none',
                           borderColor: emailFocus ? '#C2B280' : '#E3DEC3',
@@ -899,13 +899,13 @@ const LoginPage = () => {
                   </div>
 
                   {/* Password input */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#4A3B32', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.9rem', fontWeight: 800, color: '#4A3B32', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       Password
                     </label>
                     <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
-                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: passFocus ? '#8B7E66' : '#8C8273', zIndex: 6 }}>
-                        <Lock size={18} />
+                      <span style={{ position: 'absolute', left: '14px', top: '16px', color: passFocus ? '#8B7E66' : '#8C8273', zIndex: 6 }}>
+                        <Lock size={20} />
                       </span>
                       <input 
                         type={showPassword ? 'text' : 'password'} 
@@ -913,11 +913,11 @@ const LoginPage = () => {
                         minLength={6}
                         style={{
                           width: '100%',
-                          padding: '0.75rem 3rem 0.75rem 2.75rem',
+                          padding: '0.9rem 3rem 0.9rem 2.85rem',
                           borderRadius: '8px',
                           border: '1.5px solid',
                           outline: 'none',
-                          fontSize: '1rem',
+                          fontSize: '1.05rem',
                           color: '#4A3B32',
                           boxShadow: 'none',
                           borderColor: passFocus 
@@ -946,8 +946,8 @@ const LoginPage = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         style={{
                           position: 'absolute',
-                          right: '10px',
-                          top: '9px',
+                          right: '12px',
+                          top: '12px',
                           background: 'transparent',
                           border: 'none',
                           cursor: 'pointer',
@@ -981,16 +981,16 @@ const LoginPage = () => {
                       animation: 'water-gradient 8s ease infinite',
                       color: isSignUp ? '#0369a1' : '#FFFFFF',
                       border: 'none',
-                      padding: '0.9rem',
+                      padding: '1.05rem',
                       borderRadius: '8px',
                       fontWeight: 800,
-                      fontSize: '1.05rem',
+                      fontSize: '1.15rem',
                       cursor: isLoading ? 'wait' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
-                      marginTop: '0.5rem',
+                      marginTop: '0.75rem',
                       boxShadow: isSignUp 
                         ? '0 4px 12px rgba(125, 211, 252, 0.25)' 
                         : '0 4px 12px rgba(234, 88, 12, 0.25)',

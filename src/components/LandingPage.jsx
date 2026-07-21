@@ -103,7 +103,24 @@ const LandingPage = () => {
             </>
           ) : (
             <>
-              <button onClick={() => navigate('/login', { state: { mode: 'signin' } })} style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer', padding: '0.5rem', fontSize: '1.05rem' }}>Sign In</button>
+              <button 
+                onClick={() => navigate('/login', { state: { mode: 'signin' } })} 
+                style={{ 
+                  background: 'transparent', 
+                  border: '1.5px solid #CBD5E1', 
+                  color: 'var(--text-main)', 
+                  fontWeight: 700, 
+                  cursor: 'pointer', 
+                  padding: '0.5rem 1.25rem', 
+                  borderRadius: '6px', 
+                  fontSize: '0.95rem',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.borderColor = '#94A3B8'; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#CBD5E1'; }}
+              >
+                Sign In
+              </button>
               <button 
                 className="btn-primary" 
                 onClick={() => navigate('/login', { state: { mode: 'signup' } })}
