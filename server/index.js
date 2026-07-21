@@ -157,21 +157,25 @@ app.get('/api/auth/google', (req, res) => {
   if (!GOOGLE_CLIENT_ID) {
     return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('Google Client ID is not configured on the server.')}`);
   }
+  const clientOrigin = req.query.origin || CLIENT_URL;
   const redirectUri = `${SERVER_URL}/api/auth/google/callback`;
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile`;
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&state=${encodeURIComponent(clientOrigin)}`;
   res.redirect(url);
 });
 
 // Google Callback
 app.get('/api/auth/google/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
+  const clientOrigin = state || CLIENT_URL;
   const redirectUri = `${SERVER_URL}/api/auth/google/callback`;
   
   if (!code) {
-    return res.redirect(`${CLIENT_URL}/login?error=auth_failed`);
+    console.log('[Google Auth] Missing code parameter');
+    return res.redirect(`${clientOrigin}/login?error=auth_failed`);
   }
 
   try {
+    console.log('[Google Auth] Exchanging code...');
     // Exchange authorization code for token
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -185,16 +189,20 @@ app.get('/api/auth/google/callback', async (req, res) => {
       })
     });
     
+    console.log('[Google Auth] Parsing token response...');
     const tokenData = await tokenResponse.json();
+    console.log('[Google Auth] Token Data received:', tokenData);
     if (tokenData.error) {
       throw new Error(tokenData.error_description || 'Failed to exchange Google authorization code');
     }
 
+    console.log('[Google Auth] Fetching user profile info...');
     // Retrieve user profile
     const userResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` }
     });
     const userData = await userResponse.json();
+    console.log('[Google Auth] User profile received:', userData.email);
 
     const email = userData.email;
     if (!email) {
@@ -216,10 +224,11 @@ app.get('/api/auth/google/callback', async (req, res) => {
     // Sign JWT session token
     const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
     
-    res.redirect(`${CLIENT_URL}/login?token=${token}`);
+    console.log('[Google Auth] Redirecting client with token...');
+    res.redirect(`${clientOrigin}/login?token=${token}`);
   } catch (err) {
     console.error('Google OAuth Error:', err);
-    res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent(err.message)}`);
+    res.redirect(`${clientOrigin}/login?error=${encodeURIComponent(err.message)}`);
   }
 });
 
@@ -228,17 +237,19 @@ app.get('/api/auth/github', (req, res) => {
   if (!GITHUB_CLIENT_ID) {
     return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('GitHub Client ID is not configured on the server.')}`);
   }
+  const clientOrigin = req.query.origin || CLIENT_URL;
   const redirectUri = `${SERVER_URL}/api/auth/github/callback`;
-  const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email`;
+  const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email&state=${encodeURIComponent(clientOrigin)}`;
   res.redirect(url);
 });
 
 // GitHub Callback
 app.get('/api/auth/github/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
+  const clientOrigin = state || CLIENT_URL;
   
   if (!code) {
-    return res.redirect(`${CLIENT_URL}/login?error=auth_failed`);
+    return res.redirect(`${clientOrigin}/login?error=auth_failed`);
   }
 
   try {
@@ -306,10 +317,10 @@ app.get('/api/auth/github/callback', async (req, res) => {
     // Sign JWT session token
     const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
     
-    res.redirect(`${CLIENT_URL}/login?token=${token}`);
+    res.redirect(`${clientOrigin}/login?token=${token}`);
   } catch (err) {
     console.error('GitHub OAuth Error:', err);
-    res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent(err.message)}`);
+    res.redirect(`${clientOrigin}/login?error=${encodeURIComponent(err.message)}`);
   }
 });
 

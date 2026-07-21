@@ -499,12 +499,14 @@ const LoginPage = () => {
 
   const handleGoogleLogin = () => {
     const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-    window.location.href = `${apiBase}/api/auth/google`;
+    const origin = window.location.origin;
+    window.location.href = `${apiBase}/api/auth/google?origin=${encodeURIComponent(origin)}`;
   };
 
   const handleGithubLogin = () => {
     const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-    window.location.href = `${apiBase}/api/auth/github`;
+    const origin = window.location.origin;
+    window.location.href = `${apiBase}/api/auth/github?origin=${encodeURIComponent(origin)}`;
   };
 
   const handleAuth = async (e) => {
