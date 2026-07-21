@@ -4,9 +4,16 @@ import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 import { User, Resume } from './models.js';
 
-dotenv.config();
+// Load .env.local first if it exists, otherwise fall back to .env
+if (fs.existsSync(path.resolve('.env.local'))) {
+  dotenv.config({ path: path.resolve('.env.local') });
+} else {
+  dotenv.config();
+}
 
 const app = express();
 const PORT = process.env.PORT || 5001;
