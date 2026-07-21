@@ -144,73 +144,100 @@ const DustParticles = ({ isFocused, inputValue }) => {
   );
 };
 
-// --- ANIMATED WATER FLOW WAVES OVERLAY (LIGHT NATURAL VIBE) ---
-const WaterWaves = () => (
-  <div style={{
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 0,
-    pointerEvents: 'none',
-    overflow: 'hidden',
-    zIndex: 1
-  }}>
-    {/* Wave 1 */}
-    <svg
-      viewBox="0 0 240 30"
-      preserveAspectRatio="none"
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '200%',
-        height: '80%',
-        fill: 'rgba(255, 255, 255, 0.55)', // higher opacity white foam
-        animation: 'flow-wave-1 6s linear infinite',
-        opacity: 0.85
-      }}
-    >
-      <path d="M 0 15 Q 30 10, 60 15 T 120 15 T 180 15 T 240 15 V 30 H 0 Z" />
-    </svg>
-    {/* Wave 2 */}
-    <svg
-      viewBox="0 0 200 30"
-      preserveAspectRatio="none"
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '200%',
-        height: '90%',
-        fill: 'rgba(255, 255, 255, 0.4)',
-        animation: 'flow-wave-2 9s linear infinite',
-        opacity: 0.7
-      }}
-    >
-      <path d="M 0 15 Q 25 8, 50 15 T 100 15 T 150 15 T 200 15 V 30 H 0 Z" />
-    </svg>
-    {/* Wave 3 */}
-    <svg
-      viewBox="0 0 280 30"
-      preserveAspectRatio="none"
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '200%',
-        height: '100%',
-        fill: 'rgba(255, 255, 255, 0.25)',
-        animation: 'flow-wave-3 12s linear infinite',
-        opacity: 0.55
-      }}
-    >
-      <path d="M 0 15 Q 35 12, 70 15 T 140 15 T 210 15 T 280 15 V 30 H 0 Z" />
-    </svg>
-  </div>
-);
+// --- ANIMATED BUBBLES CANVAS (WATER MINIMAL VIBE) ---
+const WaterBubblesCanvas = () => {
+  const canvasRef = useRef(null);
 
-// --- ANIMATED FLOWING FIRE FLAMES CANVAS (REAL LIFE FLAMES) ---
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    const resizeCanvas = () => {
+      if (!canvas || !canvas.parentElement) return;
+      canvas.width = canvas.parentElement.offsetWidth || 150;
+      canvas.height = canvas.parentElement.offsetHeight || 40;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let particles = [];
+    const maxParticles = 12;
+
+    class Bubble {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 5;
+        this.size = Math.random() * 1.5 + 0.8; // tiny micro bubbles
+        this.speedY = -(Math.random() * 0.4 + 0.2); // rise slowly
+        this.speedX = (Math.random() - 0.5) * 0.2;
+        this.alpha = Math.random() * 0.4 + 0.3;
+        this.decay = Math.random() * 0.005 + 0.003;
+      }
+
+      update() {
+        this.x += this.speedX + Math.sin(this.y * 0.02) * 0.1;
+        this.y += this.speedY;
+        this.alpha -= this.decay;
+        return this.alpha > 0;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(56, 189, 248, ${this.alpha})`;
+        ctx.fill();
+        
+        // highlight dot
+        ctx.beginPath();
+        ctx.arc(this.x - this.size * 0.3, this.y - this.size * 0.3, this.size * 0.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha * 0.8})`;
+        ctx.fill();
+      }
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (particles.length < maxParticles && Math.random() < 0.15) {
+        particles.push(new Bubble());
+      }
+
+      particles = particles.filter(p => {
+        const keep = p.update();
+        if (keep) p.draw();
+        return keep;
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 1
+      }}
+    />
+  );
+};
+
+// --- ANIMATED FLOWING FIRE FLAMES CANVAS (MINIMAL SPARKS VIBE) ---
 const FireFlamesCanvas = () => {
   const canvasRef = useRef(null);
 
@@ -229,21 +256,18 @@ const FireFlamesCanvas = () => {
     window.addEventListener('resize', resizeCanvas);
 
     let particles = [];
-    const maxParticles = 40;
+    const maxParticles = 12;
 
-    class FireParticle {
+    class Ember {
       constructor() {
         this.x = Math.random() * canvas.width;
-        this.y = canvas.height + Math.random() * 10;
-        this.size = Math.random() * 6 + 4; // slightly larger flame tongues
-        this.speedY = -(Math.random() * 1.3 + 0.6);
-        this.speedX = (Math.random() - 0.5) * 0.8;
+        this.y = canvas.height + Math.random() * 5;
+        this.size = Math.random() * 1.5 + 0.8; // tiny micro embers
+        this.speedY = -(Math.random() * 0.5 + 0.3); // rise slightly faster
+        this.speedX = (Math.random() - 0.5) * 0.3;
         this.alpha = 1.0;
-        this.decay = Math.random() * 0.025 + 0.015;
-        this.angle = (Math.random() - 0.5) * 0.3; // wobble angle
-        this.growthSpeed = Math.random() * 0.02 - 0.01;
+        this.decay = Math.random() * 0.008 + 0.004;
         
-        // Colors: deep red, fiery orange, yellow-orange, bright gold
         const colors = [
           'rgba(239, 68, 68, ',   // red
           'rgba(249, 115, 22, ',  // orange
@@ -254,46 +278,31 @@ const FireFlamesCanvas = () => {
       }
 
       update() {
-        this.x += this.speedX + Math.sin(this.y * 0.05) * 0.2; // organic sway
+        this.x += this.speedX + Math.sin(this.y * 0.04) * 0.15;
         this.y += this.speedY;
         this.alpha -= this.decay;
-        this.size += this.growthSpeed;
-        if (this.size < 0) this.size = 0;
-        return this.alpha > 0 && this.size > 0;
+        return this.alpha > 0;
       }
 
       draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
-        const r = Math.max(0.1, this.size);
-        ctx.scale(r / 6, r / 6);
-        
         ctx.beginPath();
-        // Pointy flame path
-        ctx.moveTo(0, 0);
-        ctx.bezierCurveTo(-4, -3, -7, -10, 0, -18);
-        ctx.bezierCurveTo(7, -10, 4, -3, 0, 0);
-        ctx.closePath();
-        
-        // Flame color gradient (brighter center core)
-        const grad = ctx.createLinearGradient(0, 0, 0, -18);
+        const r = Math.max(0.1, this.size);
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, r * 1.5);
         grad.addColorStop(0, `${this.colorBase}${this.alpha})`);
-        grad.addColorStop(0.5, `${this.colorBase}${this.alpha * 0.6})`);
-        grad.addColorStop(1, 'rgba(253, 224, 71, 0)');
-        
+        grad.addColorStop(0.5, `${this.colorBase}${this.alpha * 0.5})`);
+        grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
         ctx.fillStyle = grad;
+        ctx.arc(this.x, this.y, r * 1.5, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
       }
     }
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = 'lighter'; // Additive blending for realistic glowing flames!
+      ctx.globalCompositeOperation = 'lighter'; // blend glowing embers
 
-      if (particles.length < maxParticles && Math.random() < 0.6) {
-        particles.push(new FireParticle());
+      if (particles.length < maxParticles && Math.random() < 0.18) {
+        particles.push(new Ember());
       }
 
       particles = particles.filter(p => {
@@ -642,18 +651,18 @@ const LoginPage = () => {
                       flex: 1,
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: !isSignUp ? 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)' : 'transparent',
-                      backgroundSize: '400% 400%',
-                      animation: !isSignUp ? 'water-gradient 8s ease infinite' : 'none',
+                      background: !isSignUp ? '#180f0f' : 'transparent',
                       color: !isSignUp ? '#FFFFFF' : '#475569',
-                      border: 'none',
+                      border: !isSignUp ? '1px solid #ef4444' : '1px solid transparent',
+                      boxShadow: !isSignUp ? '0 0 10px rgba(239, 68, 68, 0.2)' : 'none',
+                      animation: !isSignUp ? 'fire-glow-pulse 3s infinite ease-in-out' : 'none',
                       fontWeight: 800,
                       fontSize: '0.95rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
                       overflow: 'hidden',
-                      textShadow: !isSignUp ? '0 1px 2px rgba(0, 0, 0, 0.4)' : 'none'
+                      textShadow: !isSignUp ? '0 0 4px rgba(239, 68, 68, 0.5)' : 'none'
                     }}
                   >
                     {!isSignUp && <FireFlamesCanvas />}
@@ -667,20 +676,21 @@ const LoginPage = () => {
                       flex: 1,
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: isSignUp ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' : 'transparent',
-                      backgroundSize: '400% 400%',
-                      animation: isSignUp ? 'water-gradient 8s ease infinite' : 'none',
-                      color: isSignUp ? '#0369a1' : '#475569',
-                      border: 'none',
+                      background: isSignUp ? '#0d151c' : 'transparent',
+                      color: isSignUp ? '#FFFFFF' : '#475569',
+                      border: isSignUp ? '1px solid #38bdf8' : '1px solid transparent',
+                      boxShadow: isSignUp ? '0 0 10px rgba(56, 189, 248, 0.2)' : 'none',
+                      animation: isSignUp ? 'water-glow-pulse 3s infinite ease-in-out' : 'none',
                       fontWeight: 800,
                       fontSize: '0.95rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      textShadow: isSignUp ? '0 0 4px rgba(56, 189, 248, 0.5)' : 'none'
                     }}
                   >
-                    {isSignUp && <WaterWaves />}
+                    {isSignUp && <WaterBubblesCanvas />}
                     <span style={{ position: 'relative', zIndex: 2 }}>Create Account</span>
                   </button>
                 </div>
@@ -827,13 +837,9 @@ const LoginPage = () => {
                     type="submit"
                     disabled={isLoading}
                     style={{
-                      background: isSignUp 
-                        ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' 
-                        : 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)',
-                      backgroundSize: '400% 400%',
-                      animation: 'water-gradient 8s ease infinite',
-                      color: isSignUp ? '#0369a1' : '#FFFFFF',
-                      border: 'none',
+                      background: isSignUp ? '#0d151c' : '#180f0f',
+                      color: '#FFFFFF',
+                      border: isSignUp ? '1px solid #38bdf8' : '1px solid #ef4444',
                       padding: '0.9rem',
                       borderRadius: '8px',
                       fontWeight: 800,
@@ -845,32 +851,33 @@ const LoginPage = () => {
                       gap: '8px',
                       marginTop: '0.5rem',
                       boxShadow: isSignUp 
-                        ? '0 4px 12px rgba(125, 211, 252, 0.3)' 
-                        : '0 4px 12px rgba(234, 88, 12, 0.3)',
+                        ? '0 0 10px rgba(56, 189, 248, 0.25)' 
+                        : '0 0 10px rgba(239, 68, 68, 0.25)',
+                      animation: isSignUp ? 'water-glow-pulse 3s infinite ease-in-out' : 'fire-glow-pulse 3s infinite ease-in-out',
                       transition: 'all 0.2s ease',
                       opacity: isLoading ? 0.8 : 1,
                       position: 'relative',
                       overflow: 'hidden',
-                      textShadow: isSignUp ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.4)'
+                      textShadow: isSignUp ? '0 0 4px rgba(56, 189, 248, 0.5)' : '0 0 4px rgba(239, 68, 68, 0.5)'
                     }}
                     onMouseOver={(e) => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'translateY(-1px)';
                         e.currentTarget.style.boxShadow = isSignUp 
-                          ? '0 6px 16px rgba(125, 211, 252, 0.5)' 
-                          : '0 6px 16px rgba(234, 88, 12, 0.45)';
+                          ? '0 0 15px rgba(56, 189, 248, 0.45)' 
+                          : '0 0 15px rgba(239, 68, 68, 0.45)';
                       }
                     }}
                     onMouseOut={(e) => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'none';
                         e.currentTarget.style.boxShadow = isSignUp 
-                          ? '0 4px 12px rgba(125, 211, 252, 0.3)' 
-                          : '0 4px 12px rgba(234, 88, 12, 0.3)';
+                          ? '0 0 10px rgba(56, 189, 248, 0.25)' 
+                          : '0 0 10px rgba(239, 68, 68, 0.25)';
                       }
                     }}
                   >
-                    {isSignUp ? <WaterWaves /> : <FireFlamesCanvas />}
+                    {isSignUp ? <WaterBubblesCanvas /> : <FireFlamesCanvas />}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', position: 'relative', zIndex: 2 }}>
                       {isLoading && (
                         <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
@@ -895,22 +902,35 @@ const LoginPage = () => {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes water-gradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+        @keyframes fire-glow-pulse {
+          0%, 100% {
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.7);
+          }
+          50% {
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+            border-color: rgba(239, 68, 68, 1);
+          }
         }
-        @keyframes flow-wave-1 {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+        @keyframes water-glow-pulse {
+          0%, 100% {
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+            border-color: rgba(56, 189, 248, 0.7);
+          }
+          50% {
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+            border-color: rgba(56, 189, 248, 1);
+          }
         }
-        @keyframes flow-wave-2 {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
-        }
-        @keyframes flow-wave-3 {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+        @keyframes spill-drop {
+          0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-10px, 12px) scale(0.3);
+            opacity: 0;
+          }
         }
         @keyframes flicker-outer {
           0% { transform: scale(1) rotate(-3deg); }
