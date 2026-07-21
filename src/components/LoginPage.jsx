@@ -210,6 +210,154 @@ const WaterWaves = () => (
   </div>
 );
 
+// --- ANIMATED FLOWING FIRE FLAMES CANVAS ---
+const FireFlamesCanvas = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    const resizeCanvas = () => {
+      if (!canvas || !canvas.parentElement) return;
+      canvas.width = canvas.parentElement.offsetWidth || 150;
+      canvas.height = canvas.parentElement.offsetHeight || 40;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let particles = [];
+    const maxParticles = 35;
+
+    class FireParticle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 8;
+        this.size = Math.random() * 3.5 + 1.5;
+        this.speedY = -(Math.random() * 1.0 + 0.5);
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.02 + 0.015;
+        
+        const colors = [
+          'rgba(239, 68, 68, ',   // red
+          'rgba(249, 115, 22, ',  // orange
+          'rgba(245, 158, 11, ',  // gold
+          'rgba(254, 240, 138, '  // yellow-white
+        ];
+        this.colorBase = colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha -= this.decay;
+        this.size -= 0.04;
+        if (this.size < 0) this.size = 0;
+        return this.alpha > 0 && this.size > 0;
+      }
+
+      draw() {
+        ctx.beginPath();
+        const r = Math.max(0.1, this.size);
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, r * 1.6);
+        grad.addColorStop(0, `${this.colorBase}${this.alpha})`);
+        grad.addColorStop(0.4, `${this.colorBase}${this.alpha * 0.4})`);
+        grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        
+        ctx.fillStyle = grad;
+        ctx.arc(this.x, this.y, r * 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (particles.length < maxParticles && Math.random() < 0.5) {
+        particles.push(new FireParticle());
+      }
+
+      particles = particles.filter(p => {
+        const keep = p.update();
+        if (keep) p.draw();
+        return keep;
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 1
+      }}
+    />
+  );
+};
+
+// --- CUSTOM SVG MATCHSTICK ICON ---
+const MatchstickIcon = ({ lit }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ overflow: 'visible' }}>
+    {/* Wood stick */}
+    <rect x="11" y="9" width="2" height="13" rx="0.5" fill="#D2B48C" transform="rotate(-35 12 15)" />
+    {/* Match head */}
+    <ellipse cx="7.5" cy="9.5" rx="2" ry="2.5" fill={lit ? '#EF4444' : '#800000'} transform="rotate(-35 7.5 9.5)" />
+    {/* Flame overlay when lit */}
+    {lit && (
+      <g style={{
+        transform: 'translate(1px, -2px)',
+        filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.8))'
+      }}>
+        {/* Outer flame */}
+        <path
+          d="M5 8C4 6.5 4.5 4.5 5.5 3C6.5 4.5 7 6.5 6 8C5.5 8.8 4.5 8.8 5 8Z"
+          fill="#EF4444"
+          style={{
+            animation: 'flicker-outer 0.2s ease-in-out infinite alternate',
+            transformOrigin: '5px 8px'
+          }}
+        />
+        {/* Middle flame */}
+        <path
+          d="M5 8C4.5 7 4.8 5.5 5.5 4.5C6.2 5.5 6.5 7 6 8C5.7 8.5 4.8 8.5 5 8Z"
+          fill="#F97316"
+          style={{
+            animation: 'flicker-middle 0.15s ease-in-out infinite alternate-reverse',
+            transformOrigin: '5px 8px'
+          }}
+        />
+        {/* Inner flame core */}
+        <path
+          d="M5 8C4.7 7.5 4.9 6.5 5.5 5.5C6.1 6.5 6.3 7.5 6 8C5.8 8.3 5.2 8.3 5 8Z"
+          fill="#FDE047"
+          style={{
+            animation: 'flicker-inner 0.1s ease-in-out infinite alternate',
+            transformOrigin: '5px 8px'
+          }}
+        />
+      </g>
+    )}
+  </svg>
+);
+
 const LoginPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -222,6 +370,7 @@ const LoginPage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Focus states for the inputs (drives the page-on-page rotation under fields)
   const [emailFocus, setEmailFocus] = useState(false);
@@ -440,20 +589,21 @@ const LoginPage = () => {
                       flex: 1,
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: isSignUp ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' : 'transparent',
+                      background: isSignUp ? 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)' : 'transparent',
                       backgroundSize: '400% 400%',
                       animation: isSignUp ? 'water-gradient 8s ease infinite' : 'none',
-                      color: isSignUp ? '#0369a1' : '#475569',
+                      color: isSignUp ? '#FFFFFF' : '#475569',
                       border: 'none',
                       fontWeight: 800,
                       fontSize: '0.95rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      textShadow: isSignUp ? '0 1px 2px rgba(0, 0, 0, 0.4)' : 'none'
                     }}
                   >
-                    {isSignUp && <WaterWaves />}
+                    {isSignUp && <FireFlamesCanvas />}
                     <span style={{ position: 'relative', zIndex: 2 }}>Create Account</span>
                   </button>
                 </div>
@@ -534,20 +684,27 @@ const LoginPage = () => {
                         <Lock size={18} />
                       </span>
                       <input 
-                        type="password" 
+                        type={showPassword ? 'text' : 'password'} 
                         required
                         minLength={6}
                         style={{
                           width: '100%',
-                          padding: '0.75rem 1rem 0.75rem 2.75rem',
+                          padding: '0.75rem 3rem 0.75rem 2.75rem',
                           borderRadius: '8px',
                           border: '1.5px solid',
                           outline: 'none',
                           fontSize: '1rem',
                           color: '#4A3B32',
                           boxShadow: 'none',
-                          borderColor: passFocus ? '#C2B280' : '#E3DEC3',
-                          background: passFocus ? '#F7F5F0' : '#FCFAF6',
+                          borderColor: passFocus 
+                            ? (showPassword ? '#ea580c' : '#C2B280') 
+                            : (showPassword ? '#ea580c' : '#E3DEC3'),
+                          background: passFocus 
+                            ? (showPassword ? '#fffaf0' : '#F7F5F0') 
+                            : (showPassword ? '#fffaf8' : '#FCFAF6'),
+                          boxShadow: passFocus 
+                            ? (showPassword ? '0 0 12px rgba(234, 88, 12, 0.35), 0 0 0 3px rgba(234, 88, 12, 0.2)' : '0 0 0 3px rgba(194, 178, 128, 0.25)')
+                            : (showPassword ? '0 0 8px rgba(234, 88, 12, 0.2)' : 'none'),
                           transition: 'all 0.15s ease',
                           position: 'relative',
                           zIndex: 2
@@ -558,6 +715,26 @@ const LoginPage = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '10px',
+                          top: '9px',
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          zIndex: 10,
+                          padding: '2px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          outline: 'none'
+                        }}
+                      >
+                        <MatchstickIcon lit={showPassword} />
+                      </button>
                       <DustParticles isFocused={passFocus} inputValue={password} />
                     </div>
                   </div>
@@ -568,11 +745,11 @@ const LoginPage = () => {
                     disabled={isLoading}
                     style={{
                       background: isSignUp 
-                        ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' 
+                        ? 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)' 
                         : 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
                       backgroundSize: isSignUp ? '400% 400%' : 'auto',
                       animation: isSignUp ? 'water-gradient 8s ease infinite' : 'none',
-                      color: isSignUp ? '#0369a1' : '#FFFFFF',
+                      color: '#FFFFFF',
                       border: 'none',
                       padding: '0.9rem',
                       borderRadius: '8px',
@@ -585,18 +762,19 @@ const LoginPage = () => {
                       gap: '8px',
                       marginTop: '0.5rem',
                       boxShadow: isSignUp 
-                        ? '0 4px 12px rgba(125, 211, 252, 0.3)' 
+                        ? '0 4px 12px rgba(234, 88, 12, 0.3)' 
                         : '0 4px 12px rgba(15, 23, 42, 0.12)',
                       transition: 'all 0.2s ease',
                       opacity: isLoading ? 0.8 : 1,
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      textShadow: isSignUp ? '0 1px 2px rgba(0, 0, 0, 0.4)' : 'none'
                     }}
                     onMouseOver={(e) => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'translateY(-1px)';
                         e.currentTarget.style.boxShadow = isSignUp 
-                          ? '0 6px 16px rgba(125, 211, 252, 0.5)' 
+                          ? '0 6px 16px rgba(234, 88, 12, 0.45)' 
                           : '0 6px 16px rgba(15, 23, 42, 0.22)';
                       }
                     }}
@@ -604,12 +782,12 @@ const LoginPage = () => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'none';
                         e.currentTarget.style.boxShadow = isSignUp 
-                          ? '0 4px 12px rgba(125, 211, 252, 0.3)' 
+                          ? '0 4px 12px rgba(234, 88, 12, 0.3)' 
                           : '0 4px 12px rgba(15, 23, 42, 0.12)';
                       }
                     }}
                   >
-                    {isSignUp && <WaterWaves />}
+                    {isSignUp && <FireFlamesCanvas />}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', position: 'relative', zIndex: 2 }}>
                       {isLoading && (
                         <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
@@ -650,6 +828,18 @@ const LoginPage = () => {
         @keyframes flow-wave-3 {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
+        }
+        @keyframes flicker-outer {
+          0% { transform: scale(1) rotate(-3deg); }
+          100% { transform: scale(1.15) rotate(3deg); }
+        }
+        @keyframes flicker-middle {
+          0% { transform: scale(1) rotate(2deg); }
+          100% { transform: scale(1.1) rotate(-2deg); }
+        }
+        @keyframes flicker-inner {
+          0% { transform: scale(1) translateY(0); }
+          100% { transform: scale(1.05) translateY(-0.5px); }
         }
       `}</style>
     </div>
