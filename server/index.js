@@ -136,6 +136,175 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
   });
 });
 
+// --- OAUTH LOGINS ---
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+const SERVER_URL = process.env.SERVER_URL || 'http://localhost:5001';
+
+// Initiate Google Login
+app.get('/api/auth/google', (req, res) => {
+  if (!GOOGLE_CLIENT_ID) {
+    return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('Google Client ID is not configured on the server.')}`);
+  }
+  const redirectUri = `${SERVER_URL}/api/auth/google/callback`;
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile`;
+  res.redirect(url);
+});
+
+// Google Callback
+app.get('/api/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+  const redirectUri = `${SERVER_URL}/api/auth/google/callback`;
+  
+  if (!code) {
+    return res.redirect(`${CLIENT_URL}/login?error=auth_failed`);
+  }
+
+  try {
+    // Exchange authorization code for token
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code'
+      })
+    });
+    
+    const tokenData = await tokenResponse.json();
+    if (tokenData.error) {
+      throw new Error(tokenData.error_description || 'Failed to exchange Google authorization code');
+    }
+
+    // Retrieve user profile
+    const userResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    });
+    const userData = await userResponse.json();
+
+    const email = userData.email;
+    if (!email) {
+      throw new Error('Email address was not provided by Google');
+    }
+
+    // Find or create user in DB
+    let user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      const randomPassword = Math.random().toString(36) + Math.random().toString(36);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+      user = new User({
+        email: email.toLowerCase(),
+        password: hashedPassword
+      });
+      await user.save();
+    }
+
+    // Sign JWT session token
+    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    
+    res.redirect(`${CLIENT_URL}/login?token=${token}`);
+  } catch (err) {
+    console.error('Google OAuth Error:', err);
+    res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent(err.message)}`);
+  }
+});
+
+// Initiate GitHub Login
+app.get('/api/auth/github', (req, res) => {
+  if (!GITHUB_CLIENT_ID) {
+    return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('GitHub Client ID is not configured on the server.')}`);
+  }
+  const redirectUri = `${SERVER_URL}/api/auth/github/callback`;
+  const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email`;
+  res.redirect(url);
+});
+
+// GitHub Callback
+app.get('/api/auth/github/callback', async (req, res) => {
+  const { code } = req.query;
+  
+  if (!code) {
+    return res.redirect(`${CLIENT_URL}/login?error=auth_failed`);
+  }
+
+  try {
+    // Exchange authorization code for token
+    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        code,
+        client_id: GITHUB_CLIENT_ID,
+        client_secret: GITHUB_CLIENT_SECRET
+      })
+    });
+    
+    const tokenData = await tokenResponse.json();
+    if (tokenData.error) {
+      throw new Error(tokenData.error_description || 'Failed to exchange GitHub authorization code');
+    }
+
+    // Retrieve user profile
+    const userResponse = await fetch('https://api.github.com/user', {
+      headers: { 
+        Authorization: `Bearer ${tokenData.access_token}`,
+        'User-Agent': 'resume-builder-server'
+      }
+    });
+    const userData = await userResponse.json();
+
+    let email = userData.email;
+
+    // Fetch emails list if primary email is private
+    if (!email) {
+      const emailsResponse = await fetch('https://api.github.com/user/emails', {
+        headers: { 
+          Authorization: `Bearer ${tokenData.access_token}`,
+          'User-Agent': 'resume-builder-server'
+        }
+      });
+      const emails = await emailsResponse.json();
+      if (Array.isArray(emails)) {
+        const primaryEmailObj = emails.find(e => e.primary && e.verified);
+        email = primaryEmailObj ? primaryEmailObj.email : (emails[0] ? emails[0].email : null);
+      }
+    }
+
+    if (!email) {
+      throw new Error('No verified email address could be fetched from your GitHub account.');
+    }
+
+    // Find or create user in DB
+    let user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      const randomPassword = Math.random().toString(36) + Math.random().toString(36);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+      user = new User({
+        email: email.toLowerCase(),
+        password: hashedPassword
+      });
+      await user.save();
+    }
+
+    // Sign JWT session token
+    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    
+    res.redirect(`${CLIENT_URL}/login?token=${token}`);
+  } catch (err) {
+    console.error('GitHub OAuth Error:', err);
+    res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent(err.message)}`);
+  }
+});
+
 
 // --- RESUME SYNC ROUTES ---
 

@@ -480,6 +480,33 @@ const LoginPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Handle OAuth callback token / errors from URL queries
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const oauthToken = queryParams.get('token');
+    const oauthError = queryParams.get('error');
+
+    if (oauthToken) {
+      localStorage.setItem('auth_token', oauthToken);
+      setMessage('Social login successful! Redirecting...');
+      setTimeout(() => {
+        window.location.href = '/templates'; // Force reload to trigger AuthProvider session check
+      }, 1000);
+    } else if (oauthError) {
+      setError(oauthError || 'Social login failed.');
+    }
+  }, [location]);
+
+  const handleGoogleLogin = () => {
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+    window.location.href = `${apiBase}/api/auth/google`;
+  };
+
+  const handleGithubLogin = () => {
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+    window.location.href = `${apiBase}/api/auth/github`;
+  };
+
   const handleAuth = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -648,6 +675,7 @@ const LoginPage = () => {
                     {/* Google OAuth Button */}
                     <button
                       type="button"
+                      onClick={handleGoogleLogin}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -688,6 +716,7 @@ const LoginPage = () => {
                     {/* GitHub OAuth Button */}
                     <button
                       type="button"
+                      onClick={handleGithubLogin}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
