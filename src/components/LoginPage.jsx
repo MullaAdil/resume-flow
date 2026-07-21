@@ -1,8 +1,214 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { FileText, ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
+
+// --- ANIMATED DUST PARTICLES CANVAS (WITH SMOKE EFFECT) ---
+const DustParticles = ({ isFocused, inputValue }) => {
+  const canvasRef = useRef(null);
+  const particlesRef = useRef([]);
+  const lastValueRef = useRef(inputValue);
+
+  // Trigger burst when typing (smoke puff explosion)
+  useEffect(() => {
+    if (!isFocused) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const prevVal = lastValueRef.current;
+    if (inputValue !== prevVal) {
+      // Spawn burst of smoke plumes
+      const count = 8;
+      for (let i = 0; i < count; i++) {
+        const px = Math.random() * Math.max(10, canvas.width - 60) + 30;
+        const py = Math.random() * Math.max(10, canvas.height - 15) + 5;
+        
+        particlesRef.current.push({
+          x: px,
+          y: py,
+          size: Math.random() * 2 + 1,
+          growthSpeed: Math.random() * 0.12 + 0.06, // fast growing puffs
+          vx: (Math.random() - 0.5) * 1.6,
+          vy: -(Math.random() * 0.8 + 0.4),
+          alpha: 0.8,
+          decay: Math.random() * 0.015 + 0.01,
+          colorBase: ['rgba(220, 215, 200, ', 'rgba(194, 178, 128, ', 'rgba(235, 225, 205, ', 'rgba(205, 195, 180, '][Math.floor(Math.random() * 4)]
+        });
+      }
+      lastValueRef.current = inputValue;
+    }
+  }, [inputValue, isFocused]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    const resizeCanvas = () => {
+      if (!canvas || !canvas.parentElement) return;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width || 0;
+      canvas.height = rect.height || 0;
+    };
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initial smoke puffs
+    if (isFocused) {
+      for (let i = 0; i < 10; i++) {
+        particlesRef.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * Math.max(10, canvas.height - 10) + 5,
+          size: Math.random() * 2 + 1,
+          growthSpeed: Math.random() * 0.04 + 0.02, // slow growing background smoke
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -(Math.random() * 0.3 + 0.1),
+          alpha: Math.random() * 0.5 + 0.1,
+          decay: Math.random() * 0.003 + 0.002,
+          colorBase: ['rgba(220, 215, 200, ', 'rgba(194, 178, 128, ', 'rgba(235, 225, 205, ', 'rgba(205, 195, 180, '][Math.floor(Math.random() * 4)]
+        });
+      }
+    }
+
+    const render = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Calm background smoke spawn
+      if (isFocused && particlesRef.current.length < 25 && Math.random() < 0.12) {
+        particlesRef.current.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height - 2,
+          size: Math.random() * 2 + 1,
+          growthSpeed: Math.random() * 0.04 + 0.02,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -(Math.random() * 0.2 + 0.1),
+          alpha: Math.random() * 0.4 + 0.2,
+          decay: Math.random() * 0.003 + 0.002,
+          colorBase: ['rgba(220, 215, 200, ', 'rgba(194, 178, 128, ', 'rgba(235, 225, 205, ', 'rgba(205, 195, 180, '][Math.floor(Math.random() * 4)]
+        });
+      }
+
+      // Update and draw smoky particles
+      particlesRef.current = particlesRef.current.filter(p => {
+        p.x += Math.sin(p.y * 0.05) * 0.25 + p.vx; // rising smoke sway
+        p.y += p.vy;
+        p.size += p.growthSpeed;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0 || p.y < 0 || p.x < 0 || p.x > canvas.width) {
+          return false;
+        }
+
+        ctx.beginPath();
+        // Radial gradient for fluffy puff texture
+        const r = Math.max(0.1, p.size);
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        grad.addColorStop(0, `${p.colorBase}${p.alpha})`);
+        grad.addColorStop(0.3, `${p.colorBase}${p.alpha * 0.5})`);
+        grad.addColorStop(0.7, `${p.colorBase}${p.alpha * 0.15})`);
+        grad.addColorStop(1, 'rgba(220, 215, 200, 0)');
+        
+        ctx.fillStyle = grad;
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
+        return true;
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [isFocused]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 5
+      }}
+    />
+  );
+};
+
+// --- ANIMATED WATER FLOW WAVES OVERLAY (LIGHT NATURAL VIBE) ---
+const WaterWaves = () => (
+  <div style={{
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    pointerEvents: 'none',
+    overflow: 'hidden',
+    zIndex: 1
+  }}>
+    {/* Wave 1 */}
+    <svg
+      viewBox="0 0 240 30"
+      preserveAspectRatio="none"
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '200%',
+        height: '80%',
+        fill: 'rgba(255, 255, 255, 0.55)', // higher opacity white foam
+        animation: 'flow-wave-1 6s linear infinite',
+        opacity: 0.85
+      }}
+    >
+      <path d="M 0 15 Q 30 10, 60 15 T 120 15 T 180 15 T 240 15 V 30 H 0 Z" />
+    </svg>
+    {/* Wave 2 */}
+    <svg
+      viewBox="0 0 200 30"
+      preserveAspectRatio="none"
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '200%',
+        height: '90%',
+        fill: 'rgba(255, 255, 255, 0.4)',
+        animation: 'flow-wave-2 9s linear infinite',
+        opacity: 0.7
+      }}
+    >
+      <path d="M 0 15 Q 25 8, 50 15 T 100 15 T 150 15 T 200 15 V 30 H 0 Z" />
+    </svg>
+    {/* Wave 3 */}
+    <svg
+      viewBox="0 0 280 30"
+      preserveAspectRatio="none"
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '200%',
+        height: '100%',
+        fill: 'rgba(255, 255, 255, 0.25)',
+        animation: 'flow-wave-3 12s linear infinite',
+        opacity: 0.55
+      }}
+    >
+      <path d="M 0 15 Q 35 12, 70 15 T 140 15 T 210 15 T 280 15 V 30 H 0 Z" />
+    </svg>
+  </div>
+);
 
 const LoginPage = () => {
   const location = useLocation();
@@ -234,16 +440,21 @@ const LoginPage = () => {
                       flex: 1,
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: isSignUp ? '#0F172A' : 'transparent',
-                      color: isSignUp ? '#FFFFFF' : '#475569',
+                      background: isSignUp ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' : 'transparent',
+                      backgroundSize: '400% 400%',
+                      animation: isSignUp ? 'water-gradient 8s ease infinite' : 'none',
+                      color: isSignUp ? '#0369a1' : '#475569',
                       border: 'none',
                       fontWeight: 800,
                       fontSize: '0.95rem',
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease'
+                      transition: 'all 0.15s ease',
+                      position: 'relative',
+                      overflow: 'hidden'
                     }}
                   >
-                    Create Account
+                    {isSignUp && <WaterWaves />}
+                    <span style={{ position: 'relative', zIndex: 2 }}>Create Account</span>
                   </button>
                 </div>
 
@@ -278,11 +489,13 @@ const LoginPage = () => {
                 <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   {/* Email input */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#4A3B32', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       Email Address
                     </label>
-                    <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569' }}><Mail size={18} /></span>
+                    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
+                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: emailFocus ? '#8B7E66' : '#8C8273', zIndex: 6 }}>
+                        <Mail size={18} />
+                      </span>
                       <input 
                         type="email" 
                         required
@@ -290,14 +503,16 @@ const LoginPage = () => {
                           width: '100%',
                           padding: '0.75rem 1rem 0.75rem 2.75rem',
                           borderRadius: '8px',
-                          border: '1.5px solid #CBD5E1',
+                          border: '1.5px solid',
                           outline: 'none',
                           fontSize: '1rem',
-                          color: '#0F172A',
+                          color: '#4A3B32',
                           boxShadow: 'none',
-                          borderColor: emailFocus ? '#3B82F6' : '#CBD5E1',
-                          background: '#FFFFFF',
-                          transition: 'all 0.15s ease'
+                          borderColor: emailFocus ? '#C2B280' : '#E3DEC3',
+                          background: emailFocus ? '#F7F5F0' : '#FCFAF6',
+                          transition: 'all 0.15s ease',
+                          position: 'relative',
+                          zIndex: 2
                         }}
                         onFocus={() => setEmailFocus(true)}
                         onBlur={() => setEmailFocus(false)}
@@ -305,16 +520,19 @@ const LoginPage = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
+                      <DustParticles isFocused={emailFocus} inputValue={email} />
                     </div>
                   </div>
 
                   {/* Password input */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 800, color: '#4A3B32', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       Password
                     </label>
-                    <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: '#475569' }}><Lock size={18} /></span>
+                    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
+                      <span style={{ position: 'absolute', left: '14px', top: '14px', color: passFocus ? '#8B7E66' : '#8C8273', zIndex: 6 }}>
+                        <Lock size={18} />
+                      </span>
                       <input 
                         type="password" 
                         required
@@ -323,14 +541,16 @@ const LoginPage = () => {
                           width: '100%',
                           padding: '0.75rem 1rem 0.75rem 2.75rem',
                           borderRadius: '8px',
-                          border: '1.5px solid #CBD5E1',
+                          border: '1.5px solid',
                           outline: 'none',
                           fontSize: '1rem',
-                          color: '#0F172A',
+                          color: '#4A3B32',
                           boxShadow: 'none',
-                          borderColor: passFocus ? '#3B82F6' : '#CBD5E1',
-                          background: '#FFFFFF',
-                          transition: 'all 0.15s ease'
+                          borderColor: passFocus ? '#C2B280' : '#E3DEC3',
+                          background: passFocus ? '#F7F5F0' : '#FCFAF6',
+                          transition: 'all 0.15s ease',
+                          position: 'relative',
+                          zIndex: 2
                         }}
                         onFocus={() => setPassFocus(true)}
                         onBlur={() => setPassFocus(false)}
@@ -338,6 +558,7 @@ const LoginPage = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
+                      <DustParticles isFocused={passFocus} inputValue={password} />
                     </div>
                   </div>
 
@@ -346,8 +567,12 @@ const LoginPage = () => {
                     type="submit"
                     disabled={isLoading}
                     style={{
-                      background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
-                      color: '#FFFFFF',
+                      background: isSignUp 
+                        ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' 
+                        : 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                      backgroundSize: isSignUp ? '400% 400%' : 'auto',
+                      animation: isSignUp ? 'water-gradient 8s ease infinite' : 'none',
+                      color: isSignUp ? '#0369a1' : '#FFFFFF',
                       border: 'none',
                       padding: '0.9rem',
                       borderRadius: '8px',
@@ -359,27 +584,38 @@ const LoginPage = () => {
                       justifyContent: 'center',
                       gap: '8px',
                       marginTop: '0.5rem',
-                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12)',
+                      boxShadow: isSignUp 
+                        ? '0 4px 12px rgba(125, 211, 252, 0.3)' 
+                        : '0 4px 12px rgba(15, 23, 42, 0.12)',
                       transition: 'all 0.2s ease',
-                      opacity: isLoading ? 0.8 : 1
+                      opacity: isLoading ? 0.8 : 1,
+                      position: 'relative',
+                      overflow: 'hidden'
                     }}
                     onMouseOver={(e) => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'translateY(-1px)';
-                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(15, 23, 42, 0.22)';
+                        e.currentTarget.style.boxShadow = isSignUp 
+                          ? '0 6px 16px rgba(125, 211, 252, 0.5)' 
+                          : '0 6px 16px rgba(15, 23, 42, 0.22)';
                       }
                     }}
                     onMouseOut={(e) => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.12)';
+                        e.currentTarget.style.boxShadow = isSignUp 
+                          ? '0 4px 12px rgba(125, 211, 252, 0.3)' 
+                          : '0 4px 12px rgba(15, 23, 42, 0.12)';
                       }
                     }}
                   >
-                    {isLoading && (
-                      <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                    )}
-                    {isSignUp ? 'Create Account' : 'Sign In'}
+                    {isSignUp && <WaterWaves />}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', position: 'relative', zIndex: 2 }}>
+                      {isLoading && (
+                        <Loader2 size={18} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                      )}
+                      {isSignUp ? 'Create Account' : 'Sign In'}
+                    </div>
                   </button>
                 </form>
               </div>
@@ -391,12 +627,29 @@ const LoginPage = () => {
       {/* Styled placeholder color injector for cross-browser contrast */}
       <style>{`
         input::placeholder {
-          color: #64748B !important;
+          color: #8C8273 !important;
           opacity: 1 !important;
         }
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        @keyframes water-gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes flow-wave-1 {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes flow-wave-2 {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+        @keyframes flow-wave-3 {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>
