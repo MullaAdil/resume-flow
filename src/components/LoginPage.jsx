@@ -498,13 +498,19 @@ const LoginPage = () => {
   }, [location]);
 
   const handleGoogleLogin = () => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+    let apiBase = import.meta.env.VITE_API_BASE_URL || '';
+    if (apiBase && !apiBase.startsWith('http://') && !apiBase.startsWith('https://')) {
+      apiBase = `https://${apiBase}`;
+    }
     const origin = window.location.origin;
     window.location.href = `${apiBase}/api/auth/google?origin=${encodeURIComponent(origin)}`;
   };
 
   const handleGithubLogin = () => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+    let apiBase = import.meta.env.VITE_API_BASE_URL || '';
+    if (apiBase && !apiBase.startsWith('http://') && !apiBase.startsWith('https://')) {
+      apiBase = `https://${apiBase}`;
+    }
     const origin = window.location.origin;
     window.location.href = `${apiBase}/api/auth/github?origin=${encodeURIComponent(origin)}`;
   };
