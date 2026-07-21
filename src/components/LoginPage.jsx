@@ -589,21 +589,20 @@ const LoginPage = () => {
                       flex: 1,
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: isSignUp ? 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)' : 'transparent',
+                      background: isSignUp ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' : 'transparent',
                       backgroundSize: '400% 400%',
                       animation: isSignUp ? 'water-gradient 8s ease infinite' : 'none',
-                      color: isSignUp ? '#FFFFFF' : '#475569',
+                      color: isSignUp ? '#0369a1' : '#475569',
                       border: 'none',
                       fontWeight: 800,
                       fontSize: '0.95rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
-                      overflow: 'hidden',
-                      textShadow: isSignUp ? '0 1px 2px rgba(0, 0, 0, 0.4)' : 'none'
+                      overflow: 'hidden'
                     }}
                   >
-                    {isSignUp && <FireFlamesCanvas />}
+                    {isSignUp && <WaterWaves />}
                     <span style={{ position: 'relative', zIndex: 2 }}>Create Account</span>
                   </button>
                 </div>
