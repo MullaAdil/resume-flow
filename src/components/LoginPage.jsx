@@ -210,7 +210,7 @@ const WaterWaves = () => (
   </div>
 );
 
-// --- ANIMATED FLOWING FIRE FLAMES CANVAS ---
+// --- ANIMATED FLOWING FIRE FLAMES CANVAS (REAL LIFE FLAMES) ---
 const FireFlamesCanvas = () => {
   const canvasRef = useRef(null);
 
@@ -229,54 +229,70 @@ const FireFlamesCanvas = () => {
     window.addEventListener('resize', resizeCanvas);
 
     let particles = [];
-    const maxParticles = 35;
+    const maxParticles = 40;
 
     class FireParticle {
       constructor() {
         this.x = Math.random() * canvas.width;
-        this.y = canvas.height + Math.random() * 8;
-        this.size = Math.random() * 3.5 + 1.5;
-        this.speedY = -(Math.random() * 1.0 + 0.5);
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.alpha = 1;
-        this.decay = Math.random() * 0.02 + 0.015;
+        this.y = canvas.height + Math.random() * 10;
+        this.size = Math.random() * 6 + 4; // slightly larger flame tongues
+        this.speedY = -(Math.random() * 1.3 + 0.6);
+        this.speedX = (Math.random() - 0.5) * 0.8;
+        this.alpha = 1.0;
+        this.decay = Math.random() * 0.025 + 0.015;
+        this.angle = (Math.random() - 0.5) * 0.3; // wobble angle
+        this.growthSpeed = Math.random() * 0.02 - 0.01;
         
+        // Colors: deep red, fiery orange, yellow-orange, bright gold
         const colors = [
           'rgba(239, 68, 68, ',   // red
           'rgba(249, 115, 22, ',  // orange
           'rgba(245, 158, 11, ',  // gold
-          'rgba(254, 240, 138, '  // yellow-white
+          'rgba(253, 224, 71, '   // yellow
         ];
         this.colorBase = colors[Math.floor(Math.random() * colors.length)];
       }
 
       update() {
-        this.x += this.speedX;
+        this.x += this.speedX + Math.sin(this.y * 0.05) * 0.2; // organic sway
         this.y += this.speedY;
         this.alpha -= this.decay;
-        this.size -= 0.04;
+        this.size += this.growthSpeed;
         if (this.size < 0) this.size = 0;
         return this.alpha > 0 && this.size > 0;
       }
 
       draw() {
-        ctx.beginPath();
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
         const r = Math.max(0.1, this.size);
-        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, r * 1.6);
+        ctx.scale(r / 6, r / 6);
+        
+        ctx.beginPath();
+        // Pointy flame path
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-4, -3, -7, -10, 0, -18);
+        ctx.bezierCurveTo(7, -10, 4, -3, 0, 0);
+        ctx.closePath();
+        
+        // Flame color gradient (brighter center core)
+        const grad = ctx.createLinearGradient(0, 0, 0, -18);
         grad.addColorStop(0, `${this.colorBase}${this.alpha})`);
-        grad.addColorStop(0.4, `${this.colorBase}${this.alpha * 0.4})`);
-        grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        grad.addColorStop(0.5, `${this.colorBase}${this.alpha * 0.6})`);
+        grad.addColorStop(1, 'rgba(253, 224, 71, 0)');
         
         ctx.fillStyle = grad;
-        ctx.arc(this.x, this.y, r * 1.6, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
       }
     }
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'lighter'; // Additive blending for realistic glowing flames!
 
-      if (particles.length < maxParticles && Math.random() < 0.5) {
+      if (particles.length < maxParticles && Math.random() < 0.6) {
         particles.push(new FireParticle());
       }
 
@@ -351,6 +367,62 @@ const MatchstickIcon = ({ lit }) => (
           style={{
             animation: 'flicker-inner 0.1s ease-in-out infinite alternate',
             transformOrigin: '5px 8px'
+          }}
+        />
+      </g>
+    )}
+  </svg>
+);
+
+// --- CUSTOM SVG OLDEN STYLE WATER FLASK ---
+const FlaskIcon = ({ spilled }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ overflow: 'visible' }}>
+    <g style={{
+      transform: spilled ? 'rotate(-55deg) translate(-3px, 1px)' : 'none',
+      transformOrigin: '12px 14px',
+      transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)'
+    }}>
+      {/* Flask Body (Clay/Olden flask look) */}
+      <path d="M7 11 C7 8.5, 9 8, 10 7.5 V 4 H 14 V 7.5 C 15 8, 17 8.5, 17 11 C 17 15, 19 18, 17 21 C 15 22.5, 9 22.5, 7 21 C 5 18, 7 15, 7 11 Z" fill="#D2B48C" stroke="#8C6239" strokeWidth="1.5" />
+      {/* Leather wrap/band */}
+      <rect x="7.8" y="11" width="8.4" height="4" fill="#8C6239" opacity="0.8" rx="0.5" />
+      {/* Cork stopper */}
+      {!spilled ? (
+        <rect x="11" y="2" width="2" height="2.5" rx="0.3" fill="#8C5239" />
+      ) : (
+        // Cork flying away or removed
+        <rect x="17" y="-2" width="2" height="2.5" rx="0.3" fill="#8C5239" style={{ transform: 'rotate(55deg)' }} />
+      )}
+    </g>
+    
+    {/* Animated Spilling Water Flow/Droplets */}
+    {spilled && (
+      <g style={{ filter: 'drop-shadow(0 0 3px rgba(56, 189, 248, 0.75))' }}>
+        {/* Drop 1 */}
+        <path
+          d="M 5 10 C 4.5 10, 4 9.5, 4 9 C 4 8.2, 5 7.2, 5 7.2 C 5 7.2, 6 8.2, 6 9 C 6 9.5, 5.5 10, 5 10 Z"
+          fill="#38BDF8"
+          style={{
+            animation: 'spill-drop 1.1s linear infinite',
+            transformOrigin: '5px 10px'
+          }}
+        />
+        {/* Drop 2 */}
+        <path
+          d="M 2 13 C 1.5 13, 1 12.5, 1 12 C 1 11.2, 2 10.2, 2 10.2 C 2 10.2, 3 11.2, 3 12 C 3 12.5, 2.5 13, 2 13 Z"
+          fill="#0EA5E9"
+          style={{
+            animation: 'spill-drop 1.4s linear infinite 0.25s',
+            transformOrigin: '2px 13px'
+          }}
+        />
+        {/* Drop 3 */}
+        <path
+          d="M 5 14 C 4.5 14, 4 13.5, 4 13 C 4 12.2, 5 11.2, 5 11.2 C 5 11.2, 6 12.2, 6 13 C 6 13.5, 5.5 14, 5 14 Z"
+          fill="#7DD3FC"
+          style={{
+            animation: 'spill-drop 1.2s linear infinite 0.5s',
+            transformOrigin: '5px 14px'
           }}
         />
       </g>
@@ -702,14 +774,16 @@ const LoginPage = () => {
                           color: '#4A3B32',
                           boxShadow: 'none',
                           borderColor: passFocus 
-                            ? (showPassword ? '#ea580c' : '#C2B280') 
-                            : (showPassword ? '#ea580c' : '#E3DEC3'),
+                            ? (showPassword ? (isSignUp ? '#38bdf8' : '#ea580c') : '#C2B280') 
+                            : (showPassword ? (isSignUp ? '#38bdf8' : '#ea580c') : '#E3DEC3'),
                           background: passFocus 
-                            ? (showPassword ? '#fffaf0' : '#F7F5F0') 
-                            : (showPassword ? '#fffaf8' : '#FCFAF6'),
+                            ? (showPassword ? (isSignUp ? '#f0f9ff' : '#fffaf0') : '#F7F5F0') 
+                            : (showPassword ? (isSignUp ? '#f4fbfd' : '#fffaf8') : '#FCFAF6'),
                           boxShadow: passFocus 
-                            ? (showPassword ? '0 0 12px rgba(234, 88, 12, 0.35), 0 0 0 3px rgba(234, 88, 12, 0.2)' : '0 0 0 3px rgba(194, 178, 128, 0.25)')
-                            : (showPassword ? '0 0 8px rgba(234, 88, 12, 0.2)' : 'none'),
+                            ? (showPassword 
+                              ? (isSignUp ? '0 0 12px rgba(56, 189, 248, 0.35), 0 0 0 3px rgba(56, 189, 248, 0.2)' : '0 0 12px rgba(234, 88, 12, 0.35), 0 0 0 3px rgba(234, 88, 12, 0.2)')
+                              : '0 0 0 3px rgba(194, 178, 128, 0.25)')
+                            : (showPassword ? (isSignUp ? '0 0 8px rgba(56, 189, 248, 0.2)' : '0 0 8px rgba(234, 88, 12, 0.2)') : 'none'),
                           transition: 'all 0.15s ease',
                           position: 'relative',
                           zIndex: 2
@@ -738,7 +812,11 @@ const LoginPage = () => {
                           outline: 'none'
                         }}
                       >
-                        <MatchstickIcon lit={showPassword} />
+                        {isSignUp ? (
+                          <FlaskIcon spilled={showPassword} />
+                        ) : (
+                          <MatchstickIcon lit={showPassword} />
+                        )}
                       </button>
                       <DustParticles isFocused={passFocus} inputValue={password} />
                     </div>
