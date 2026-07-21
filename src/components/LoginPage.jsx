@@ -651,18 +651,19 @@ const LoginPage = () => {
                       flex: 1,
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: !isSignUp ? '#180f0f' : 'transparent',
+                      background: !isSignUp ? 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)' : 'transparent',
+                      backgroundSize: '400% 400%',
+                      animation: !isSignUp ? 'water-gradient 8s ease infinite' : 'none',
                       color: !isSignUp ? '#FFFFFF' : '#475569',
-                      border: !isSignUp ? '1px solid #ef4444' : '1px solid transparent',
-                      boxShadow: !isSignUp ? '0 0 10px rgba(239, 68, 68, 0.2)' : 'none',
-                      animation: !isSignUp ? 'fire-glow-pulse 3s infinite ease-in-out' : 'none',
+                      border: 'none',
+                      boxShadow: !isSignUp ? '0 4px 12px rgba(234, 88, 12, 0.25)' : 'none',
                       fontWeight: 800,
                       fontSize: '0.95rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
                       overflow: 'hidden',
-                      textShadow: !isSignUp ? '0 0 4px rgba(239, 68, 68, 0.5)' : 'none'
+                      textShadow: !isSignUp ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
                     }}
                   >
                     {!isSignUp && <FireFlamesCanvas />}
@@ -676,18 +677,19 @@ const LoginPage = () => {
                       flex: 1,
                       padding: '0.75rem',
                       borderRadius: '8px',
-                      background: isSignUp ? '#0d151c' : 'transparent',
-                      color: isSignUp ? '#FFFFFF' : '#475569',
-                      border: isSignUp ? '1px solid #38bdf8' : '1px solid transparent',
-                      boxShadow: isSignUp ? '0 0 10px rgba(56, 189, 248, 0.2)' : 'none',
-                      animation: isSignUp ? 'water-glow-pulse 3s infinite ease-in-out' : 'none',
+                      background: isSignUp ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' : 'transparent',
+                      backgroundSize: '400% 400%',
+                      animation: isSignUp ? 'water-gradient 8s ease infinite' : 'none',
+                      color: isSignUp ? '#0369a1' : '#475569',
+                      border: 'none',
+                      boxShadow: isSignUp ? '0 4px 12px rgba(125, 211, 252, 0.2)' : 'none',
                       fontWeight: 800,
                       fontSize: '0.95rem',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       position: 'relative',
                       overflow: 'hidden',
-                      textShadow: isSignUp ? '0 0 4px rgba(56, 189, 248, 0.5)' : 'none'
+                      textShadow: 'none'
                     }}
                   >
                     {isSignUp && <WaterBubblesCanvas />}
@@ -837,9 +839,13 @@ const LoginPage = () => {
                     type="submit"
                     disabled={isLoading}
                     style={{
-                      background: isSignUp ? '#0d151c' : '#180f0f',
-                      color: '#FFFFFF',
-                      border: isSignUp ? '1px solid #38bdf8' : '1px solid #ef4444',
+                      background: isSignUp 
+                        ? 'linear-gradient(270deg, #bae6fd, #7dd3fc, #99f6e4, #a5f3fc, #bae6fd)' 
+                        : 'linear-gradient(270deg, #dc2626, #ea580c, #f59e0b, #ef4444, #dc2626)',
+                      backgroundSize: '400% 400%',
+                      animation: 'water-gradient 8s ease infinite',
+                      color: isSignUp ? '#0369a1' : '#FFFFFF',
+                      border: 'none',
                       padding: '0.9rem',
                       borderRadius: '8px',
                       fontWeight: 800,
@@ -851,29 +857,28 @@ const LoginPage = () => {
                       gap: '8px',
                       marginTop: '0.5rem',
                       boxShadow: isSignUp 
-                        ? '0 0 10px rgba(56, 189, 248, 0.25)' 
-                        : '0 0 10px rgba(239, 68, 68, 0.25)',
-                      animation: isSignUp ? 'water-glow-pulse 3s infinite ease-in-out' : 'fire-glow-pulse 3s infinite ease-in-out',
+                        ? '0 4px 12px rgba(125, 211, 252, 0.25)' 
+                        : '0 4px 12px rgba(234, 88, 12, 0.25)',
                       transition: 'all 0.2s ease',
                       opacity: isLoading ? 0.8 : 1,
                       position: 'relative',
                       overflow: 'hidden',
-                      textShadow: isSignUp ? '0 0 4px rgba(56, 189, 248, 0.5)' : '0 0 4px rgba(239, 68, 68, 0.5)'
+                      textShadow: isSignUp ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.3)'
                     }}
                     onMouseOver={(e) => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'translateY(-1px)';
                         e.currentTarget.style.boxShadow = isSignUp 
-                          ? '0 0 15px rgba(56, 189, 248, 0.45)' 
-                          : '0 0 15px rgba(239, 68, 68, 0.45)';
+                          ? '0 6px 16px rgba(125, 211, 252, 0.4)' 
+                          : '0 6px 16px rgba(234, 88, 12, 0.4)';
                       }
                     }}
                     onMouseOut={(e) => {
                       if (!isLoading) {
                         e.currentTarget.style.transform = 'none';
                         e.currentTarget.style.boxShadow = isSignUp 
-                          ? '0 0 10px rgba(56, 189, 248, 0.25)' 
-                          : '0 0 10px rgba(239, 68, 68, 0.25)';
+                          ? '0 4px 12px rgba(125, 211, 252, 0.25)' 
+                          : '0 4px 12px rgba(234, 88, 12, 0.25)';
                       }
                     }}
                   >
@@ -902,25 +907,10 @@ const LoginPage = () => {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes fire-glow-pulse {
-          0%, 100% {
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
-            border-color: rgba(239, 68, 68, 0.7);
-          }
-          50% {
-            box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
-            border-color: rgba(239, 68, 68, 1);
-          }
-        }
-        @keyframes water-glow-pulse {
-          0%, 100% {
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
-            border-color: rgba(56, 189, 248, 0.7);
-          }
-          50% {
-            box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
-            border-color: rgba(56, 189, 248, 1);
-          }
+        @keyframes water-gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
         @keyframes spill-drop {
           0% {
