@@ -88,13 +88,6 @@ const LandingPage = () => {
                 {user.email}
               </span>
               <button 
-                className="btn-primary" 
-                onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
-                style={{ padding: '0.5rem 1.25rem', borderRadius: '6px', fontSize: '0.95rem' }}
-              >
-                Dashboard
-              </button>
-              <button 
                 onClick={signOut}
                 style={{ 
                   background: 'transparent', border: '1px solid #CBD5E1', 
