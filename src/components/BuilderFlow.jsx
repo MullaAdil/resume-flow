@@ -332,19 +332,32 @@ const BuilderFlow = () => {
 
   const steps = allSteps.filter(s => !(s.id === 'experience' && resumeData.profileType === 'student'));
 
+  const previewContainerRef = useRef(null);
+
   useEffect(() => {
     const handleResize = () => {
-      const paneWidth = window.innerWidth / 2;
-      const paneHeight = window.innerHeight - 64;
-      const scaleW = (paneWidth - 20) / 800;
-      const scaleH = (paneHeight - 20) / 1131;
-      const newScale = Math.min(scaleW, scaleH, 1);
+      const el = previewContainerRef.current;
+      const paneWidth = el ? el.offsetWidth : (window.innerWidth * 0.38);
+      const paneHeight = el ? el.offsetHeight : (window.innerHeight - 64);
+      const scaleW = (paneWidth - 32) / 800;
+      const scaleH = (paneHeight - 32) / 1131;
+      const newScale = Math.max(0.3, Math.min(scaleW, scaleH, 1));
       setPreviewScale(newScale);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    
+    let observer;
+    if (previewContainerRef.current && typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(handleResize);
+      observer.observe(previewContainerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (observer) observer.disconnect();
+    };
+  }, [mobileTab]);
 
   const handleNext = () => {
     if (activeStepIndex < steps.length - 1) setActiveStepIndex(prev => prev + 1);
@@ -2077,18 +2090,51 @@ const BuilderFlow = () => {
       `}</style>
       
       {/* Top Header */}
-      <header style={{ height: '64px', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', position: 'relative', zIndex: 10 }}>
-        {/* Mode Selector (Desktop & Mobile) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px' }}>
+      <header style={{ height: '64px', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', position: 'relative', zIndex: 20 }}>
+        {/* Left: Quick Back to Templates */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <button 
+            onClick={() => navigate('/templates')}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#64748B',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.color = '#059669'; e.currentTarget.style.background = '#F1F5F9'; }}
+            onMouseOut={(e) => { e.currentTarget.style.color = '#64748B'; e.currentTarget.style.background = 'transparent'; }}
+          >
+            <ChevronLeft size={16} /> Change Template
+          </button>
+        </div>
+
+        {/* Center Mode Selector (Dead Center across all screens & zoom levels) */}
+        <div style={{ 
+          position: 'absolute', 
+          left: '50%', 
+          transform: 'translateX(-50%)', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '0.75rem', 
+          zIndex: 25 
+        }}>
+          <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <button 
-              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? '#059669' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }} 
+              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? '#059669' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
               onClick={() => setLeftPaneMode('edit')}
             >
               Edit
             </button>
             <button 
-              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? '#059669' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }} 
+              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? '#059669' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
               onClick={() => setLeftPaneMode('customize')}
             >
               Customize
@@ -2112,7 +2158,8 @@ const BuilderFlow = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        {/* Right: Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button 
             onClick={() => {
               setShowSyncModal(true);
@@ -2262,7 +2309,7 @@ const BuilderFlow = () => {
         </div>
 
         {/* Right Pane — Compact Live Preview (~38% Width) */}
-        <div className="builder-preview-area" style={{ flex: '0.85 1 0%', minWidth: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
+        <div ref={previewContainerRef} className="builder-preview-area" style={{ flex: '0.85 1 0%', minWidth: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', minHeight: '100%', padding: '2rem 1rem' }}>
             <div 
               style={{ 
