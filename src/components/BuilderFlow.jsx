@@ -133,6 +133,7 @@ const BuilderFlow = () => {
     addEducation, updateEducation, removeEducation,
     addSkill, removeSkill, addItem, updateItem, removeItem,
     selectedTemplate, setSelectedTemplate,
+    setProfileType,
     updateSettings,
     updateSection,
     generateSummaryAI,
@@ -449,13 +450,22 @@ const BuilderFlow = () => {
   };
 
   const handlePrewrittenPhrases = () => {
-    const phrases = [
+    const isStudent = resumeData.profileType === 'student';
+    const studentPhrases = [
+      "Motivated and detail-oriented student with a strong foundation in modern technology and problem solving.",
+      "Eager fresher seeking an entry-level opportunity to leverage academic background and hands-on project experience.",
+      "Passionate learner with experience building web applications and collaborating effectively in team projects.",
+      "Quick learner with analytical mindset and a strong commitment to continuous professional growth.",
+      "Adaptable and enthusiastic candidate possessing strong technical, communication, and organizational skills."
+    ];
+    const proPhrases = [
       "Led cross-functional teams to deliver high-priority projects on time and within budget.",
       "Successfully optimized operational workflows, resulting in a 20% increase in productivity.",
       "Proven ability to translate complex business requirements into scalable technical solutions.",
       "Skilled in collaborating with senior leadership to define strategic goals and objectives.",
       "Strong track record of mentoring junior staff and fostering a culture of continuous improvement."
     ];
+    const phrases = isStudent ? studentPhrases : proPhrases;
     const phrase = phrases[Math.floor(Math.random() * phrases.length)];
     const currentSummary = resumeData.personalInfo?.summary || '';
     const newSummary = currentSummary ? `${currentSummary.trim()} ${phrase}` : phrase;
