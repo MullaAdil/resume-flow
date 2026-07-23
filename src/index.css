@@ -17,8 +17,8 @@
   --warning: #F59E0B;
   --danger: #EF4444;
 
-  /* Multi-Color Accent Palette */
-  --grad-multicolor: linear-gradient(135deg, #6366F1 0%, #8B5CF6 25%, #EC4899 50%, #F59E0B 75%, #10B981 100%);
+  /* Multi-Color Accent Palette for UI */
+  --grad-multicolor: linear-gradient(135deg, #4F46E5 0%, #7C3AED 35%, #EC4899 70%, #059669 100%);
   --grad-sunset: linear-gradient(135deg, #FF512F 0%, #DD2476 100%);
   --grad-ocean: linear-gradient(135deg, #06B6D4 0%, #3B82F6 50%, #6366F1 100%);
   --grad-emerald: linear-gradient(135deg, #10B981 0%, #059669 100%);
@@ -29,7 +29,7 @@
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  --shadow-multicolor: 0 10px 30px -5px rgba(99, 102, 241, 0.25), 0 4px 12px -2px rgba(236, 72, 153, 0.15);
+  --shadow-multicolor: 0 10px 25px -5px rgba(99, 102, 241, 0.15);
   
   /* Radii */
   --radius-md: 12px;
@@ -39,17 +39,15 @@
   
   /* Transitions */
   --transition-fast: 150ms ease;
-  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
 }
 
-/* Multi-Color Gradient Utilities */
+/* Static Clean Text Gradients */
 .text-gradient-multicolor {
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 25%, #DB2777 50%, #EA580C 75%, #059669 100%);
-  background-size: 200% auto;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 40%, #EC4899 70%, #059669 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmerGradient 6s linear infinite;
 }
 
 .text-gradient-purple {
@@ -68,45 +66,21 @@
   height: 4px;
   width: 100%;
   background: linear-gradient(90deg, #6366F1, #8B5CF6, #EC4899, #F59E0B, #10B981, #3B82F6);
-  background-size: 200% 100%;
-  animation: shimmerGradient 4s linear infinite;
-}
-
-@keyframes shimmerGradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
 .multicolor-card {
   background: #FFFFFF;
   border-radius: 20px;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.multicolor-card::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 22px;
-  padding: 2px;
-  background: linear-gradient(135deg, rgba(99,102,241,0.4), rgba(236,72,153,0.4), rgba(245,158,11,0.4), rgba(16,185,129,0.4));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
-}
-
-.multicolor-card:hover::before {
-  opacity: 1;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .multicolor-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.15);
+  border-color: #CBD5E1;
 }
 
 .badge-multicolor {
@@ -117,10 +91,8 @@
   border-radius: 9999px;
   font-size: 0.85rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
   color: #3730A3;
 }
 

@@ -10,12 +10,11 @@ const TEMPLATE_WIDTH = 800;
 const TEMPLATE_HEIGHT = 1131;
 const SCALE = (PAGE_HEIGHT = 580) => PAGE_HEIGHT / TEMPLATE_HEIGHT;
 
-const FaceContent = ({ face, selectedColor, onSelect, onPreview }) => {
+const FaceContent = ({ face, onSelect, onPreview }) => {
   const contentRef = React.useRef(null);
   const [contentHeight, setContentHeight] = React.useState(TEMPLATE_HEIGHT);
 
   React.useEffect(() => {
-    // Wait a tiny bit for the template components to mount and render their DOM
     const timer = setTimeout(() => {
       if (contentRef.current) {
         setContentHeight(Math.max(TEMPLATE_HEIGHT, contentRef.current.scrollHeight));
@@ -34,29 +33,25 @@ const FaceContent = ({ face, selectedColor, onSelect, onPreview }) => {
     return (
       <div style={{
         width: '100%', height: '100%',
-        background: 'linear-gradient(to right, #4a3b32 0%, #3a2a22 100%)',
-        backgroundImage: 'radial-gradient(circle, #5b4636 10%, transparent 10.01%), radial-gradient(circle, #4a3b32 10%, transparent 10.01%)',
-        backgroundSize: '20px 20px', // slight texture
+        background: 'linear-gradient(to right, #2D3748 0%, #1A202C 100%)',
         display: 'flex', flexDirection: 'column',
         justifyContent: 'center', alignItems: 'center',
         padding: '2rem', textAlign: 'center',
-        color: '#d4c4b7',
-        boxShadow: 'inset 5px 0 15px rgba(0,0,0,0.1)',
-        border: '4px solid #2a1a12',
-        borderLeft: '12px solid #1a0f0a', // spine
+        color: '#E2E8F0',
+        borderLeft: '12px solid #0F172A', // spine
         borderRadius: '0 8px 8px 0'
       }}>
         <div style={{
-          border: '2px dashed rgba(212, 196, 183, 0.4)',
+          border: '2px dashed rgba(226, 232, 240, 0.3)',
           padding: '3rem',
-          borderRadius: '4px',
+          borderRadius: '8px',
           width: '80%'
         }}>
-          <h1 style={{ fontSize: '4rem', fontFamily: 'Georgia, serif', fontWeight: 900, marginBottom: '1rem', textShadow: '2px 4px 6px rgba(0,0,0,0.5)' }}>
+          <h1 style={{ fontSize: '3.5rem', fontFamily: 'Georgia, serif', fontWeight: 900, marginBottom: '1rem', color: '#FFFFFF' }}>
             Resume<br />Templates
           </h1>
-          <p style={{ fontSize: '1.25rem', fontFamily: 'Georgia, serif', opacity: 0.9 }}>
-            Open the book to find your perfect fit
+          <p style={{ fontSize: '1.2rem', fontFamily: 'Georgia, serif', opacity: 0.9 }}>
+            Flip through to find your ideal design
           </p>
         </div>
       </div>
@@ -75,15 +70,7 @@ const FaceContent = ({ face, selectedColor, onSelect, onPreview }) => {
     const template = face.template;
     const scaleX = PAGE_WIDTH / TEMPLATE_WIDTH;
     const scaleY = BOOK_HEIGHT / contentHeight;
-
-    const baseData = templateMockData[template.id] || mockResumeData;
-    const previewData = {
-      ...baseData,
-      settings: {
-        ...(baseData.settings || {}),
-        primaryColor: selectedColor || (template.colors && template.colors[0]) || (baseData.settings && baseData.settings.primaryColor) || '#000000'
-      }
-    };
+    const previewData = templateMockData[template.id] || mockResumeData;
 
     return (
       <div
@@ -92,10 +79,10 @@ const FaceContent = ({ face, selectedColor, onSelect, onPreview }) => {
           width: '100%', height: '100%',
           background: '#ffffff',
           position: 'relative',
-          overflow: 'hidden', // No scrolling
+          overflow: 'hidden',
           display: 'flex',
-          justifyContent: 'center', // Center it horizontally if it shrinks
-          alignItems: 'center', // Center it vertically
+          justifyContent: 'center',
+          alignItems: 'center',
           cursor: 'pointer'
         }}
         title={`Preview ${template.name}`}
@@ -109,9 +96,8 @@ const FaceContent = ({ face, selectedColor, onSelect, onPreview }) => {
           transform: `scale(${scaleX}, ${scaleY})`,
           transformOrigin: 'center center',
           backgroundColor: '#FFFFFF',
-          pointerEvents: 'none' // Let clicks pass to the parent if needed, or keep buttons above
+          pointerEvents: 'none'
         }}>
-          {/* We removed isPreview={true} so the templates look exactly like the original grid view */}
           <TemplateRenderer templateId={template.id} resumeData={previewData} />
         </div>
         
@@ -169,11 +155,8 @@ const FaceContent = ({ face, selectedColor, onSelect, onPreview }) => {
   return null;
 };
 
-const Sheet = ({ index, currentSheetIndex, sheet, selectedColor, onSelect, onPreview }) => {
+const Sheet = ({ index, currentSheetIndex, sheet, onSelect, onPreview }) => {
   const isFlipped = index < currentSheetIndex;
-
-  // Stacking context: when flipped, lower index should be UNDER higher index sheets.
-  // When not flipped, lower index should be ABOVE higher index sheets.
   const zIndex = isFlipped ? index : 1000 - index;
 
   return (
@@ -191,7 +174,6 @@ const Sheet = ({ index, currentSheetIndex, sheet, selectedColor, onSelect, onPre
       initial={false}
       animate={{
         rotateY: isFlipped ? -180 : 0,
-        // Tiny translateZ hack keeps browsers from z-fighting during animation
         z: isFlipped ? index * 0.1 : -index * 0.1
       }}
       transition={{ duration: 0.8, type: 'spring', stiffness: 40, damping: 14 }}
@@ -204,7 +186,7 @@ const Sheet = ({ index, currentSheetIndex, sheet, selectedColor, onSelect, onPre
         borderRadius: '0 8px 8px 0', overflow: 'hidden',
         boxSizing: 'border-box'
       }}>
-        <FaceContent face={sheet.front} selectedColor={selectedColor} onSelect={onSelect} onPreview={onPreview} />
+        <FaceContent face={sheet.front} onSelect={onSelect} onPreview={onPreview} />
       </div>
 
       {/* Back Face (Left Side Page) */}
@@ -216,25 +198,15 @@ const Sheet = ({ index, currentSheetIndex, sheet, selectedColor, onSelect, onPre
         borderRadius: '8px 0 0 8px', overflow: 'hidden',
         boxSizing: 'border-box'
       }}>
-        <FaceContent face={sheet.back} selectedColor={selectedColor} onSelect={onSelect} onPreview={onPreview} />
+        <FaceContent face={sheet.back} onSelect={onSelect} onPreview={onPreview} />
       </div>
     </motion.div>
   );
 };
 
-const FlipBook = ({ templates, selectedColor, onColorChange, onSelect }) => {
+const FlipBook = ({ templates, onSelect }) => {
   const [currentSheetIndex, setCurrentSheetIndex] = useState(1);
   const [previewTemplate, setPreviewTemplate] = useState(null);
-
-  const themeColors = [
-    { name: 'Emerald', hex: '#059669', gradient: 'linear-gradient(135deg, #059669, #10B981)' },
-    { name: 'Indigo', hex: '#4F46E5', gradient: 'linear-gradient(135deg, #4F46E5, #6366F1)' },
-    { name: 'Violet', hex: '#7C3AED', gradient: 'linear-gradient(135deg, #7C3AED, #A855F7)' },
-    { name: 'Rose', hex: '#DB2777', gradient: 'linear-gradient(135deg, #DB2777, #EC4899)' },
-    { name: 'Sunset', hex: '#E11D48', gradient: 'linear-gradient(135deg, #E11D48, #F43F5E)' },
-    { name: 'Amber', hex: '#D97706', gradient: 'linear-gradient(135deg, #D97706, #F59E0B)' },
-    { name: 'Ocean', hex: '#0D9488', gradient: 'linear-gradient(135deg, #0D9488, #06B6D4)' },
-  ];
 
   const faces = [
     { type: 'cover' },
@@ -251,7 +223,6 @@ const FlipBook = ({ templates, selectedColor, onColorChange, onSelect }) => {
     });
   }
 
-  // Reset book to open state if filters change
   useEffect(() => {
     setCurrentSheetIndex(1);
   }, [templates]);
@@ -263,14 +234,13 @@ const FlipBook = ({ templates, selectedColor, onColorChange, onSelect }) => {
   };
 
   const handlePrev = () => {
-    if (currentSheetIndex > 1) { // Keeps open
+    if (currentSheetIndex > 1) {
       setCurrentSheetIndex(prev => prev - 1);
     }
   };
 
   const isBookClosed = false;
 
-  // Determine active template names for current sheet
   const activeSheet = sheets[currentSheetIndex - 1];
   const frontName = activeSheet?.front?.template?.name;
   const backName = activeSheet?.back?.template?.name;
@@ -287,22 +257,8 @@ const FlipBook = ({ templates, selectedColor, onColorChange, onSelect }) => {
       overflowX: 'hidden',
       position: 'relative'
     }}>
-      
-      {/* Multi-Color Ambient Glow Behind Book */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '90%',
-        height: '80%',
-        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.12) 35%, rgba(16, 185, 129, 0.1) 70%, transparent 100%)',
-        filter: 'blur(70px)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }} />
 
-      {/* Multi-Color Palette & Toolbar down near top of book */}
+      {/* Clean Toolbar down near top of book */}
       <div style={{
         position: 'relative',
         zIndex: 20,
@@ -310,57 +266,25 @@ const FlipBook = ({ templates, selectedColor, onColorChange, onSelect }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '1.5rem',
+        gap: '1rem',
         width: '100%',
         maxWidth: `${PAGE_WIDTH * 2 + 160}px`,
-        marginBottom: '2.5rem',
-        padding: '1rem 1.75rem',
-        background: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(16px)',
-        borderRadius: '24px',
-        border: '1px solid rgba(226, 232, 240, 0.8)',
-        boxShadow: '0 10px 30px -5px rgba(99, 102, 241, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.05)'
+        marginBottom: '2rem',
+        padding: '0.85rem 1.5rem',
+        background: '#FFFFFF',
+        borderRadius: '16px',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)'
       }}>
-        {/* Left: Interactive Color Swatches */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: selectedColor || '#059669', display: 'inline-block' }} />
-            Theme Color:
-          </span>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            {themeColors.map(color => {
-              const isSelected = (selectedColor || '#059669') === color.hex;
-              return (
-                <button
-                  key={color.hex}
-                  onClick={() => onColorChange && onColorChange(color.hex)}
-                  title={`Apply ${color.name} Theme`}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    background: color.gradient,
-                    border: isSelected ? '3px solid #0F172A' : '2px solid #FFFFFF',
-                    boxShadow: isSelected ? '0 0 0 2px rgba(99, 102, 241, 0.5), 0 4px 10px rgba(0,0,0,0.15)' : '0 2px 5px rgba(0,0,0,0.1)',
-                    cursor: 'pointer',
-                    transform: isSelected ? 'scale(1.15)' : 'scale(1)',
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Center: Page Info Badge */}
+        {/* Left: Page Info Badge */}
         <div className="badge-multicolor">
           <span style={{ fontSize: '0.9rem' }}>📖 Page {currentSheetIndex} of {sheets.length}</span>
           <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#94A3B8' }} />
           <span style={{ fontWeight: 600, color: '#475569' }}>{pageLabel}</span>
         </div>
 
-        {/* Right: Flip Hint */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#64748B', fontWeight: 600 }}>
+        {/* Right: Navigation Hint */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: '#64748B', fontWeight: 600 }}>
           <span>Click pages or arrows to flip</span>
         </div>
       </div>

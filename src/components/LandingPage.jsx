@@ -48,17 +48,6 @@ const LandingPage = () => {
 
   const [userResumes, setUserResumes] = useState([]);
   const [loadingResumes, setLoadingResumes] = useState(false);
-  const [selectedColor, setSelectedColor] = useState('#059669'); // Default theme accent
-
-  const themeColors = [
-    { name: 'Emerald', hex: '#059669' },
-    { name: 'Indigo', hex: '#4F46E5' },
-    { name: 'Violet', hex: '#7C3AED' },
-    { name: 'Rose', hex: '#DB2777' },
-    { name: 'Sunset', hex: '#E11D48' },
-    { name: 'Amber', hex: '#D97706' },
-    { name: 'Ocean', hex: '#0D9488' },
-  ];
 
   useEffect(() => {
     if (user && user.id) {
@@ -116,21 +105,19 @@ const LandingPage = () => {
       {/* Top Multi-Color Accent Line */}
       <div className="bg-multicolor-bar" />
 
-      {/* Header - Modern Multi-Color Glassmorphic Navbar */}
+      {/* Header - Modern Clean Navbar */}
       <header style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-        padding: '1rem 3rem', background: 'rgba(255, 255, 255, 0.9)', 
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
+        padding: '1rem 3rem', background: '#FFFFFF', 
+        borderBottom: '1px solid #E2E8F0',
         position: 'sticky', top: 0, zIndex: 1000,
-        boxShadow: '0 4px 20px -5px rgba(99, 102, 241, 0.05)'
+        boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 800, fontSize: '1.35rem', color: 'var(--text-main)', cursor: 'pointer' }} onClick={() => navigate('/')}>
            <div style={{
-             width: '40px', height: '40px', borderRadius: '12px',
-             background: 'linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899)',
-             display: 'flex', alignItems: 'center', justifyContent: 'center',
-             boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+             width: '40px', height: '40px', borderRadius: '10px',
+             background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+             display: 'flex', alignItems: 'center', justifyContent: 'center'
            }}>
              <FileText size={24} color="#FFFFFF" />
            </div>
@@ -159,11 +146,8 @@ const LandingPage = () => {
                 style={{ 
                   background: 'transparent', border: '1.5px solid #CBD5E1', 
                   color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', 
-                  padding: '0.5rem 1.25rem', borderRadius: '8px', fontSize: '0.95rem',
-                  transition: 'all 0.15s ease'
+                  padding: '0.5rem 1.25rem', borderRadius: '8px', fontSize: '0.95rem'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = '#F8FAFC'}
-                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Logout
               </button>
@@ -180,11 +164,8 @@ const LandingPage = () => {
                   cursor: 'pointer', 
                   padding: '0.55rem 1.35rem', 
                   borderRadius: '10px', 
-                  fontSize: '0.95rem',
-                  transition: 'all 0.15s ease'
+                  fontSize: '0.95rem'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.borderColor = '#94A3B8'; }}
-                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#CBD5E1'; }}
               >
                 Sign In
               </button>
@@ -192,13 +173,10 @@ const LandingPage = () => {
                 onClick={() => navigate('/login', { state: { mode: 'signup' } })}
                 style={{ 
                   padding: '0.6rem 1.5rem', borderRadius: '10px', fontSize: '0.95rem', fontWeight: 700,
-                  background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #EC4899 100%)',
+                  background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
                   color: '#FFFFFF', border: 'none', cursor: 'pointer',
-                  boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
-                  transition: 'transform 0.2s ease, boxShadow 0.2s ease'
+                  boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 Create Account
               </button>
@@ -207,14 +185,8 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section - Multi-Color Mesh Background */}
-      <div style={{ position: 'relative', overflow: 'hidden', paddingBottom: '2rem' }}>
-        {/* Abstract Multi-Color Gradient Mesh Background */}
-        <div style={{ position: 'absolute', top: '-15%', right: '-5%', width: '750px', height: '750px', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(70px)', zIndex: 0 }} />
-        <div style={{ position: 'absolute', bottom: '0%', right: '25%', width: '650px', height: '650px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(70px)', zIndex: 0 }} />
-        <div style={{ position: 'absolute', top: '15%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(70px)', zIndex: 0 }} />
-        <div style={{ position: 'absolute', bottom: '-10%', left: '20%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(70px)', zIndex: 0 }} />
-
+      {/* Hero Section */}
+      <div style={{ position: 'relative', overflow: 'hidden', paddingBottom: '2rem', background: '#FAF9F6' }}>
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -227,156 +199,108 @@ const LandingPage = () => {
         >
           {/* Left Side: Content */}
           <div style={{ paddingRight: '2rem' }}>
-            {/* Multi-Color Badge */}
             <div style={{ marginBottom: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <span className="badge-multicolor">
-                <Sparkles size={16} color="#6366F1" /> Multi-Color Resume Builder
+                <Sparkles size={16} color="#4F46E5" /> AI-Powered Resume Builder
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 1rem', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(16, 185, 129, 0.1)', color: '#047857', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                <Zap size={15} /> 100% ATS Ready
+                <Zap size={15} /> 100% ATS Approved
               </span>
             </div>
 
             <h1 className="hero-title" style={{ fontSize: '3.75rem', fontWeight: 800, marginBottom: '1.25rem', lineHeight: 1.1, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-              Land 3x more interviews with our <span className="text-gradient-multicolor">Multi-Color AI Resume Builder</span>
+              Land 3x more interviews with our <span className="text-gradient-multicolor">AI Resume Builder</span>
             </h1>
             
             <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '2.25rem', fontWeight: 500, lineHeight: 1.6, maxWidth: '620px' }}>
-              Pick from stunning multi-color themes, instant AI resume writer, and 1-click ATS optimizer designed to impress hiring managers.
+              Select professional templates, instant AI resume content generator, and 1-click ATS optimizer designed to impress recruiters.
             </p>
-
-            {/* Quick Hero Theme Color Switcher */}
-            <div style={{ marginBottom: '2.25rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(12px)', padding: '0.75rem 1.25rem', borderRadius: '16px', border: '1px solid rgba(226, 232, 240, 0.8)', width: 'fit-content' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pick Color Theme:</span>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                {themeColors.map(c => (
-                  <button
-                    key={c.hex}
-                    onClick={() => setSelectedColor(c.hex)}
-                    title={c.name}
-                    style={{
-                      width: '24px', height: '24px', borderRadius: '50%', background: c.hex,
-                      border: selectedColor === c.hex ? '2.5px solid #0F172A' : '2px solid transparent',
-                      cursor: 'pointer', transform: selectedColor === c.hex ? 'scale(1.2)' : 'scale(1)',
-                      transition: 'transform 0.15s ease'
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
 
             <div className="hero-actions" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
               <button 
                 onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
                 style={{ 
-                  fontSize: '1.2rem', padding: '1.1rem 2.5rem', borderRadius: '24px 12px 24px 12px', 
-                  background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%)', 
+                  fontSize: '1.2rem', padding: '1.1rem 2.5rem', borderRadius: '14px', 
+                  background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)', 
                   color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer', 
-                  boxShadow: '0 12px 30px -5px rgba(99, 102, 241, 0.4)',
-                  transition: 'all 0.2s ease'
+                  boxShadow: '0 10px 25px rgba(79, 70, 229, 0.3)'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 Build Your Resume Now <ArrowRight size={20} style={{ display: 'inline', marginLeft: '0.5rem', verticalAlign: 'middle' }} />
               </button>
               <button 
                 onClick={() => navigate('/import', { state: { skipPathSelection: false } })}
                 style={{ 
-                  fontSize: '1.1rem', padding: '1rem 2.5rem', borderRadius: '12px', 
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)', color: 'var(--text-main)', 
+                  fontSize: '1.1rem', padding: '1rem 2.5rem', borderRadius: '14px', 
+                  backgroundColor: '#FFFFFF', color: 'var(--text-main)', 
                   border: '2px solid var(--text-main)',
-                  fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease',
-                  backdropFilter: 'blur(8px)'
+                  fontWeight: 700, cursor: 'pointer'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--text-main)'; e.currentTarget.style.color = '#FFFFFF'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)'; e.currentTarget.style.color = 'var(--text-main)'; }}
               >
                 Upload Existing CV
               </button>
             </div>
           </div>
 
-          {/* Right Side: Multi-Color Visual Preview */}
+          {/* Right Side: Clean Visual Preview */}
           <div className="hero-preview" style={{ position: 'relative', height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-             <motion.div 
-               initial={{ y: 20, rotate: -2 }}
-               animate={{ y: 0, rotate: 0 }}
-               transition={{ duration: 0.6, delay: 0.2 }}
+             <div 
                style={{ 
                  width: '400px', height: '565px', 
-                 background: 'linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, #FFFFFF 15%)',
-                 borderLeft: `4px solid ${selectedColor}`, borderRight: '1.5px solid #CBD5E1',
+                 background: '#FFFFFF',
+                 borderLeft: '4px solid #4F46E5', borderRight: '1.5px solid #CBD5E1',
                  borderTop: 'none', borderBottom: 'none',
-                 boxShadow: '0 30px 60px -15px rgba(99, 102, 241, 0.25)',
+                 boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.12)',
                  overflow: 'visible', position: 'relative', zIndex: 10
                }}
              >
                <TornEdge />
                <TornEdge isBottom />
                <div style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '800px', height: '1131px', background: '#FFFFFF', overflow: 'hidden' }}>
-                  {(() => {
-                     const baseData = templateMockData['visionary'] || mockResumeData;
-                     const previewData = {
-                       ...baseData,
-                       settings: {
-                         ...(baseData.settings || {}),
-                         primaryColor: selectedColor
-                       }
-                     };
-                     return <TemplateRenderer templateId="visionary" resumeData={previewData} />;
-                  })()}
+                  <TemplateRenderer templateId="visionary" resumeData={mockResumeData} />
                </div>
-             </motion.div>
+             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* 3D FlipBook Showcase Section - Down Near Book with Multi-Color Flow */}
+      {/* 3D FlipBook Showcase Section - Down Near Book */}
       <div id="templates" style={{ 
         padding: '4rem 2rem 5rem', 
-        background: 'linear-gradient(180deg, #FFFFFF 0%, #FAF9F6 50%, #F1F5F9 100%)', 
+        background: '#FFFFFF', 
         borderTop: '1px solid var(--border-color)', 
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         position: 'relative'
       }}>
-         {/* Subtle Multi-Color Glow Bar */}
-         <div style={{ width: '100px', height: '6px', borderRadius: '9999px', background: 'var(--grad-multicolor)', marginBottom: '1.5rem' }} />
-
          <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
               <div style={{ marginBottom: '0.5rem' }}>
                 <span className="badge-multicolor">
-                  🎨 Interactive 3D Book Showcase
+                  📖 Interactive 3D Showcase
                 </span>
               </div>
               <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
-                 Flip through our <span className="text-gradient-multicolor">Multi-Color Templates</span>
+                 Flip through our <span className="text-gradient-multicolor">Template Showcase</span>
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Use the color swatches below to test different themes live inside the book pages!</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Click or drag pages to flip through the book below.</p>
             </div>
             <button 
                onClick={() => navigate('/templates', { state: { skipPathSelection: false } })}
                style={{ 
-                 background: 'rgba(255, 255, 255, 0.9)', border: '1px solid #CBD5E1', 
+                 background: '#FFFFFF', border: '1px solid #CBD5E1', 
                  color: 'var(--text-main)', fontWeight: 700, fontSize: '1rem', 
                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', 
-                 padding: '0.75rem 1.5rem', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                 transition: 'all 0.2s ease' 
+                 padding: '0.75rem 1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                }}
-               onMouseOver={(e) => { e.currentTarget.style.borderColor = '#6366F1'; e.currentTarget.style.color = '#4F46E5'; }}
-               onMouseOut={(e) => { e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.color = 'var(--text-main)'; }}
             >
                See All Templates <ChevronRight size={18} />
             </button>
          </div>
 
-         {/* Render the Enhanced Multi-Color FlipBook */}
+         {/* Render the Clean FlipBook */}
          <div style={{ width: '100%' }}>
            <FlipBook 
              templates={templates}
-             selectedColor={selectedColor}
-             onColorChange={setSelectedColor}
              onSelect={handleSelectTemplate}
            />
          </div>
@@ -430,34 +354,27 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* Full-Width Multi-Color CTA Banner */}
+      {/* CTA Banner */}
       <div style={{ 
         padding: '5rem 2rem', 
-        background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 40%, #4C1D95 70%, #831843 100%)',
-        color: '#FFFFFF', textAlign: 'center', position: 'relative', overflow: 'hidden'
+        background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)',
+        color: '#FFFFFF', textAlign: 'center', position: 'relative'
       }}>
-        {/* Glow Spheres */}
-        <div style={{ position: 'absolute', top: '-50%', left: '20%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%)', filter: 'blur(50px)' }} />
-        <div style={{ position: 'absolute', bottom: '-50%', right: '20%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 70%)', filter: 'blur(50px)' }} />
-
         <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
           <h2 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '1.25rem', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
-            Ready to build your <span style={{ background: 'linear-gradient(135deg, #38BDF8, #818CF8, #F472B6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Multi-Color Resume</span>?
+            Ready to build your <span style={{ background: 'linear-gradient(135deg, #38BDF8, #818CF8, #F472B6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Professional Resume</span>?
           </h2>
           <p style={{ fontSize: '1.2rem', opacity: 0.9, marginBottom: '2.5rem', fontWeight: 500, lineHeight: 1.6 }}>
-            Join thousands of job seekers who landed interviews at top tech companies, financial firms, and creative agencies.
+            Join thousands of job seekers who landed interviews at top companies.
           </p>
           <button 
             onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
             style={{ 
-              fontSize: '1.25rem', padding: '1.2rem 3rem', borderRadius: '30px', 
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', 
+              fontSize: '1.25rem', padding: '1.2rem 3rem', borderRadius: '14px', 
+              background: '#10B981', 
               color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer', 
-              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.4)',
-              transition: 'all 0.2s ease'
+              boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)'
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
             Create My Free Resume Now
           </button>
@@ -470,7 +387,7 @@ const LandingPage = () => {
            <FileText size={24} color="#6366F1" />
            Elevate Resume
         </div>
-        <p style={{ fontSize: '0.95rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} Elevate Resume. All rights reserved. Crafted with multi-color precision.</p>
+        <p style={{ fontSize: '0.95rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} Elevate Resume. All rights reserved.</p>
       </footer>
 
     </motion.div>
