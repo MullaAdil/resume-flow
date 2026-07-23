@@ -392,7 +392,6 @@ const FlipBook = ({ templates, onSelect }) => {
                 index={i}
                 currentSheetIndex={currentSheetIndex}
                 sheet={sheet}
-                selectedColor={selectedColor}
                 onSelect={onSelect}
                 onPreview={setPreviewTemplate}
               />
@@ -511,14 +510,7 @@ const FlipBook = ({ templates, onSelect }) => {
               <div style={{ transform: 'scale(1)', transformOrigin: 'top center', background: '#fff' }}>
                 {
                   (() => {
-                    const baseData = templateMockData[previewTemplate] || mockResumeData;
-                    const previewData = {
-                      ...baseData,
-                      settings: {
-                        ...(baseData.settings || {}),
-                        primaryColor: selectedColor || (baseData.settings && baseData.settings.primaryColor) || '#000000'
-                      }
-                    };
+                    const previewData = templateMockData[previewTemplate] || mockResumeData;
                     return <TemplateRenderer templateId={previewTemplate} resumeData={previewData} />;
                   })()
                 }
