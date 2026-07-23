@@ -100,28 +100,17 @@ const LandingPage = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', backgroundColor: 'var(--bg-color)', position: 'relative' }}>
+      style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', backgroundColor: 'var(--bg-color)' }}>
       
-      {/* Top Multi-Color Accent Line */}
-      <div className="bg-multicolor-bar" />
-
-      {/* Header - Modern Clean Navbar */}
+      {/* Header - Green Style */}
       <header style={{ 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-        padding: '1rem 3rem', background: '#FFFFFF', 
-        borderBottom: '1px solid #E2E8F0',
-        position: 'sticky', top: 0, zIndex: 1000,
-        boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        padding: '1rem 3rem', background: 'var(--card-bg)', 
+        borderBottom: '1px solid var(--border-color)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 800, fontSize: '1.35rem', color: 'var(--text-main)', cursor: 'pointer' }} onClick={() => navigate('/')}>
-           <div style={{
-             width: '40px', height: '40px', borderRadius: '10px',
-             background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
-             display: 'flex', alignItems: 'center', justifyContent: 'center'
-           }}>
-             <FileText size={24} color="#FFFFFF" />
-           </div>
-           <span className="text-gradient-multicolor">Elevate Resume</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-main)' }}>
+           <FileText size={28} color="var(--primary)" />
+           Elevate Resume
         </div>
 
         <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
@@ -131,7 +120,6 @@ const LandingPage = () => {
           >
             Templates
           </button>
-          <a href="#templates" style={{ color: 'var(--text-main)', fontWeight: 600, textDecoration: 'none', fontSize: '0.95rem' }}>3D Showcase</a>
           <a href="#features" style={{ color: 'var(--text-main)', fontWeight: 600, textDecoration: 'none', fontSize: '0.95rem' }}>Features</a>
         </nav>
 
@@ -144,10 +132,13 @@ const LandingPage = () => {
               <button 
                 onClick={signOut}
                 style={{ 
-                  background: 'transparent', border: '1.5px solid #CBD5E1', 
+                  background: 'transparent', border: '1px solid #CBD5E1', 
                   color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', 
-                  padding: '0.5rem 1.25rem', borderRadius: '8px', fontSize: '0.95rem'
+                  padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.95rem',
+                  transition: 'all 0.15s ease'
                 }}
+                onMouseOver={(e) => e.currentTarget.style.background = '#F8FAFC'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 Logout
               </button>
@@ -162,21 +153,20 @@ const LandingPage = () => {
                   color: 'var(--text-main)', 
                   fontWeight: 700, 
                   cursor: 'pointer', 
-                  padding: '0.55rem 1.35rem', 
-                  borderRadius: '10px', 
-                  fontSize: '0.95rem'
+                  padding: '0.5rem 1.25rem', 
+                  borderRadius: '6px', 
+                  fontSize: '0.95rem',
+                  transition: 'all 0.15s ease'
                 }}
+                onMouseOver={(e) => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.borderColor = '#94A3B8'; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#CBD5E1'; }}
               >
                 Sign In
               </button>
               <button 
+                className="btn-primary" 
                 onClick={() => navigate('/login', { state: { mode: 'signup' } })}
-                style={{ 
-                  padding: '0.6rem 1.5rem', borderRadius: '10px', fontSize: '0.95rem', fontWeight: 700,
-                  background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
-                  color: '#FFFFFF', border: 'none', cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)'
-                }}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '6px', fontSize: '0.95rem' }}
               >
                 Create Account
               </button>
@@ -185,8 +175,13 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <div style={{ position: 'relative', overflow: 'hidden', paddingBottom: '2rem', background: '#FAF9F6' }}>
+      {/* Hero Section - Simple Minimal Multicolor Background Mesh */}
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Simple Minimal Gradient Mesh Background */}
+        <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '800px', height: '800px', background: 'radial-gradient(circle, rgba(67, 56, 202, 0.12) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
+        <div style={{ position: 'absolute', bottom: '-10%', right: '10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
+        <div style={{ position: 'absolute', top: '20%', left: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
+
         <motion.div 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,63 +189,54 @@ const LandingPage = () => {
           className="container hero-grid"
           style={{ 
             display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '2rem', alignItems: 'center', 
-            paddingTop: '4.5rem', paddingBottom: '4rem', position: 'relative', zIndex: 10
+            paddingTop: '6rem', paddingBottom: '6rem', position: 'relative', zIndex: 10
           }}
         >
           {/* Left Side: Content */}
           <div style={{ paddingRight: '2rem' }}>
-            <div style={{ marginBottom: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <span className="badge-multicolor">
-                <Sparkles size={16} color="#4F46E5" /> AI-Powered Resume Builder
-              </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 1rem', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(16, 185, 129, 0.1)', color: '#047857', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                <Zap size={15} /> 100% ATS Approved
-              </span>
-            </div>
-
-            <h1 className="hero-title" style={{ fontSize: '3.75rem', fontWeight: 800, marginBottom: '1.25rem', lineHeight: 1.1, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-              Land 3x more interviews with our <span className="text-gradient-multicolor">AI Resume Builder</span>
+            <h1 className="hero-title" style={{ fontSize: '4rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+              Land more interviews with our <span style={{ color: 'var(--primary)' }}>Resume Builder</span>
             </h1>
             
-            <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '2.25rem', fontWeight: 500, lineHeight: 1.6, maxWidth: '620px' }}>
-              Select professional templates, instant AI resume content generator, and 1-click ATS optimizer designed to impress recruiters.
+            <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '2.5rem', fontWeight: 500, lineHeight: 1.6, maxWidth: '600px' }}>
+              ATS Check, AI Writer, and One-Click Job Tailoring make your resume stand out to recruiters instantly.
             </p>
 
             <div className="hero-actions" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
               <button 
+                className="btn-primary" 
                 onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
-                style={{ 
-                  fontSize: '1.2rem', padding: '1.1rem 2.5rem', borderRadius: '14px', 
-                  background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)', 
-                  color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer', 
-                  boxShadow: '0 10px 25px rgba(79, 70, 229, 0.3)'
-                }}
+                style={{ fontSize: '1.2rem', padding: '1.1rem 2.5rem', borderRadius: '24px 12px 24px 12px', background: '#059669', color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(5,150,105,0.3)' }}
               >
-                Build Your Resume Now <ArrowRight size={20} style={{ display: 'inline', marginLeft: '0.5rem', verticalAlign: 'middle' }} />
+                Build Your Resume
               </button>
               <button 
                 onClick={() => navigate('/import', { state: { skipPathSelection: false } })}
                 style={{ 
-                  fontSize: '1.1rem', padding: '1rem 2.5rem', borderRadius: '14px', 
-                  backgroundColor: '#FFFFFF', color: 'var(--text-main)', 
-                  border: '2px solid var(--text-main)',
-                  fontWeight: 700, cursor: 'pointer'
+                  fontSize: '1.1rem', padding: '1rem 2.5rem', borderRadius: '8px', 
+                  backgroundColor: 'transparent', color: 'var(--text-main)', border: '2px solid var(--text-main)',
+                  fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s ease'
                 }}
+                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'var(--text-main)'; e.currentTarget.style.color = 'var(--card-bg)'; }}
+                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-main)'; }}
               >
                 Upload Existing CV
               </button>
             </div>
           </div>
 
-          {/* Right Side: Clean Visual Preview */}
+          {/* Right Side: Visual Preview */}
           <div className="hero-preview" style={{ position: 'relative', height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-             <div 
+             <motion.div 
+               initial={{ y: 20, rotate: -2 }}
+               animate={{ y: 0, rotate: 0 }}
+               transition={{ duration: 0.6, delay: 0.2 }}
                style={{ 
                  width: '400px', height: '565px', 
-                 background: '#FFFFFF',
-                 borderLeft: '4px solid #4F46E5', borderRight: '1.5px solid #CBD5E1',
+                 background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)',
+                 borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1',
                  borderTop: 'none', borderBottom: 'none',
-                 boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.12)',
+                 boxShadow: '0 30px 60px -15px rgba(15, 23, 42, 0.15)',
                  overflow: 'visible', position: 'relative', zIndex: 10
                }}
              >
@@ -259,46 +245,30 @@ const LandingPage = () => {
                <div style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '800px', height: '1131px', background: '#FFFFFF', overflow: 'hidden' }}>
                   <TemplateRenderer templateId="visionary" resumeData={mockResumeData} />
                </div>
-             </div>
+             </motion.div>
           </div>
         </motion.div>
       </div>
 
-      {/* 3D FlipBook Showcase Section - Down Near Book */}
-      <div id="templates" style={{ 
-        padding: '4rem 2rem 5rem', 
-        background: '#FFFFFF', 
-        borderTop: '1px solid var(--border-color)', 
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        position: 'relative'
-      }}>
-         <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+      {/* 3D FlipBook Showcase Inline */}
+      <div id="templates" style={{ padding: '3rem 2rem', background: 'var(--card-bg)', borderTop: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+         <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
             <div>
-              <div style={{ marginBottom: '0.5rem' }}>
-                <span className="badge-multicolor">
-                  📖 Interactive 3D Showcase
-                </span>
-              </div>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
-                 Flip through our <span className="text-gradient-multicolor">Template Showcase</span>
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+                 Get started with a template
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Click or drag pages to flip through the book below.</p>
+              <p style={{ color: 'var(--text-muted)' }}>Select a design below to jump right into the builder.</p>
             </div>
             <button 
                onClick={() => navigate('/templates', { state: { skipPathSelection: false } })}
-               style={{ 
-                 background: '#FFFFFF', border: '1px solid #CBD5E1', 
-                 color: 'var(--text-main)', fontWeight: 700, fontSize: '1rem', 
-                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', 
-                 padding: '0.75rem 1.5rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-               }}
+               style={{ background: 'transparent', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', paddingBottom: '0.5rem' }}
             >
-               See All Templates <ChevronRight size={18} />
+               See All <ChevronRight size={18} />
             </button>
          </div>
 
-         {/* Render the Clean FlipBook */}
-         <div style={{ width: '100%' }}>
+         {/* Render the FlipBook in the landing page! */}
+         <div style={{ marginTop: '2rem', width: '100%' }}>
            <FlipBook 
              templates={templates}
              onSelect={handleSelectTemplate}
@@ -306,88 +276,46 @@ const LandingPage = () => {
          </div>
       </div>
 
-      {/* Features Section - Multi-Color Glass Cards */}
-      <div id="features" style={{ background: 'var(--bg-color)', padding: '5rem 2rem', borderTop: '1px solid var(--border-color)', position: 'relative' }}>
-        <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem' }}>
-          <span className="badge-multicolor" style={{ marginBottom: '1rem' }}>⚡ Powerful Features</span>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '1rem' }}>
-             Everything you need to land your <span className="text-gradient-multicolor">Next Dream Role</span>
-          </h2>
-          <p style={{ fontSize: '1.15rem', color: 'var(--text-muted)' }}>Created by industry experts to give your application an unfair advantage.</p>
-        </div>
-
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2.5rem', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Features Section */}
+      <div id="features" style={{ background: 'var(--bg-color)', padding: '4rem 2rem', borderTop: '1px solid var(--border-color)' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '3rem', textAlign: 'center', maxWidth: '1100px', margin: '0 auto' }}>
           
-          {/* Card 1: Blue/Indigo Theme */}
-          <div className="multicolor-card" style={{ padding: '2.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '2.5rem 1.5rem', boxShadow: '0 10px 25px -10px rgba(15, 23, 42, 0.06)', position: 'relative' }}>
             <TornEdge />
             <TornEdge isBottom />
-            <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(59, 130, 246, 0.15))', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-              <CheckCircle size={32} color="#4F46E5" />
+            <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'rgba(120, 113, 108, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <CheckCircle size={28} color="var(--primary)" />
             </div>
-            <h3 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>100% ATS-Optimized</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6 }}>Our multi-color templates are tested with top ATS software (Workday, Greenhouse, Taleo) to ensure flawless parsing every time.</p>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>ATS-Friendly</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5 }}>Our templates are parsed perfectly by Applicant Tracking Systems, ensuring recruiters actually see your resume.</p>
           </div>
 
-          {/* Card 2: Pink/Purple Theme */}
-          <div className="multicolor-card" style={{ padding: '2.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '2.5rem 1.5rem', boxShadow: '0 10px 25px -10px rgba(15, 23, 42, 0.06)', position: 'relative' }}>
             <TornEdge />
             <TornEdge isBottom />
-            <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.15))', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-              <Zap size={32} color="#EC4899" />
+            <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'rgba(220, 38, 38, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <Zap size={28} color="var(--danger)" />
             </div>
-            <h3 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>AI Content Writer</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6 }}>Generate tailored bullet points, summary statements, and key skill lists in seconds using artificial intelligence.</p>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>Lightning Fast</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5 }}>No sign-ups, no friction. Just start typing or upload your old PDF, and let AI extract your data instantly.</p>
           </div>
 
-          {/* Card 3: Emerald/Teal Theme */}
-          <div className="multicolor-card" style={{ padding: '2.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '2.5rem 1.5rem', boxShadow: '0 10px 25px -10px rgba(15, 23, 42, 0.06)', position: 'relative' }}>
             <TornEdge />
             <TornEdge isBottom />
-            <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15))', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-              <FileText size={32} color="#10B981" />
+            <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'rgba(22, 163, 74, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <FileText size={28} color="var(--success)" />
             </div>
-            <h3 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>1-Click HD Export</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6 }}>Download vector-perfect PDF files instantly without watermarks, custom margins, or formatting distortion.</p>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>1-Click Export</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5 }}>Once you're happy with your design, export it to a pixel-perfect PDF with a single click, completely free.</p>
           </div>
 
-        </div>
-      </div>
-
-      {/* CTA Banner */}
-      <div style={{ 
-        padding: '5rem 2rem', 
-        background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)',
-        color: '#FFFFFF', textAlign: 'center', position: 'relative'
-      }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 10 }}>
-          <h2 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '1.25rem', color: '#FFFFFF', letterSpacing: '-0.02em' }}>
-            Ready to build your <span style={{ background: 'linear-gradient(135deg, #38BDF8, #818CF8, #F472B6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Professional Resume</span>?
-          </h2>
-          <p style={{ fontSize: '1.2rem', opacity: 0.9, marginBottom: '2.5rem', fontWeight: 500, lineHeight: 1.6 }}>
-            Join thousands of job seekers who landed interviews at top companies.
-          </p>
-          <button 
-            onClick={() => navigate('/templates', { state: { skipPathSelection: true } })}
-            style={{ 
-              fontSize: '1.25rem', padding: '1.2rem 3rem', borderRadius: '14px', 
-              background: '#10B981', 
-              color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer', 
-              boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)'
-            }}
-          >
-            Create My Free Resume Now
-          </button>
         </div>
       </div>
 
       {/* Footer */}
-      <footer style={{ background: '#0F172A', color: '#94A3B8', padding: '3rem 2rem', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.25rem', color: '#FFFFFF', marginBottom: '1rem' }}>
-           <FileText size={24} color="#6366F1" />
-           Elevate Resume
-        </div>
-        <p style={{ fontSize: '0.95rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} Elevate Resume. All rights reserved.</p>
+      <footer style={{ background: 'var(--card-bg)', padding: '2rem 2rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} Elevate Resume. All rights reserved.</p>
       </footer>
 
     </motion.div>
