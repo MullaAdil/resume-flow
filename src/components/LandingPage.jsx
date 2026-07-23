@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -6,8 +6,10 @@ import { useResume } from '../context/ResumeContext';
 import { useAuth } from '../context/AuthContext';
 import { templates } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
+import FlipBook from './FlipBook';
 import { mockResumeData, templateMockData } from '../utils/mockResumeData';
-import { ArrowRight, Sparkles, CheckCircle, Zap, FileText, ChevronRight, Layout, Upload } from 'lucide-react';
+import { apiClient } from '../utils/apiClient';
+import { ArrowRight, Sparkles, CheckCircle, Zap, FileText, ChevronRight, Layout, Upload, Clock, Edit3, Trash2 } from 'lucide-react';
 
 
 // ── Deckled Torn Paper Edges ──
@@ -40,9 +42,48 @@ const TornEdge = ({ isBottom }) => (
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { setSelectedTemplate } = useResume();
+  const { setSelectedTemplate, setResumeData } = useResume();
   const { user, signOut } = useAuth();
   const templatesRef = useRef(null);
+
+  const [userResumes, setUserResumes] = useState([]);
+  const [loadingResumes, setLoadingResumes] = useState(false);
+
+  useEffect(() => {
+    if (user && user.id) {
+      setLoadingResumes(true);
+      apiClient.resumes.list(user.id)
+        .then(res => setUserResumes(res))
+        .catch(err => console.error("Failed to load user resumes:", err))
+        .finally(() => setLoadingResumes(false));
+    }
+  }, [user]);
+
+  const handleEditResume = async (id) => {
+    try {
+      const savedResume = await apiClient.resumes.get(id);
+      if (savedResume && savedResume.data) {
+        setResumeData(savedResume.data);
+        if (savedResume.data.settings?.template) {
+           setSelectedTemplate(savedResume.data.settings.template);
+        }
+        navigate('/editor');
+      }
+    } catch (err) {
+      console.error("Failed to load resume for editing", err);
+    }
+  };
+
+  const handleDeleteResume = async (id) => {
+    if (window.confirm("Are you sure you want to delete this resume?")) {
+      try {
+        await apiClient.resumes.delete(id);
+        setUserResumes(prev => prev.filter(r => r.id !== id));
+      } catch (err) {
+        console.error("Failed to delete resume", err);
+      }
+    }
+  };
 
   const scrollToTemplates = () => {
     templatesRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -209,94 +250,29 @@ const LandingPage = () => {
       </div>
 
       {/* Inline Templates Section - Medium sized actual renders */}
-      <div ref={templatesRef} id="templates" style={{ padding: '3rem 2rem', background: 'var(--card-bg)', borderTop: '1px solid var(--border-color)' }}>
-         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
-               <div>
-                 <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
-                    Get started with a template
-                 </h2>
-                 <p style={{ color: 'var(--text-muted)' }}>Select a design below to jump right into the builder.</p>
-               </div>
-               <button 
-                  onClick={() => navigate('/templates', { state: { skipPathSelection: false } })}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', paddingBottom: '0.5rem' }}
-               >
-                  See All <ChevronRight size={18} />
-               </button>
+      {/* 3D FlipBook Showcase Inline */}
+      <div id="templates" style={{ padding: '3rem 2rem', background: 'var(--card-bg)', borderTop: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+         <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
+            <div>
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+                 Get started with a template
+              </h2>
+              <p style={{ color: 'var(--text-muted)' }}>Select a design below to jump right into the builder.</p>
             </div>
+            <button 
+               onClick={() => navigate('/templates', { state: { skipPathSelection: false } })}
+               style={{ background: 'transparent', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', paddingBottom: '0.5rem' }}
+            >
+               See All <ChevronRight size={18} />
+            </button>
+         </div>
 
-            {/* Horizontal Scrollable Container */}
-            <div style={{ 
-               display: 'flex', gap: '2.5rem', overflowX: 'auto', paddingBottom: '2.5rem', paddingTop: '1rem',
-               scrollbarWidth: 'none', msOverflowStyle: 'none'
-            }}>
-               {templates.slice(0, 8).map((template, index) => {
-                  const cardWidth = 340;
-                  const scale = cardWidth / 800;
-                  const scaledHeight = 1131 * scale;
-
-                  return (
-                     <motion.div
-                        key={template.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                        whileHover={{ y: -6 }}
-                        onClick={() => handleSelectTemplate(template.id)}
-                        style={{
-                           flex: '0 0 auto',
-                           width: `${cardWidth}px`,
-                           background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)',
-                           borderLeft: '4px solid #1D4ED8',
-                           borderRight: '1.5px solid #CBD5E1',
-                           borderTop: 'none',
-                           borderBottom: 'none',
-                           boxShadow: '0 12px 30px -10px rgba(15, 23, 42, 0.08)',
-                           cursor: 'pointer',
-                           display: 'flex',
-                           flexDirection: 'column',
-                           transition: 'all 0.2s ease',
-                           position: 'relative'
-                        }}
-                     >
-                        <TornEdge />
-                        <TornEdge isBottom />
-                        <div style={{ 
-                           height: `${scaledHeight}px`,
-                           width: '100%',
-                           background: 'var(--bg-color)',
-                           overflow: 'hidden',
-                           borderBottom: '1px solid var(--border-color)',
-                           position: 'relative'
-                        }}>
-                           <div style={{ 
-                             width: '800px', height: '1131px', 
-                             transform: `scale(${scale})`, transformOrigin: 'top left',
-                             background: 'var(--card-bg)'
-                           }}>
-                              <TemplateRenderer templateId={template.id} resumeData={templateMockData[template.id] || mockResumeData} />
-                           </div>
-                        </div>
-
-                        <div style={{ padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                           <div>
-                             <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>{template.name}</h3>
-                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                                Chosen by {Math.floor(Math.random() * 8 + 2)}.{Math.floor(Math.random() * 9)}K users
-                             </div>
-                           </div>
-                           <div style={{ display: 'flex', gap: '0.25rem' }}>
-                             {template.colors?.map((color, i) => (
-                               <div key={i} style={{ width: '14px', height: '14px', borderRadius: '50%', backgroundColor: color, border: '1px solid var(--border-color)' }} />
-                             ))}
-                           </div>
-                        </div>
-                     </motion.div>
-                  );
-               })}
-            </div>
+         {/* Render the FlipBook in the landing page! */}
+         <div style={{ marginTop: '2rem', width: '100%' }}>
+           <FlipBook 
+             templates={templates}
+             onSelect={handleSelectTemplate}
+           />
          </div>
       </div>
 

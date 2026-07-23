@@ -103,7 +103,7 @@ export const dummyData = {
   ]
 };
 
-const TemplateRenderer = ({ templateId, resumeData }) => {
+const TemplateRenderer = ({ templateId, resumeData, isPreview = false }) => {
   const isAslam = templateId === 'aslam';
   const currentDummy = isAslam ? aslamDummyData : dummyData;
 
@@ -201,11 +201,11 @@ const TemplateRenderer = ({ templateId, resumeData }) => {
   const hasUserCertifications = resumeData?.certifications && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c.name);
   const hasUserLanguages = resumeData?.languages && resumeData.languages.length > 0 && resumeData.languages.some(l => l.name);
 
-  const fallbackExperience = isAslam ? (aslamDummyData.experience || []) : dummyData.experience;
-  const fallbackEducation = isAslam ? (aslamDummyData.education || []) : dummyData.education;
-  const fallbackProjects = isAslam ? (aslamDummyData.projects || []) : dummyData.projects;
-  const fallbackCertifications = isAslam ? (aslamDummyData.certifications || []) : dummyData.certifications;
-  const fallbackLanguages = isAslam ? (aslamDummyData.languages || []) : dummyData.languages;
+  const fallbackExperience = isPreview ? [] : (isAslam ? (aslamDummyData.experience || []) : dummyData.experience);
+  const fallbackEducation = isPreview ? [] : (isAslam ? (aslamDummyData.education || []) : dummyData.education);
+  const fallbackProjects = isPreview ? [] : (isAslam ? (aslamDummyData.projects || []) : dummyData.projects);
+  const fallbackCertifications = isPreview ? [] : (isAslam ? (aslamDummyData.certifications || []) : dummyData.certifications);
+  const fallbackLanguages = isPreview ? [] : (isAslam ? (aslamDummyData.languages || []) : dummyData.languages);
 
   const mergedData = {
     ...resumeData,
@@ -243,7 +243,7 @@ const TemplateRenderer = ({ templateId, resumeData }) => {
     projects: hasUserProjects ? resumeData.projects : fallbackProjects,
     skills: isAslam
       ? (hasUserSkills ? aslamUserSkills : dummySkills)
-      : (templateId === 'boxedmodern' || templateId === 'letscode') 
+      : (templateId === 'boxedmodern' || templateId === 'letscode')
         ? (hasUserSkills ? userSkills : dummySkills)
         : (hasUserSkills ? userSkills.map(s => typeof s === 'object' ? s.name : s) : dummySkills.map(s => typeof s === 'object' ? s.name : s)),
     certifications: hasUserCertifications ? resumeData.certifications : fallbackCertifications,
