@@ -222,9 +222,19 @@ const Sheet = ({ index, currentSheetIndex, sheet, selectedColor, onSelect, onPre
   );
 };
 
-const FlipBook = ({ templates, selectedColor, onSelect }) => {
+const FlipBook = ({ templates, selectedColor, onColorChange, onSelect }) => {
   const [currentSheetIndex, setCurrentSheetIndex] = useState(1);
   const [previewTemplate, setPreviewTemplate] = useState(null);
+
+  const themeColors = [
+    { name: 'Emerald', hex: '#059669', gradient: 'linear-gradient(135deg, #059669, #10B981)' },
+    { name: 'Indigo', hex: '#4F46E5', gradient: 'linear-gradient(135deg, #4F46E5, #6366F1)' },
+    { name: 'Violet', hex: '#7C3AED', gradient: 'linear-gradient(135deg, #7C3AED, #A855F7)' },
+    { name: 'Rose', hex: '#DB2777', gradient: 'linear-gradient(135deg, #DB2777, #EC4899)' },
+    { name: 'Sunset', hex: '#E11D48', gradient: 'linear-gradient(135deg, #E11D48, #F43F5E)' },
+    { name: 'Amber', hex: '#D97706', gradient: 'linear-gradient(135deg, #D97706, #F59E0B)' },
+    { name: 'Ocean', hex: '#0D9488', gradient: 'linear-gradient(135deg, #0D9488, #06B6D4)' },
+  ];
 
   const faces = [
     { type: 'cover' },
@@ -253,13 +263,18 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
   };
 
   const handlePrev = () => {
-    if (currentSheetIndex > 1) { // Prevents closing the book, keeping it open to templates 0 and 1
+    if (currentSheetIndex > 1) { // Keeps open
       setCurrentSheetIndex(prev => prev - 1);
     }
   };
 
-  // Determine if book is fully closed (it shouldn't be anymore)
   const isBookClosed = false;
+
+  // Determine active template names for current sheet
+  const activeSheet = sheets[currentSheetIndex - 1];
+  const frontName = activeSheet?.front?.template?.name;
+  const backName = activeSheet?.back?.template?.name;
+  const pageLabel = frontName && backName ? `${frontName} & ${backName}` : (frontName || backName || 'Cover');
 
   return (
     <div style={{
@@ -268,11 +283,90 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
       alignItems: 'center',
       justifyContent: 'center',
       width: '100%',
-      padding: '2rem 0 4rem 0',
-      overflowX: 'hidden'
+      padding: '1rem 0 3rem 0',
+      overflowX: 'hidden',
+      position: 'relative'
     }}>
+      
+      {/* Multi-Color Ambient Glow Behind Book */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '90%',
+        height: '80%',
+        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.12) 35%, rgba(16, 185, 129, 0.1) 70%, transparent 100%)',
+        filter: 'blur(70px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4rem', width: '100%' }}>
+      {/* Multi-Color Palette & Toolbar down near top of book */}
+      <div style={{
+        position: 'relative',
+        zIndex: 20,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '1.5rem',
+        width: '100%',
+        maxWidth: `${PAGE_WIDTH * 2 + 160}px`,
+        marginBottom: '2.5rem',
+        padding: '1rem 1.75rem',
+        background: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(16px)',
+        borderRadius: '24px',
+        border: '1px solid rgba(226, 232, 240, 0.8)',
+        boxShadow: '0 10px 30px -5px rgba(99, 102, 241, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.05)'
+      }}>
+        {/* Left: Interactive Color Swatches */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: selectedColor || '#059669', display: 'inline-block' }} />
+            Theme Color:
+          </span>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            {themeColors.map(color => {
+              const isSelected = (selectedColor || '#059669') === color.hex;
+              return (
+                <button
+                  key={color.hex}
+                  onClick={() => onColorChange && onColorChange(color.hex)}
+                  title={`Apply ${color.name} Theme`}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: color.gradient,
+                    border: isSelected ? '3px solid #0F172A' : '2px solid #FFFFFF',
+                    boxShadow: isSelected ? '0 0 0 2px rgba(99, 102, 241, 0.5), 0 4px 10px rgba(0,0,0,0.15)' : '0 2px 5px rgba(0,0,0,0.1)',
+                    cursor: 'pointer',
+                    transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Center: Page Info Badge */}
+        <div className="badge-multicolor">
+          <span style={{ fontSize: '0.9rem' }}>📖 Page {currentSheetIndex} of {sheets.length}</span>
+          <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#94A3B8' }} />
+          <span style={{ fontWeight: 600, color: '#475569' }}>{pageLabel}</span>
+        </div>
+
+        {/* Right: Flip Hint */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#64748B', fontWeight: 600 }}>
+          <span>Click pages or arrows to flip</span>
+        </div>
+      </div>
+
+      {/* Main 3D Book Controls Row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2.5rem', width: '100%', position: 'relative', zIndex: 10 }}>
 
         {/* Left Side Navigation Button */}
         <button
@@ -280,17 +374,23 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
           disabled={currentSheetIndex <= 1}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: '60px', height: '60px', borderRadius: '50%',
-            background: currentSheetIndex > 1 ? '#382518' : '#e2e8f0',
-            color: currentSheetIndex > 1 ? '#f5ecd6' : '#94a3b8',
+            width: '64px', height: '64px', borderRadius: '50%',
+            background: currentSheetIndex > 1 
+              ? 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)' 
+              : '#E2E8F0',
+            color: currentSheetIndex > 1 ? '#FFFFFF' : '#94A3B8',
             border: 'none', cursor: currentSheetIndex > 1 ? 'pointer' : 'not-allowed',
-            boxShadow: currentSheetIndex > 1 ? '0 10px 25px rgba(56, 37, 24, 0.4)' : 'none',
-            transition: 'all 0.2s',
+            boxShadow: currentSheetIndex > 1 
+              ? '0 12px 25px -5px rgba(49, 46, 129, 0.4), 0 0 0 2px rgba(99, 102, 241, 0.3)' 
+              : 'none',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             zIndex: 100
           }}
+          onMouseOver={(e) => { if (currentSheetIndex > 1) e.currentTarget.style.transform = 'scale(1.08) translateX(-2px)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1) translateX(0)'; }}
           title="Previous Page"
         >
-          <ChevronLeft size={32} />
+          <ChevronLeft size={34} />
         </button>
 
         {/* 3D Scene Container */}
@@ -302,9 +402,9 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          transform: 'rotateX(0deg)', // Perfectly flat so no text distortion, we use isometric shadows for bulk
+          transform: 'rotateX(0deg)',
           transformStyle: 'preserve-3d',
-          marginBottom: '2rem'
+          marginBottom: '1rem'
         }}>
 
           {/* Isometric Left Page Stack (Bulk) */}
@@ -314,7 +414,7 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
             left: 0, width: `${PAGE_WIDTH}px`,
             backgroundColor: '#ffffff',
             borderRadius: '8px 0 0 8px',
-            transform: 'translateZ(-50px)', // Push behind pages in 3D space
+            transform: 'translateZ(-50px)',
             boxShadow: `
               -1px 1px 0 #f8fafc, -2px 2px 0 #e2e8f0, -3px 3px 0 #cbd5e1,
               -4px 4px 0 #f8fafc, -5px 5px 0 #e2e8f0, -6px 6px 0 #cbd5e1,
@@ -335,7 +435,7 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
             left: '50%', width: `${PAGE_WIDTH}px`,
             backgroundColor: '#ffffff',
             borderRadius: '0 8px 8px 0',
-            transform: 'translateZ(-50px)', // Push behind pages in 3D space
+            transform: 'translateZ(-50px)',
             boxShadow: `
               1px 1px 0 #f8fafc, 2px 2px 0 #e2e8f0, 3px 3px 0 #cbd5e1,
               4px 4px 0 #f8fafc, 5px 5px 0 #e2e8f0, 6px 6px 0 #cbd5e1,
@@ -349,9 +449,7 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
             zIndex: -2,
           }} />
 
-
-
-          {/* The spine container, shifted slightly if book is closed so it looks centered */}
+          {/* The spine container */}
           <motion.div
             style={{
               position: 'absolute',
@@ -377,13 +475,13 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
             ))}
           </motion.div>
 
-          {/* Inner Spine Shadow (On top of pages for separation) */}
+          {/* Inner Spine Shadow */}
           <div style={{
             position: 'absolute', top: 0, bottom: 0, left: '50%', transform: 'translateX(-50%)',
             width: '60px',
             background: 'linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0) 100%)',
             pointerEvents: 'none',
-            zIndex: 10000 // Ensure it sits on top of all pages
+            zIndex: 10000
           }} />
         </div>
 
@@ -393,19 +491,63 @@ const FlipBook = ({ templates, selectedColor, onSelect }) => {
           disabled={currentSheetIndex >= sheets.length}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: '60px', height: '60px', borderRadius: '50%',
-            background: currentSheetIndex < sheets.length ? '#382518' : '#e2e8f0',
-            color: currentSheetIndex < sheets.length ? '#f5ecd6' : '#94a3b8',
+            width: '64px', height: '64px', borderRadius: '50%',
+            background: currentSheetIndex < sheets.length 
+              ? 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)' 
+              : '#E2E8F0',
+            color: currentSheetIndex < sheets.length ? '#FFFFFF' : '#94A3B8',
             border: 'none', cursor: currentSheetIndex < sheets.length ? 'pointer' : 'not-allowed',
-            boxShadow: currentSheetIndex < sheets.length ? '0 10px 25px rgba(56, 37, 24, 0.4)' : 'none',
-            transition: 'all 0.2s',
+            boxShadow: currentSheetIndex < sheets.length 
+              ? '0 12px 25px -5px rgba(49, 46, 129, 0.4), 0 0 0 2px rgba(99, 102, 241, 0.3)' 
+              : 'none',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             zIndex: 100
           }}
+          onMouseOver={(e) => { if (currentSheetIndex < sheets.length) e.currentTarget.style.transform = 'scale(1.08) translateX(2px)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1) translateX(0)'; }}
           title="Next Page"
         >
-          <ChevronRight size={32} />
+          <ChevronRight size={34} />
         </button>
 
+      </div>
+
+      {/* Page Navigation Jump Dots & Selector Down Near Bottom of Book */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem',
+        marginTop: '2rem',
+        position: 'relative',
+        zIndex: 20
+      }}>
+        {sheets.map((sheet, index) => {
+          const sheetNum = index + 1;
+          const isActive = currentSheetIndex === sheetNum;
+          return (
+            <button
+              key={index}
+              onClick={() => setCurrentSheetIndex(sheetNum)}
+              style={{
+                padding: isActive ? '0.4rem 1rem' : '0.4rem 0.6rem',
+                borderRadius: '9999px',
+                border: 'none',
+                background: isActive 
+                  ? 'linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899)' 
+                  : '#CBD5E1',
+                color: isActive ? '#FFFFFF' : '#475569',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: isActive ? '0 4px 12px rgba(99, 102, 241, 0.4)' : 'none'
+              }}
+            >
+              {index === 0 ? 'Cover' : `Page ${index}`}
+            </button>
+          );
+        })}
       </div>
 
       {/* Fullscreen Preview Modal */}
