@@ -311,6 +311,7 @@ const BuilderFlow = () => {
     setActiveEduIndex(resumeData.education?.length || 0);
   };
   const [leftPaneMode, setLeftPaneMode] = useState('edit');
+  const [mobileTab, setMobileTab] = useState('edit'); // 'edit' or 'preview'
   const [customizeFilterTag, setCustomizeFilterTag] = useState('All');
   const [previewScale, setPreviewScale] = useState(0.75);
   const [showAIAudit, setShowAIAudit] = useState(false);
@@ -2076,22 +2077,42 @@ const BuilderFlow = () => {
       `}</style>
       
       {/* Top Header */}
-      <header style={{ height: '64px', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 10 }}>
-        <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px' }}>
-          <button 
-            style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? '#059669' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B' }} 
-            onClick={() => setLeftPaneMode('edit')}
-          >
-            Edit
-          </button>
-          <button 
-            style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? '#059669' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B' }} 
-            onClick={() => setLeftPaneMode('customize')}
-          >
-            Customize
-          </button>
+      <header style={{ height: '64px', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', position: 'relative', zIndex: 10 }}>
+        {/* Mode Selector (Desktop & Mobile) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px' }}>
+            <button 
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? '#059669' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }} 
+              onClick={() => setLeftPaneMode('edit')}
+            >
+              Edit
+            </button>
+            <button 
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? '#059669' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }} 
+              onClick={() => setLeftPaneMode('customize')}
+            >
+              Customize
+            </button>
+          </div>
+
+          {/* Mobile View Switcher (Edit vs Preview) */}
+          <div className="mobile-view-toggle" style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px' }}>
+            <button 
+              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'edit' ? '#1E293B' : 'transparent', color: mobileTab === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
+              onClick={() => setMobileTab('edit')}
+            >
+              ✏️ Form
+            </button>
+            <button 
+              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'preview' ? '#1E293B' : 'transparent', color: mobileTab === 'preview' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
+              onClick={() => setMobileTab('preview')}
+            >
+              👁️ Preview
+            </button>
+          </div>
         </div>
-        <div style={{ position: 'absolute', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button 
             onClick={() => {
               setShowSyncModal(true);
@@ -2144,16 +2165,16 @@ const BuilderFlow = () => {
           >
             <Download size={14} /> Download PDF
           </button>
-
         </div>
       </header>
 
-      {/* Main 50/50 Split */}
-      <div className="builder-layout" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      {/* Main Split Layout: Editor takes ~62% space for maximum clarity */}
+      <div className={`builder-layout mobile-tab-${mobileTab}`} style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
-        {/* Left Pane */}
+        {/* Left Pane — Editing Form (Expanded Width ~62%) */}
         <div className="editor-container builder-sidebar" style={{ 
-          flex: 1, 
+          flex: '1.4 1 0%', 
+          minWidth: 0,
           borderRight: '1.5px solid #E2E8F0', 
           display: 'flex', 
           flexDirection: 'column', 
@@ -2171,13 +2192,13 @@ const BuilderFlow = () => {
           <div style={{ position: 'absolute', bottom: '-5%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', top: '30%', left: '-10%', width: '350px', height: '350px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.06) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
           
-          <div style={{ flex: 1, overflowY: 'auto', padding: '2.5rem 3rem 100px 3rem', position: 'relative', zIndex: 10 }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '2rem 2.5rem 100px 2.5rem', position: 'relative', zIndex: 10 }}>
             {leftPaneMode === 'edit' ? (showAIAudit ? renderAIAuditPanel() : renderEditForm()) : renderCustomizePanel()}
           </div>
 
           {/* Footer — only in edit mode and when not showing AI Audit */}
           {leftPaneMode === 'edit' && !showAIAudit && (
-            <div style={{ padding: '1.5rem 3rem', background: '#FFFFFF', borderTop: '1.5px solid #18181B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '1.25rem 2.5rem', background: '#FFFFFF', borderTop: '1.5px solid #18181B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <JellyButton 
                 onClick={handleBack} 
                 style={{ width: '110px', borderRadius: '12px 24px 12px 24px' }}
@@ -2240,8 +2261,8 @@ const BuilderFlow = () => {
           )}
         </div>
 
-        {/* Right Pane — Live Preview */}
-        <div className="builder-preview-area" style={{ flex: 1, background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
+        {/* Right Pane — Compact Live Preview (~38% Width) */}
+        <div className="builder-preview-area" style={{ flex: '0.85 1 0%', minWidth: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', minHeight: '100%', padding: '2rem 1rem' }}>
             <div 
               style={{ 
