@@ -249,12 +249,12 @@ const LandingPage = () => {
       </div>
 
       {/* 3D FlipBook Showcase Inline */}
-      <div id="templates" style={{ position: 'relative', overflow: 'hidden', padding: '5rem 2rem', background: 'var(--bg-color)', borderTop: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div id="templates" style={{ position: 'relative', overflow: 'hidden', padding: '4rem 2rem', background: 'var(--bg-color)', borderTop: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
          {/* Simple Minimal Gradient Mesh Background matching hero */}
          <div style={{ position: 'absolute', top: '-10%', left: '-5%', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(67, 56, 202, 0.08) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
          <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
 
-         <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', position: 'relative', zIndex: 10 }}>
+         <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', position: 'relative', zIndex: 10 }}>
             <div>
               <h2 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
                  Get started with a template
@@ -277,7 +277,7 @@ const LandingPage = () => {
          </div>
 
          {/* Render the FlipBook in the landing page! */}
-         <div style={{ marginTop: '1rem', width: '100%', position: 'relative', zIndex: 10 }}>
+         <div style={{ marginTop: '0.5rem', width: '100%', position: 'relative', zIndex: 10 }}>
            <FlipBook 
              templates={templates}
              onSelect={handleSelectTemplate}
@@ -286,7 +286,7 @@ const LandingPage = () => {
       </div>
 
       {/* Features Section */}
-      <div id="features" style={{ background: '#FFFFFF', padding: '5rem 2rem', borderTop: 'none' }}>
+      <div id="features" style={{ background: 'var(--bg-color)', padding: '4rem 2rem 5rem', borderTop: 'none' }}>
         <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem', textAlign: 'center', maxWidth: '1100px', margin: '0 auto' }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#FFFFFF', borderRadius: '20px', padding: '2.5rem 2rem', boxShadow: '0 10px 30px -5px rgba(15, 23, 42, 0.05)', border: '1px solid #E2E8F0', position: 'relative' }}>
@@ -317,7 +317,7 @@ const LandingPage = () => {
       </div>
 
       {/* Footer */}
-      <footer style={{ background: 'var(--card-bg)', padding: '2rem 2rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
+      <footer style={{ background: 'var(--card-bg)', padding: '2.5rem 2rem', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500 }}>&copy; {new Date().getFullYear()} Elevate Resume. All rights reserved.</p>
       </footer>
 

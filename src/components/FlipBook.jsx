@@ -280,41 +280,10 @@ const FlipBook = ({ templates, onSelect }) => {
       alignItems: 'center',
       justifyContent: 'center',
       width: '100%',
-      padding: '1rem 0 3rem 0',
+      padding: '1rem 0 2rem 0',
       overflowX: 'hidden',
       position: 'relative'
     }}>
-
-      {/* Clean Toolbar down near top of book */}
-      <div style={{
-        position: 'relative',
-        zIndex: 20,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '1rem',
-        width: '100%',
-        maxWidth: `${PAGE_WIDTH * 2 + 160}px`,
-        marginBottom: '2rem',
-        padding: '0.85rem 1.5rem',
-        background: '#FFFFFF',
-        borderRadius: '16px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)'
-      }}>
-        {/* Left: Page Info Badge */}
-        <div className="badge-multicolor">
-          <span style={{ fontSize: '0.9rem' }}>📖 Page {currentSheetIndex} of {sheets.length}</span>
-          <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#94A3B8' }} />
-          <span style={{ fontWeight: 600, color: '#475569' }}>{pageLabel}</span>
-        </div>
-
-        {/* Right: Navigation Hint */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: '#64748B', fontWeight: 600 }}>
-          <span>Click pages or arrows to flip</span>
-        </div>
-      </div>
 
       {/* Main 3D Book Controls Row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2.5rem', width: '100%', position: 'relative', zIndex: 10 }}>
