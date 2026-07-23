@@ -40,6 +40,222 @@ const TornEdge = ({ isBottom }) => (
   </svg>
 );
 
+// ── Hero Animated Transformation Component ──
+const HeroAnimatedCard = () => {
+  const [phase, setPhase] = useState('resume'); // 'resume' | 'tearing' | 'letter'
+
+  useEffect(() => {
+    const timer1 = setTimeout(() => {
+      setPhase('tearing');
+    }, 4000);
+
+    const timer2 = setTimeout(() => {
+      setPhase('letter');
+    }, 4800);
+
+    const timer3 = setTimeout(() => {
+      setPhase('resume');
+    }, 9000);
+
+    const interval = setInterval(() => {
+      setPhase('resume');
+      setTimeout(() => setPhase('tearing'), 4000);
+      setTimeout(() => setPhase('letter'), 4800);
+    }, 9000);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div style={{ position: 'relative', width: '450px', height: '636px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+
+      {/* Floating Confetti Shards during tearing */}
+      {phase === 'tearing' && (
+        <>
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
+              animate={{
+                x: (i % 2 === 0 ? 1 : -1) * (60 + Math.random() * 120),
+                y: -50 - Math.random() * 100,
+                opacity: 0,
+                scale: 0.2,
+                rotate: Math.random() * 360
+              }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              style={{
+                position: 'absolute',
+                width: `${12 + (i % 4) * 6}px`,
+                height: `${16 + (i % 3) * 8}px`,
+                background: i % 3 === 0 ? '#10B981' : i % 3 === 1 ? '#F59E0B' : '#6366F1',
+                borderRadius: '3px',
+                zIndex: 30
+              }}
+            />
+          ))}
+        </>
+      )}
+
+      {/* Phase 1: Full Elon Musk Resume Card */}
+      {phase !== 'letter' && (
+        <motion.div
+          key="resume-card"
+          initial={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
+          animate={
+            phase === 'tearing'
+              ? {
+                  scale: [1, 1.03, 0.85],
+                  rotate: [0, -4, 6, -10],
+                  opacity: [1, 0.9, 0],
+                  filter: ['blur(0px)', 'blur(2px)', 'blur(8px)']
+                }
+              : { opacity: 1, scale: 1, rotate: 0, y: 0 }
+          }
+          transition={{ duration: phase === 'tearing' ? 0.75 : 0.4 }}
+          style={{
+            width: '450px',
+            height: '636px',
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.18)',
+            border: '1px solid #E2E8F0',
+            overflow: 'hidden',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 10
+          }}
+        >
+          {/* Status Badge */}
+          <div style={{
+            position: 'absolute', top: '12px', right: '12px', zIndex: 20,
+            background: 'rgba(5, 150, 105, 0.9)', color: '#FFFFFF',
+            padding: '0.35rem 0.85rem', borderRadius: '9999px',
+            fontSize: '0.8rem', fontWeight: 700, backdropFilter: 'blur(6px)',
+            boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)',
+            display: 'flex', alignItems: 'center', gap: '0.35rem'
+          }}>
+            <Sparkles size={14} /> Elon Musk ATS Resume
+          </div>
+
+          {/* Full Resume Render scaled to fit container completely without cropping */}
+          <div style={{
+            transform: 'scale(0.5625)',
+            transformOrigin: 'top left',
+            width: '800px',
+            height: '1131px',
+            background: '#FFFFFF',
+            overflow: 'hidden'
+          }}>
+            <TemplateRenderer templateId="visionary" resumeData={templateMockData['visionary'] || mockResumeData} />
+          </div>
+        </motion.div>
+      )}
+
+      {/* Phase 2: Official Job Offer Letter Card (Spawns after tear down) */}
+      {phase !== 'resume' && (
+        <motion.div
+          key="letter-card"
+          initial={{ opacity: 0, scale: 0.8, y: 30, rotate: 5 }}
+          animate={
+            phase === 'letter'
+              ? { opacity: 1, scale: 1, y: 0, rotate: 0 }
+              : { opacity: 0, scale: 0.85, y: 20 }
+          }
+          transition={{ duration: 0.5, ease: 'backOut' }}
+          style={{
+            width: '450px',
+            height: '636px',
+            background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(5, 150, 105, 0.25)',
+            border: '2px solid #10B981',
+            padding: '2.25rem 2rem',
+            boxSizing: 'border-box',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 15,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}
+        >
+          {/* Top Status Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px dashed #E2E8F0', paddingBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'linear-gradient(135deg, #10B981, #047857)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+                <CheckCircle size={24} />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0F172A' }}>SPACEX & TESLA</h4>
+                <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>OFFICIAL OFFER OF EMPLOYMENT</span>
+              </div>
+            </div>
+            <span style={{ background: '#D1FAE5', color: '#047857', fontSize: '0.75rem', fontWeight: 800, padding: '0.35rem 0.75rem', borderRadius: '9999px' }}>
+              PASSED ATS (99%)
+            </span>
+          </div>
+
+          {/* Letter Body */}
+          <div style={{ margin: '1.25rem 0', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <p style={{ fontSize: '0.9rem', color: '#64748B', fontWeight: 600, marginBottom: '0.5rem' }}>Date: July 23, 2026</p>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', marginBottom: '1rem', lineHeight: 1.3 }}>
+              Dear Elon Musk,
+            </h3>
+            <p style={{ fontSize: '0.95rem', color: '#334155', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+              We were thoroughly impressed by your ATS-formatted resume created with <strong>Elevate Resume</strong>!
+            </p>
+            <p style={{ fontSize: '0.95rem', color: '#334155', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+              We are thrilled to formally offer you the role of <strong>Chief Executive Engineer</strong> with an annual compensation package of <strong>$250,000 + Equity Stock Options</strong>.
+            </p>
+
+            {/* Official Stamp Box */}
+            <div style={{
+              border: '2px solid #10B981',
+              borderRadius: '12px',
+              padding: '1rem',
+              background: 'rgba(16, 185, 129, 0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              justify: 'space-between'
+            }}>
+              <div>
+                <span style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 700, display: 'block' }}>RECRUITMENT STATUS</span>
+                <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A' }}>OFFER ACCEPTED 🎉</span>
+              </div>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '2px dashed #10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(-12deg)', color: '#10B981', fontWeight: 900, fontSize: '0.7rem', textAlign: 'center' }}>
+                APPROVED
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Signatures */}
+          <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <span style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'block' }}>Verified ATS Candidate</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>Elevate Resume System</span>
+            </div>
+            <button 
+              onClick={() => setPhase('resume')}
+              style={{ background: '#10B981', color: '#FFFFFF', border: 'none', padding: '0.5rem 1rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Replay Visual 🔄
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+    </div>
+  );
+};
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const { setSelectedTemplate, setResumeData } = useResume();
@@ -188,12 +404,12 @@ const LandingPage = () => {
           transition={{ duration: 0.4 }}
           className="container hero-grid"
           style={{ 
-            display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '2rem', alignItems: 'center', 
-            paddingTop: '6rem', paddingBottom: '6rem', position: 'relative', zIndex: 10
+            display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '2rem', alignItems: 'center', 
+            paddingTop: '5rem', paddingBottom: '5rem', position: 'relative', zIndex: 10
           }}
         >
           {/* Left Side: Content */}
-          <div style={{ paddingRight: '2rem' }}>
+          <div style={{ paddingRight: '1.5rem' }}>
             <h1 className="hero-title" style={{ fontSize: '4rem', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
               Land more interviews with our <span style={{ color: 'var(--primary)' }}>Resume Builder</span>
             </h1>
@@ -225,25 +441,9 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Right Side: Visual Preview */}
-          <div className="hero-preview" style={{ position: 'relative', height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-             <motion.div 
-               initial={{ y: 20, rotate: -2 }}
-               animate={{ y: 0, rotate: 0 }}
-               transition={{ duration: 0.6, delay: 0.2 }}
-               style={{ 
-                 width: '400px', height: '565px', 
-                 background: '#FFFFFF',
-                 borderRadius: '16px',
-                 boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.15)',
-                 border: '1px solid rgba(226, 232, 240, 0.8)',
-                 overflow: 'hidden', position: 'relative', zIndex: 10
-               }}
-             >
-               <div style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '800px', height: '1131px', background: '#FFFFFF', overflow: 'hidden' }}>
-                  <TemplateRenderer templateId="visionary" resumeData={mockResumeData} />
-               </div>
-             </motion.div>
+          {/* Right Side: Animated Hero Card (Full Resume -> Tears down into pieces -> Spawns Job Offer Letter) */}
+          <div className="hero-preview" style={{ position: 'relative', height: '640px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+             <HeroAnimatedCard />
           </div>
         </motion.div>
       </div>
