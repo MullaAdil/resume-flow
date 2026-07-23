@@ -87,6 +87,29 @@ const FaceContent = ({ face, onSelect, onPreview }) => {
         }}
         title={`Preview ${template.name}`}
       >
+        {/* Template Name Header Badge Overlay */}
+        <div style={{
+          position: 'absolute',
+          top: '16px',
+          left: '16px',
+          zIndex: 20,
+          background: 'rgba(15, 23, 42, 0.85)',
+          backdropFilter: 'blur(8px)',
+          color: '#FFFFFF',
+          padding: '0.4rem 1rem',
+          borderRadius: '9999px',
+          fontSize: '0.85rem',
+          fontWeight: 700,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.4rem',
+          pointerEvents: 'none'
+        }}>
+          <span>✨</span>
+          <span>{template.name}</span>
+        </div>
+
         <div 
           ref={contentRef}
           style={{
@@ -101,15 +124,16 @@ const FaceContent = ({ face, onSelect, onPreview }) => {
           <TemplateRenderer templateId={template.id} resumeData={previewData} />
         </div>
         
-        {/* Choose Template Overlay */}
+        {/* Reshaped Accessible Button Overlay */}
         <div style={{
           position: 'absolute',
-          bottom: '20px',
+          bottom: '24px',
           left: '0',
           right: '0',
           display: 'flex',
           justifyContent: 'center',
-          pointerEvents: 'none' // Container ignores clicks
+          pointerEvents: 'none',
+          zIndex: 20
         }}>
           <button 
             onClick={(e) => {
@@ -117,22 +141,25 @@ const FaceContent = ({ face, onSelect, onPreview }) => {
               onSelect(template.id);
             }}
             style={{
-              pointerEvents: 'auto', // Button captures clicks
-              padding: '0.8rem 2rem',
+              pointerEvents: 'auto',
+              padding: '0.75rem 2.25rem',
               background: '#059669',
-              color: 'white',
+              color: '#FFFFFF',
               border: 'none',
-              borderRadius: '30px',
+              borderRadius: '9999px',
               fontWeight: 700,
-              fontSize: '1rem',
+              fontSize: '0.95rem',
               cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(5, 150, 105, 0.4)',
-              transition: 'transform 0.2s',
+              boxShadow: '0 6px 20px rgba(5, 150, 105, 0.35)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem'
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0) scale(1)'}
           >
-            Choose Template
+            Use Template
           </button>
         </div>
       </div>

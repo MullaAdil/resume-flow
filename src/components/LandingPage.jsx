@@ -233,15 +233,13 @@ const LandingPage = () => {
                transition={{ duration: 0.6, delay: 0.2 }}
                style={{ 
                  width: '400px', height: '565px', 
-                 background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)',
-                 borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1',
-                 borderTop: 'none', borderBottom: 'none',
-                 boxShadow: '0 30px 60px -15px rgba(15, 23, 42, 0.15)',
-                 overflow: 'visible', position: 'relative', zIndex: 10
+                 background: '#FFFFFF',
+                 borderRadius: '16px',
+                 boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.15)',
+                 border: '1px solid rgba(226, 232, 240, 0.8)',
+                 overflow: 'hidden', position: 'relative', zIndex: 10
                }}
              >
-               <TornEdge />
-               <TornEdge isBottom />
                <div style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '800px', height: '1131px', background: '#FFFFFF', overflow: 'hidden' }}>
                   <TemplateRenderer templateId="visionary" resumeData={mockResumeData} />
                </div>
@@ -251,22 +249,28 @@ const LandingPage = () => {
       </div>
 
       {/* 3D FlipBook Showcase Inline */}
-      <div id="templates" style={{ position: 'relative', overflow: 'hidden', padding: '4rem 2rem', background: 'var(--bg-color)', borderTop: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div id="templates" style={{ position: 'relative', overflow: 'hidden', padding: '5rem 2rem', background: 'var(--bg-color)', borderTop: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
          {/* Simple Minimal Gradient Mesh Background matching hero */}
-         <div style={{ position: 'absolute', top: '-10%', left: '-5%', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(67, 56, 202, 0.12) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
-         <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
-         <div style={{ position: 'absolute', top: '30%', right: '20%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
+         <div style={{ position: 'absolute', top: '-10%', left: '-5%', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(67, 56, 202, 0.08) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
+         <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(255,255,255,0) 60%)', filter: 'blur(60px)', zIndex: 0 }} />
 
-         <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', position: 'relative', zIndex: 10 }}>
+         <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', position: 'relative', zIndex: 10 }}>
             <div>
-              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+              <h2 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
                  Get started with a template
               </h2>
-              <p style={{ color: 'var(--text-muted)' }}>Select a design below to jump right into the builder.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem' }}>Select a design below to jump right into the builder.</p>
             </div>
             <button 
                onClick={() => navigate('/templates', { state: { skipPathSelection: false } })}
-               style={{ background: 'transparent', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', paddingBottom: '0.5rem' }}
+               style={{ 
+                 background: '#FFFFFF', border: '1px solid #E2E8F0', color: 'var(--primary)', 
+                 fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', 
+                 alignItems: 'center', gap: '0.35rem', padding: '0.6rem 1.25rem', borderRadius: '9999px',
+                 boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease'
+               }}
+               onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+               onMouseOut={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
                See All <ChevronRight size={18} />
             </button>
@@ -282,37 +286,31 @@ const LandingPage = () => {
       </div>
 
       {/* Features Section */}
-      <div id="features" style={{ background: 'var(--bg-color)', padding: '4rem 2rem', borderTop: '1px solid var(--border-color)' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '3rem', textAlign: 'center', maxWidth: '1100px', margin: '0 auto' }}>
+      <div id="features" style={{ background: '#FFFFFF', padding: '5rem 2rem', borderTop: 'none' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem', textAlign: 'center', maxWidth: '1100px', margin: '0 auto' }}>
           
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '2.5rem 1.5rem', boxShadow: '0 10px 25px -10px rgba(15, 23, 42, 0.06)', position: 'relative' }}>
-            <TornEdge />
-            <TornEdge isBottom />
-            <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'rgba(120, 113, 108, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-              <CheckCircle size={28} color="var(--primary)" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#FFFFFF', borderRadius: '20px', padding: '2.5rem 2rem', boxShadow: '0 10px 30px -5px rgba(15, 23, 42, 0.05)', border: '1px solid #E2E8F0', position: 'relative' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(5, 150, 105, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <CheckCircle size={30} color="var(--primary)" />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>ATS-Friendly</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5 }}>Our templates are parsed perfectly by Applicant Tracking Systems, ensuring recruiters actually see your resume.</p>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>ATS-Friendly</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6 }}>Our templates are parsed perfectly by Applicant Tracking Systems, ensuring recruiters actually see your resume.</p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '2.5rem 1.5rem', boxShadow: '0 10px 25px -10px rgba(15, 23, 42, 0.06)', position: 'relative' }}>
-            <TornEdge />
-            <TornEdge isBottom />
-            <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'rgba(220, 38, 38, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-              <Zap size={28} color="var(--danger)" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#FFFFFF', borderRadius: '20px', padding: '2.5rem 2rem', boxShadow: '0 10px 30px -5px rgba(15, 23, 42, 0.05)', border: '1px solid #E2E8F0', position: 'relative' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <Zap size={30} color="var(--danger)" />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>Lightning Fast</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5 }}>No sign-ups, no friction. Just start typing or upload your old PDF, and let AI extract your data instantly.</p>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>Lightning Fast</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6 }}>No sign-ups, no friction. Just start typing or upload your old PDF, and let AI extract your data instantly.</p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', borderLeft: '4px solid #1D4ED8', borderRight: '1.5px solid #CBD5E1', borderTop: 'none', borderBottom: 'none', padding: '2.5rem 1.5rem', boxShadow: '0 10px 25px -10px rgba(15, 23, 42, 0.06)', position: 'relative' }}>
-            <TornEdge />
-            <TornEdge isBottom />
-            <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'rgba(22, 163, 74, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-              <FileText size={28} color="var(--success)" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#FFFFFF', borderRadius: '20px', padding: '2.5rem 2rem', boxShadow: '0 10px 30px -5px rgba(15, 23, 42, 0.05)', border: '1px solid #E2E8F0', position: 'relative' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              <FileText size={30} color="var(--success)" />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>1-Click Export</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5 }}>Once you're happy with your design, export it to a pixel-perfect PDF with a single click, completely free.</p>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-main)' }}>1-Click Export</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6 }}>Once you're happy with your design, export it to a pixel-perfect PDF with a single click, completely free.</p>
           </div>
 
         </div>

@@ -184,21 +184,26 @@ const TemplateShowcase = () => {
                  className="template-card"
                  style={{ 
                    display: 'flex', flexDirection: 'column',
-                   background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)',
-                   borderLeft: '4px solid #1D4ED8',
-                   borderRight: '1.5px solid #CBD5E1',
-                   borderTop: 'none',
-                   borderBottom: 'none',
-                   padding: '2rem 1.25rem',
-                   boxShadow: '0 12px 30px -10px rgba(15, 23, 42, 0.08)',
+                   background: '#FFFFFF',
+                   borderRadius: '16px',
+                   border: '1px solid #E2E8F0',
+                   padding: '1.25rem',
+                   boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.06)',
                    transition: 'all 0.2s ease',
                    position: 'relative',
                    cursor: 'pointer'
                  }}
                  onClick={() => handleSelectTemplate(template.id)}
                >
-                 <TornEdge />
-                 <TornEdge isBottom />
+                 {/* Top Template Header Info */}
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', padding: '0 0.25rem' }}>
+                   <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                     {template.name}
+                   </h3>
+                   <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#059669', background: 'rgba(5, 150, 105, 0.1)', padding: '0.2rem 0.6rem', borderRadius: '9999px' }}>
+                     Recommended
+                   </span>
+                 </div>
                  
                  {/* Preview Container */}
                  <div style={{
@@ -206,9 +211,9 @@ const TemplateShowcase = () => {
                      height: `${scaledHeight}px`,
                      position: 'relative',
                      overflow: 'hidden',
-                     borderRadius: '4px',
-                     border: '1px solid rgba(0,0,0,0.05)',
-                     boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                     borderRadius: '8px',
+                     border: '1px solid #E2E8F0',
+                     boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                  }}>
                    {/* The actual high-fidelity template render */}
                    <div style={{
@@ -219,34 +224,25 @@ const TemplateShowcase = () => {
                      backgroundColor: '#FFFFFF'
                    }}>
                      {
-                       // Inject selected color into the resumeData.settings so previews reflect color choice
                        (() => {
-                         const baseData = templateMockData[template.id] || mockResumeData;
-                         const previewData = {
-                           ...baseData,
-                           settings: {
-                             ...(baseData.settings || {}),
-                             primaryColor: selectedColor || (template.colors && template.colors[0]) || (baseData.settings && baseData.settings.primaryColor) || '#000000'
-                           }
-                         };
+                         const previewData = templateMockData[template.id] || mockResumeData;
                          return <TemplateRenderer templateId={template.id} resumeData={previewData} />;
                        })()
                      }
                    </div>
 
-                   {/* Hover Overlay with Magnifying Glass */}
+                   {/* Hover Overlay */}
                    <div 
                      className="template-hover-zoom"
                      style={{
                        position: 'absolute',
                        top: 0, left: 0, right: 0, bottom: 0,
-                       backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                       backgroundColor: 'rgba(15, 23, 42, 0.25)',
                        display: 'flex',
                        alignItems: 'center',
                        justifyContent: 'center',
                        opacity: 0,
-                       transition: 'opacity 0.2s ease',
-                       backdropFilter: 'blur(1px)'
+                       transition: 'opacity 0.2s ease'
                      }}
                      onClick={(e) => {
                        e.stopPropagation();
@@ -254,35 +250,35 @@ const TemplateShowcase = () => {
                      }}
                    >
                      <div style={{
-                       width: '64px', height: '64px', borderRadius: '50%',
-                       background: '#FCD34D', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                       boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                       width: '56px', height: '56px', borderRadius: '50%',
+                       background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                       boxShadow: '0 6px 16px rgba(0,0,0,0.2)'
                      }}>
-                        <ZoomIn size={28} color="#000" />
+                        <ZoomIn size={26} color="#0F172A" />
                      </div>
                    </div>
                  </div>
 
-                 {/* Choose Button fixed at bottom of card */}
-                 <div style={{ marginTop: '1.5rem' }}>
+                 {/* Reshaped Button */}
+                 <div style={{ marginTop: '1.25rem' }}>
                     <button 
                       style={{
                         width: '100%',
-                        backgroundColor: '#10B981',
+                        backgroundColor: '#059669',
                         color: '#FFFFFF',
                         border: 'none',
-                        padding: '1rem',
-                        borderRadius: '30px', // heavily rounded like Resume-Now
-                        fontSize: '1.05rem',
+                        padding: '0.85rem',
+                        borderRadius: '9999px',
+                        fontSize: '1rem',
                         fontWeight: 700,
                         cursor: 'pointer',
-                        boxShadow: '0 4px 10px rgba(16, 185, 129, 0.2)',
-                        transition: 'background-color 0.2s ease'
+                        boxShadow: '0 4px 14px rgba(5, 150, 105, 0.25)',
+                        transition: 'all 0.2s ease'
                       }}
-                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#10B981'}
+                      onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#047857'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#059669'; e.currentTarget.style.transform = 'translateY(0)'; }}
                     >
-                      Choose template
+                      Use Template
                     </button>
                  </div>
 
