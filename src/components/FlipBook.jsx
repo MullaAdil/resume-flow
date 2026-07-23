@@ -249,10 +249,30 @@ const FlipBook = ({ templates, onSelect }) => {
       back: faces[i + 1] || { type: 'empty' }
     });
   }
+  const bookWrapperRef = useRef(null);
+  const [bookScale, setBookScale] = useState(1);
 
   useEffect(() => {
     setCurrentSheetIndex(1);
   }, [templates]);
+
+  useEffect(() => {
+    const handleBookResize = () => {
+      const parentWidth = bookWrapperRef.current ? bookWrapperRef.current.offsetWidth : window.innerWidth;
+      const screenW = Math.min(parentWidth, window.innerWidth);
+      const targetW = 1040; // Book (920px) + Buttons & padding
+      if (screenW < targetW) {
+        const calculatedScale = Math.max(0.32, (screenW - 20) / targetW);
+        setBookScale(calculatedScale);
+      } else {
+        setBookScale(1);
+      }
+    };
+
+    handleBookResize();
+    window.addEventListener('resize', handleBookResize);
+    return () => window.removeEventListener('resize', handleBookResize);
+  }, []);
 
   const handleNext = () => {
     if (currentSheetIndex < sheets.length) {
@@ -274,19 +294,31 @@ const FlipBook = ({ templates, onSelect }) => {
   const pageLabel = frontName && backName ? `${frontName} & ${backName}` : (frontName || backName || 'Cover');
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
-      padding: '1rem 0 2rem 0',
-      overflowX: 'hidden',
-      position: 'relative'
-    }}>
-
-      {/* Main 3D Book Controls Row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2.5rem', width: '100%', position: 'relative', zIndex: 10 }}>
+    <div 
+      ref={bookWrapperRef}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        padding: '1rem 0 2rem 0',
+        overflowX: 'hidden',
+        position: 'relative'
+      }}
+    >
+      {/* Scaled Container for Mobile & Tablet Screen Widths */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        transform: `scale(${bookScale})`,
+        transformOrigin: 'top center',
+        marginBottom: `${-(1 - bookScale) * (BOOK_HEIGHT + 70)}px`,
+        transition: 'transform 0.1s ease'
+      }}>
+        {/* Main 3D Book Controls Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', width: '100%', position: 'relative', zIndex: 10 }}>
 
         {/* Left Side Navigation Button */}
         <button
@@ -479,6 +511,7 @@ const FlipBook = ({ templates, onSelect }) => {
             </button>
           );
         })}
+      </div>
       </div>
 
       {/* Fullscreen Preview Modal */}
