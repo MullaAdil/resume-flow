@@ -909,11 +909,11 @@ const BuilderFlow = () => {
                       top: '100%',
                       left: 0,
                       right: 0,
-                      zIndex: 100,
+                      zIndex: 999999,
                       background: '#FFFFFF',
                       border: '1.5px solid #CBD5E1',
                       borderRadius: '10px',
-                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                      boxShadow: '0 15px 30px -5px rgba(15, 23, 42, 0.25)',
                       maxHeight: '220px',
                       overflowY: 'auto',
                       marginTop: '0.25rem',
@@ -1475,15 +1475,23 @@ const BuilderFlow = () => {
                                 });
                               }
                             }}
+                            menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                             styles={{
                               control: (base) => ({
                                 ...base,
                                 padding: '2px',
-                                borderRadius: '4px',
+                                borderRadius: '8px',
                                 border: '1px solid #CBD5E1',
                                 boxShadow: 'none',
                                 '&:hover': { border: '1px solid #94A3B8' },
                                 fontSize: '1rem'
+                              }),
+                              menuPortal: (base) => ({ ...base, zIndex: 999999 }),
+                              menu: (base) => ({
+                                ...base,
+                                zIndex: 999999,
+                                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
+                                borderRadius: '10px'
                               })
                             }}
                           />
@@ -1619,7 +1627,16 @@ const BuilderFlow = () => {
                         
                         updateSection('skills', updatedSkills);
                       }}
+                      menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                       styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 999999 }),
+                        menu: (base) => ({
+                          ...base,
+                          zIndex: 999999,
+                          boxShadow: '0 12px 30px -5px rgba(15, 23, 42, 0.2)',
+                          borderRadius: '10px',
+                          overflow: 'hidden'
+                        }),
                         control: (base) => ({
                           ...base,
                           padding: '4px',
