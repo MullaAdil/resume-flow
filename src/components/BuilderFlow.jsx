@@ -609,7 +609,10 @@ const BuilderFlow = () => {
     fontSize: '1.2rem', // even larger input font
     color: '#111827',
     transition: 'all 0.1s ease',
-    boxShadow: 'none'
+    boxShadow: 'none',
+    boxSizing: 'border-box',
+    width: '100%',
+    minWidth: 0
   };
   const labelStyle = { 
     fontSize: '1.05rem', // even larger label font
@@ -1214,25 +1217,25 @@ const BuilderFlow = () => {
                         <button onClick={() => removeExperience(index)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                           <Trash2 size={16} />
                         </button>
-                        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', marginTop: '0.5rem' }}>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem', marginTop: '0.5rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>Job title</label>
                             <input style={inputStyle} value={exp.title || exp.jobTitle || ''} onChange={(e) => { updateExperience(index, 'title', e.target.value); updateExperience(index, 'jobTitle', e.target.value); }} />
                           </div>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>Employer</label>
                             <input style={inputStyle} value={exp.company || ''} onChange={(e) => updateExperience(index, 'company', e.target.value)} />
                           </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>Start & End Date</label>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                              <input style={{ ...inputStyle, flex: 1 }} placeholder="MM / YYYY" value={exp.startDate || ''} onChange={(e) => updateExperience(index, 'startDate', e.target.value)} />
-                              <input style={{ ...inputStyle, flex: 1 }} placeholder="MM / YYYY" value={exp.endDate || ''} onChange={(e) => updateExperience(index, 'endDate', e.target.value)} />
+                            <div style={{ display: 'flex', gap: '0.5rem', width: '100%', minWidth: 0 }}>
+                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={exp.startDate || ''} onChange={(e) => updateExperience(index, 'startDate', e.target.value)} />
+                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={exp.endDate || ''} onChange={(e) => updateExperience(index, 'endDate', e.target.value)} />
                             </div>
                           </div>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>City, State</label>
                             <input style={inputStyle} value={exp.location || ''} onChange={(e) => updateExperience(index, 'location', e.target.value)} />
                           </div>
@@ -1313,25 +1316,25 @@ const BuilderFlow = () => {
                         <button onClick={() => removeEducation(index)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                           <Trash2 size={16} />
                         </button>
-                        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', marginTop: '0.5rem' }}>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem', marginTop: '0.5rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>School / Institution</label>
                             <input style={inputStyle} value={edu.school || edu.institution || ''} onChange={(e) => { updateEducation(index, 'school', e.target.value); updateEducation(index, 'institution', e.target.value); }} />
                           </div>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>Degree</label>
                             <input style={inputStyle} value={edu.degree || ''} onChange={(e) => updateEducation(index, 'degree', e.target.value)} />
                           </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>Start & End Date</label>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                              <input style={{ ...inputStyle, flex: 1 }} placeholder="MM / YYYY" value={edu.startDate || ''} onChange={(e) => updateEducation(index, 'startDate', e.target.value)} />
-                              <input style={{ ...inputStyle, flex: 1 }} placeholder="MM / YYYY" value={edu.endDate || ''} onChange={(e) => updateEducation(index, 'endDate', e.target.value)} />
+                            <div style={{ display: 'flex', gap: '0.5rem', width: '100%', minWidth: 0 }}>
+                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={edu.startDate || ''} onChange={(e) => updateEducation(index, 'startDate', e.target.value)} />
+                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={edu.endDate || ''} onChange={(e) => updateEducation(index, 'endDate', e.target.value)} />
                             </div>
                           </div>
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <label style={labelStyle}>City</label>
                             <input style={inputStyle} value={edu.location || ''} onChange={(e) => updateEducation(index, 'location', e.target.value)} />
                           </div>
