@@ -296,12 +296,12 @@ const FlipBook = ({ templates, onSelect }) => {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: '64px', height: '64px', borderRadius: '50%',
             background: currentSheetIndex > 1 
-              ? 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)' 
+              ? 'linear-gradient(135deg, #059669 0%, #047857 100%)' 
               : '#E2E8F0',
             color: currentSheetIndex > 1 ? '#FFFFFF' : '#94A3B8',
             border: 'none', cursor: currentSheetIndex > 1 ? 'pointer' : 'not-allowed',
             boxShadow: currentSheetIndex > 1 
-              ? '0 12px 25px -5px rgba(49, 46, 129, 0.4), 0 0 0 2px rgba(99, 102, 241, 0.3)' 
+              ? '0 12px 25px -5px rgba(5, 150, 105, 0.45), 0 0 0 3px rgba(16, 185, 129, 0.25)' 
               : 'none',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             zIndex: 100
@@ -412,12 +412,12 @@ const FlipBook = ({ templates, onSelect }) => {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: '64px', height: '64px', borderRadius: '50%',
             background: currentSheetIndex < sheets.length 
-              ? 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)' 
+              ? 'linear-gradient(135deg, #059669 0%, #047857 100%)' 
               : '#E2E8F0',
             color: currentSheetIndex < sheets.length ? '#FFFFFF' : '#94A3B8',
             border: 'none', cursor: currentSheetIndex < sheets.length ? 'pointer' : 'not-allowed',
             boxShadow: currentSheetIndex < sheets.length 
-              ? '0 12px 25px -5px rgba(49, 46, 129, 0.4), 0 0 0 2px rgba(99, 102, 241, 0.3)' 
+              ? '0 12px 25px -5px rgba(5, 150, 105, 0.45), 0 0 0 3px rgba(16, 185, 129, 0.25)' 
               : 'none',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             zIndex: 100
@@ -449,18 +449,30 @@ const FlipBook = ({ templates, onSelect }) => {
               key={index}
               onClick={() => setCurrentSheetIndex(sheetNum)}
               style={{
-                padding: isActive ? '0.4rem 1rem' : '0.4rem 0.6rem',
+                padding: isActive ? '0.45rem 1.25rem' : '0.4rem 0.75rem',
                 borderRadius: '9999px',
                 border: 'none',
                 background: isActive 
-                  ? 'linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899)' 
-                  : '#CBD5E1',
-                color: isActive ? '#FFFFFF' : '#475569',
-                fontSize: '0.8rem',
+                  ? 'linear-gradient(135deg, #059669, #10B981)' 
+                  : '#E2E8F0',
+                color: isActive ? '#FFFFFF' : '#334155',
+                fontSize: '0.85rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: isActive ? '0 4px 12px rgba(99, 102, 241, 0.4)' : 'none'
+                transition: 'all 0.25s ease',
+                boxShadow: isActive ? '0 4px 14px rgba(5, 150, 105, 0.45)' : 'none'
+              }}
+              onMouseOver={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = 'rgba(5, 150, 105, 0.15)';
+                  e.currentTarget.style.color = '#059669';
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.background = '#E2E8F0';
+                  e.currentTarget.style.color = '#334155';
+                }
               }}
             >
               {index === 0 ? 'Cover' : `Page ${index}`}
