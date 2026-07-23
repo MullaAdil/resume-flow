@@ -45,28 +45,21 @@ const HeroAnimatedCard = () => {
   const [phase, setPhase] = useState('resume'); // 'resume' | 'tearing' | 'letter'
 
   useEffect(() => {
-    const timer1 = setTimeout(() => {
-      setPhase('tearing');
-    }, 4000);
-
-    const timer2 = setTimeout(() => {
-      setPhase('letter');
-    }, 4800);
-
-    const timer3 = setTimeout(() => {
+    const runCycle = () => {
       setPhase('resume');
-    }, 9000);
+      const t1 = setTimeout(() => setPhase('tearing'), 3800);
+      const t2 = setTimeout(() => setPhase('letter'), 4600);
+      return [t1, t2];
+    };
 
+    let timers = runCycle();
     const interval = setInterval(() => {
-      setPhase('resume');
-      setTimeout(() => setPhase('tearing'), 4000);
-      setTimeout(() => setPhase('letter'), 4800);
-    }, 9000);
+      timers.forEach(t => clearTimeout(t));
+      timers = runCycle();
+    }, 9500);
 
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
+      timers.forEach(t => clearTimeout(t));
       clearInterval(interval);
     };
   }, []);
@@ -74,35 +67,51 @@ const HeroAnimatedCard = () => {
   return (
     <div style={{ position: 'relative', width: '450px', height: '636px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 
-      {/* Floating Confetti Shards during tearing */}
+      {/* Realistic Paper Pieces Dropping Downwards during Tearing */}
       {phase === 'tearing' && (
-        <>
-          {[...Array(12)].map((_, i) => (
-            <motion.div
-              key={i}
-              initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
-              animate={{
-                x: (i % 2 === 0 ? 1 : -1) * (60 + Math.random() * 120),
-                y: -50 - Math.random() * 100,
-                opacity: 0,
-                scale: 0.2,
-                rotate: Math.random() * 360
-              }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              style={{
-                position: 'absolute',
-                width: `${12 + (i % 4) * 6}px`,
-                height: `${16 + (i % 3) * 8}px`,
-                background: i % 3 === 0 ? '#10B981' : i % 3 === 1 ? '#F59E0B' : '#6366F1',
-                borderRadius: '3px',
-                zIndex: 30
-              }}
-            />
-          ))}
-        </>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 30, overflow: 'hidden' }}>
+          {[...Array(14)].map((_, i) => {
+            const width = 40 + (i % 4) * 25;
+            const height = 50 + (i % 3) * 30;
+            const leftPos = (i * 30) % 400;
+            const initialY = (i % 4) * 80;
+            const fallY = 250 + Math.random() * 200;
+            const rotateDeg = (i % 2 === 0 ? 1 : -1) * (20 + Math.random() * 45);
+
+            return (
+              <motion.div
+                key={i}
+                initial={{ y: initialY, x: leftPos, opacity: 1, rotate: 0 }}
+                animate={{
+                  y: initialY + fallY,
+                  x: leftPos + (i % 2 === 0 ? 25 : -25),
+                  rotate: rotateDeg,
+                  opacity: [1, 1, 0.8, 0]
+                }}
+                transition={{ duration: 0.85, ease: [0.25, 0.1, 0.25, 1.0], delay: (i % 3) * 0.04 }}
+                style={{
+                  position: 'absolute',
+                  width: `${width}px`,
+                  height: `${height}px`,
+                  background: '#FFFFFF',
+                  border: '1px solid #CBD5E1',
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
+                  borderRadius: '4px'
+                }}
+              >
+                {/* Simulated torn text snippet lines on falling paper piece */}
+                <div style={{ padding: '6px' }}>
+                  <div style={{ height: '4px', background: '#94A3B8', width: '80%', marginBottom: '4px', borderRadius: '2px' }} />
+                  <div style={{ height: '4px', background: '#CBD5E1', width: '60%', marginBottom: '4px', borderRadius: '2px' }} />
+                  <div style={{ height: '4px', background: '#E2E8F0', width: '90%', borderRadius: '2px' }} />
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       )}
 
-      {/* Phase 1: Full Elon Musk Resume Card */}
+      {/* Phase 1: Full Elon Musk Resume Card (Drops down & splits when tearing) */}
       {phase !== 'letter' && (
         <motion.div
           key="resume-card"
@@ -110,14 +119,14 @@ const HeroAnimatedCard = () => {
           animate={
             phase === 'tearing'
               ? {
-                  scale: [1, 1.03, 0.85],
-                  rotate: [0, -4, 6, -10],
+                  y: [0, 20, 120],
+                  rotate: [0, -3, 8],
                   opacity: [1, 0.9, 0],
-                  filter: ['blur(0px)', 'blur(2px)', 'blur(8px)']
+                  scale: [1, 0.98, 0.9]
                 }
               : { opacity: 1, scale: 1, rotate: 0, y: 0 }
           }
-          transition={{ duration: phase === 'tearing' ? 0.75 : 0.4 }}
+          transition={{ duration: phase === 'tearing' ? 0.8 : 0.4 }}
           style={{
             width: '450px',
             height: '636px',
@@ -135,7 +144,7 @@ const HeroAnimatedCard = () => {
           {/* Status Badge */}
           <div style={{
             position: 'absolute', top: '12px', right: '12px', zIndex: 20,
-            background: 'rgba(5, 150, 105, 0.9)', color: '#FFFFFF',
+            background: 'rgba(5, 150, 105, 0.92)', color: '#FFFFFF',
             padding: '0.35rem 0.85rem', borderRadius: '9999px',
             fontSize: '0.8rem', fontWeight: 700, backdropFilter: 'blur(6px)',
             boxShadow: '0 4px 12px rgba(5, 150, 105, 0.3)',
@@ -158,25 +167,25 @@ const HeroAnimatedCard = () => {
         </motion.div>
       )}
 
-      {/* Phase 2: Official Job Offer Letter Card (Spawns after tear down) */}
+      {/* Phase 2: Authentic Real Corporate Job Offer Letter (Spawns elegantly) */}
       {phase !== 'resume' && (
         <motion.div
           key="letter-card"
-          initial={{ opacity: 0, scale: 0.8, y: 30, rotate: 5 }}
+          initial={{ opacity: 0, scale: 0.9, y: 40 }}
           animate={
             phase === 'letter'
-              ? { opacity: 1, scale: 1, y: 0, rotate: 0 }
-              : { opacity: 0, scale: 0.85, y: 20 }
+              ? { opacity: 1, scale: 1, y: 0 }
+              : { opacity: 0, scale: 0.95, y: 20 }
           }
-          transition={{ duration: 0.5, ease: 'backOut' }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           style={{
             width: '450px',
             height: '636px',
-            background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+            background: '#FFFFFF',
             borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(5, 150, 105, 0.25)',
-            border: '2px solid #10B981',
-            padding: '2.25rem 2rem',
+            boxShadow: '0 30px 60px -15px rgba(5, 150, 105, 0.25), 0 0 0 1px rgba(16, 185, 129, 0.3)',
+            border: '1px solid #E2E8F0',
+            padding: '2.5rem 2.25rem',
             boxSizing: 'border-box',
             position: 'absolute',
             top: 0,
@@ -184,70 +193,105 @@ const HeroAnimatedCard = () => {
             zIndex: 15,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            fontFamily: '"Inter", sans-serif'
           }}
         >
-          {/* Top Status Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px dashed #E2E8F0', paddingBottom: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'linear-gradient(135deg, #10B981, #047857)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
-                <CheckCircle size={24} />
-              </div>
+          {/* Authentic Corporate Header */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '2px solid #0F172A', paddingBottom: '1rem' }}>
               <div>
-                <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0F172A' }}>SPACEX & TESLA</h4>
-                <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>OFFICIAL OFFER OF EMPLOYMENT</span>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em' }}>
+                  SPACEX & TESLA, INC.
+                </h3>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', letterSpacing: '0.05em' }}>
+                  EXECUTIVE HUMAN RESOURCES
+                </span>
+              </div>
+              <div style={{
+                background: '#ECFDF5', color: '#047857', border: '1px solid #A7F3D0',
+                padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800
+              }}>
+                VERIFIED ATS 99%
               </div>
             </div>
-            <span style={{ background: '#D1FAE5', color: '#047857', fontSize: '0.75rem', fontWeight: 800, padding: '0.35rem 0.75rem', borderRadius: '9999px' }}>
-              PASSED ATS (99%)
-            </span>
+
+            {/* Document Title */}
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.05em', textDecoration: 'underline' }}>
+                Formal Offer of Employment
+              </span>
+            </div>
+
+            {/* Candidate & Reference */}
+            <div style={{ background: '#F8FAFC', padding: '0.75rem 1rem', borderRadius: '8px', borderLeft: '3px solid #10B981', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569', marginBottom: '0.2rem' }}>
+                <span><strong>Candidate:</strong> Elon Musk</span>
+                <span><strong>Date:</strong> July 23, 2026</span>
+              </div>
+              <div style={{ color: '#475569' }}>
+                <strong>Position:</strong> Senior Executive Engineer
+              </div>
+            </div>
+
+            {/* Letter Content Body */}
+            <div style={{ fontSize: '0.9rem', color: '#334155', lineHeight: 1.6 }}>
+              <p style={{ margin: '0 0 0.85rem 0' }}>
+                Dear Mr. Musk,
+              </p>
+              <p style={{ margin: '0 0 0.85rem 0' }}>
+                We are thrilled to extend this formal offer of employment! Your resume, created with <strong>Elevate Resume</strong>, scored in the 99th percentile across our automated ATS screenings.
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong>Annual Compensation:</strong> $275,000 USD + Stock Options & Full Benefits.
+              </p>
+            </div>
           </div>
 
-          {/* Letter Body */}
-          <div style={{ margin: '1.25rem 0', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <p style={{ fontSize: '0.9rem', color: '#64748B', fontWeight: 600, marginBottom: '0.5rem' }}>Date: July 23, 2026</p>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', marginBottom: '1rem', lineHeight: 1.3 }}>
-              Dear Elon Musk,
-            </h3>
-            <p style={{ fontSize: '0.95rem', color: '#334155', lineHeight: 1.6, marginBottom: '1.25rem' }}>
-              We were thoroughly impressed by your ATS-formatted resume created with <strong>Elevate Resume</strong>!
-            </p>
-            <p style={{ fontSize: '0.95rem', color: '#334155', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-              We are thrilled to formally offer you the role of <strong>Chief Executive Engineer</strong> with an annual compensation package of <strong>$250,000 + Equity Stock Options</strong>.
-            </p>
-
-            {/* Official Stamp Box */}
+          {/* Official Gold/Emerald Stamp Seal & Signatures */}
+          <div>
             <div style={{
-              border: '2px solid #10B981',
-              borderRadius: '12px',
-              padding: '1rem',
-              background: 'rgba(16, 185, 129, 0.05)',
-              display: 'flex',
-              alignItems: 'center',
-              justify: 'space-between'
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%)',
+              border: '1.5px dashed #10B981', borderRadius: '12px', padding: '0.85rem 1rem',
+              marginBottom: '1rem'
             }}>
               <div>
-                <span style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 700, display: 'block' }}>RECRUITMENT STATUS</span>
-                <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A' }}>OFFER ACCEPTED 🎉</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#047857', display: 'block' }}>RECRUITMENT STATUS</span>
+                <span style={{ fontSize: '1rem', fontWeight: 900, color: '#0F172A' }}>OFFER ACCEPTED 🎉</span>
               </div>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '2px dashed #10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'rotate(-12deg)', color: '#10B981', fontWeight: 900, fontSize: '0.7rem', textAlign: 'center' }}>
-                APPROVED
+              {/* Embossed Round Seal */}
+              <div style={{
+                width: '52px', height: '52px', borderRadius: '50%',
+                background: 'linear-gradient(135deg, #10B981, #047857)',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                color: '#FFFFFF', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1
+              }}>
+                <span>OFFICIAL</span>
+                <span>SEAL</span>
               </div>
             </div>
-          </div>
 
-          {/* Footer Signatures */}
-          <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'block' }}>Verified ATS Candidate</span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>Elevate Resume System</span>
+            {/* Bottom Footer Signature Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '1px solid #E2E8F0', paddingTop: '0.75rem' }}>
+              <div>
+                <div style={{ fontFamily: 'serif', fontStyle: 'italic', fontSize: '1.1rem', fontWeight: 700, color: '#0F172A' }}>
+                  Gwynne Shotwell
+                </div>
+                <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 600 }}>President & COO</span>
+              </div>
+              <button 
+                onClick={() => setPhase('resume')}
+                style={{
+                  background: 'transparent', border: '1px solid #CBD5E1', color: 'var(--text-main)',
+                  padding: '0.4rem 0.85rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                Replay Animation 🔄
+              </button>
             </div>
-            <button 
-              onClick={() => setPhase('resume')}
-              style={{ background: '#10B981', color: '#FFFFFF', border: 'none', padding: '0.5rem 1rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
-            >
-              Replay Visual 🔄
-            </button>
           </div>
         </motion.div>
       )}
