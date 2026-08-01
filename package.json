@@ -10,7 +10,7 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "start": "node server/index.js"
+    "start": "NODE_ENV=production node server/index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -33,7 +33,7 @@ import { useResume } from '../context/ResumeContext';
 import { templates, allTags } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
 import { mockResumeData, templateMockData } from '../utils/mockResumeData';
-import { Layout, Search, ZoomIn, X, ArrowLeft, FileText } from 'lucide-react';
+import AuraHeader from './AuraHeader';
 
 const TemplateShowcase = () => {
   const [selectedColor, setSelectedColor] = React.useState(null);
@@ -84,42 +84,10 @@ const TemplateShowcase = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      style={{ minHeight: '100%', backgroundColor: '#F8F9FA', display: 'flex', flexDirection: 'column' }}>
+      style={{ minHeight: '100%', backgroundColor: 'var(--bg-color)', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header Navigation */}
-      <header style={{ 
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-        padding: '1.25rem 2.5rem', background: '#FFFFFF', 
-        borderBottom: '1px solid rgba(0,0,0,0.08)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <button 
-            onClick={() => navigate('/')}
-            style={{ 
-              background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', 
-              cursor: 'pointer', color: '#4B5563', fontSize: '0.95rem', fontWeight: 600, padding: 0 
-            }}
-          >
-            <ArrowLeft size={18} />
-            Back
-          </button>
-          <div style={{ height: '20px', width: '1px', background: '#E5E7EB' }}></div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.25rem', color: '#111827' }}>
-             <FileText size={28} color="var(--primary)" />
-             Elevate Resume
-          </div>
-
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-           <button 
-             onClick={() => navigate(location.state?.skipPathSelection ? '/builder' : '/choose')}
-             className="btn-primary" 
-             style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', fontSize: '1rem', fontWeight: 600, boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)' }}
-           >
-             Create my resume
-           </button>
-        </div>
-      </header>
+      <AuraHeader />
 
       {/* Hero / Filter Section */}
       <div style={{ padding: '3rem 2rem 1rem', textAlign: 'center' }}>

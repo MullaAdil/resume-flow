@@ -625,26 +625,26 @@ const BuilderFlow = () => {
 
   // ── Shared input style ──
   const inputStyle = { 
-    padding: '0.95rem 1.35rem', 
-    borderRadius: '10px', 
-    border: '1.5px solid #94A3B8', 
+    padding: '0.85rem 1.15rem', 
+    borderRadius: '8px', 
+    border: '1px solid var(--border-color)', 
     background: '#FFFFFF', 
     outline: 'none', 
-    fontSize: '1.2rem', // even larger input font
-    color: '#111827',
-    transition: 'all 0.1s ease',
-    boxShadow: 'none',
+    fontSize: '0.95rem', 
+    color: 'var(--text-main)',
+    transition: 'all 0.15s ease',
+    boxShadow: 'var(--shadow-xs)',
     boxSizing: 'border-box',
     width: '100%',
     minWidth: 0
   };
   const labelStyle = { 
-    fontSize: '1.05rem', // even larger label font
-    fontWeight: 800, 
-    color: '#111827', 
+    fontSize: '0.85rem', 
+    fontWeight: 700, 
+    color: 'var(--text-main)', 
     textTransform: 'uppercase', 
-    letterSpacing: '0.05em', 
-    marginBottom: '0.45rem' 
+    letterSpacing: '0.04em', 
+    marginBottom: '0.4rem' 
   };
 
   // ── Render the edit form for the current step ──
@@ -2126,7 +2126,6 @@ const BuilderFlow = () => {
           </button>
         </div>
 
-        {/* Center Mode Selector (Dead Center across all screens & zoom levels) */}
         <div style={{ 
           position: 'absolute', 
           left: '50%', 
@@ -2138,13 +2137,13 @@ const BuilderFlow = () => {
         }}>
           <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <button 
-              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? '#059669' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
               onClick={() => setLeftPaneMode('edit')}
             >
               Edit
             </button>
             <button 
-              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? '#059669' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
               onClick={() => setLeftPaneMode('customize')}
             >
               Customize
@@ -2154,13 +2153,13 @@ const BuilderFlow = () => {
           {/* Mobile View Switcher (Edit vs Preview) */}
           <div className="mobile-view-toggle" style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px' }}>
             <button 
-              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'edit' ? '#1E293B' : 'transparent', color: mobileTab === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
+              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'edit' ? 'var(--text-main)' : 'transparent', color: mobileTab === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
               onClick={() => setMobileTab('edit')}
             >
               ✏️ Form
             </button>
             <button 
-              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'preview' ? '#1E293B' : 'transparent', color: mobileTab === 'preview' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
+              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'preview' ? 'var(--text-main)' : 'transparent', color: mobileTab === 'preview' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
               onClick={() => setMobileTab('preview')}
             >
               👁️ Preview
@@ -2179,23 +2178,8 @@ const BuilderFlow = () => {
                 handleRetrieveResumes();
               }
             }}
-            style={{
-              padding: '0.5rem 1.25rem',
-              borderRadius: '8px',
-              border: '1.5px solid #059669',
-              background: 'rgba(5, 150, 105, 0.05)',
-              color: '#059669',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              boxShadow: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.1s ease'
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.12)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.05)'; }}
+            className="aura-btn-subtle"
+            style={{ padding: '0.5rem 1.1rem', fontSize: '0.85rem' }}
           >
             <Cloud size={14} /> Cloud Sync
           </button>
