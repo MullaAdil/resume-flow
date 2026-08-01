@@ -5,14 +5,14 @@ import { FileText, Palette, ArrowRight, Check, Sparkles } from 'lucide-react';
 const AuraHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTheme, setActiveTheme] = useState('emerald');
+  const [activeTheme, setActiveTheme] = useState('amber');
   const [isThemeOpen, setIsThemeOpen] = useState(false);
 
   const themes = [
-    { id: 'emerald', name: 'Emerald Cyber', color: '#059669' },
-    { id: 'sapphire', name: 'Royal Sapphire', color: '#2563EB' },
-    { id: 'violet', name: 'Hyper Violet', color: '#7C3AED' },
-    { id: 'amber', name: 'Sunset Amber', color: '#D97706' }
+    { id: 'amber', name: '🧱 Terracotta Bricks', color: '#EA580C' },
+    { id: 'emerald', name: '🌿 Emerald Bricks', color: '#059669' },
+    { id: 'sapphire', name: '💎 Sapphire Bricks', color: '#2563EB' },
+    { id: 'violet', name: '🔮 Violet Bricks', color: '#7C3AED' }
   ];
 
   const handleThemeChange = (themeId) => {
