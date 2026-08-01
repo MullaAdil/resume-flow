@@ -32,8 +32,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useResume } from '../context/ResumeContext';
 import { templates, allTags } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
-import { mockResumeData, templateMockData } from '../utils/mockResumeData';
 import AuraHeader from './AuraHeader';
+import { ZoomIn, Eye, X, Check, Layout, Search } from 'lucide-react';
 
 const TemplateShowcase = () => {
   const [selectedColor, setSelectedColor] = React.useState(null);
