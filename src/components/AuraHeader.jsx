@@ -166,6 +166,34 @@ const AuraHeader = () => {
             )}
           </div>
 
+          {/* Auth Nav Buttons */}
+          <Link
+            to="/login"
+            style={{
+              padding: '0.5rem 0.85rem',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--text-main)',
+              textDecoration: 'none'
+            }}
+          >
+            Sign In
+          </Link>
+
+          <Link
+            to="/signup"
+            className="aura-btn-subtle"
+            style={{
+              padding: '0.5rem 0.95rem',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              textDecoration: 'none'
+            }}
+          >
+            Sign Up
+          </Link>
+
           {/* Primary CTA */}
           <button
             onClick={() => navigate('/builder')}

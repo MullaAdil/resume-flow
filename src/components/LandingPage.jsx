@@ -204,12 +204,21 @@ export default function LandingPage() {
                   </button>
 
                   <button
+                    onClick={() => navigate('/signup')}
+                    className="aura-btn-subtle"
+                    style={{ padding: '0.85rem 1.6rem', fontSize: '1rem' }}
+                  >
+                    <Sparkles size={18} />
+                    <span>Create Free Account</span>
+                  </button>
+
+                  <button
                     onClick={() => navigate('/templates')}
                     className="aura-btn-secondary"
                     style={{ padding: '0.85rem 1.6rem', fontSize: '1rem' }}
                   >
                     <Layout size={18} />
-                    <span>Explore 16+ Templates</span>
+                    <span>Explore Templates</span>
                   </button>
                 </div>
 
