@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Geist:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Default Signature Palette: Cyber Indigo & Mint */
-  --primary: #4F46E5;
-  --primary-hover: #4338CA;
-  --primary-light: #EEF2FF;
-  --primary-border: #C7D2FE;
-  --primary-glow: rgba(79, 70, 229, 0.15);
+  /* Default Luxury Palette: Cyber Emerald & Titanium */
+  --primary: #059669;
+  --primary-hover: #047857;
+  --primary-light: #ECFDF5;
+  --primary-border: #A7F3D0;
+  --primary-glow: rgba(5, 150, 105, 0.18);
   
-  --bg-color: #F8F9FA;
+  --bg-color: #FAFAFC;
   --card-bg: #FFFFFF;
   --panel-bg: #F1F5F9;
   
@@ -19,11 +19,12 @@
   --border-color: #E2E8F0;
   --border-subtle: #F1F5F9;
 
-  /* Premium Depth Shadows */
-  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
-  --shadow-sm: 0 4px 8px -2px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.02);
-  --shadow-md: 0 12px 28px -6px rgba(15, 23, 42, 0.05), 0 4px 12px -4px rgba(15, 23, 42, 0.03);
-  --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.08), 0 8px 20px -6px rgba(15, 23, 42, 0.04);
+  /* Rich Multi-Stage Shadows & Depth */
+  --shadow-xs: 0 2px 4px rgba(15, 23, 42, 0.03);
+  --shadow-sm: 0 6px 12px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -2px rgba(15, 23, 42, 0.02);
+  --shadow-md: 0 16px 32px -8px rgba(15, 23, 42, 0.06), 0 6px 16px -4px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 28px 56px -14px rgba(15, 23, 42, 0.09), 0 10px 24px -8px rgba(15, 23, 42, 0.04);
+  --shadow-glow: 0 0 28px var(--primary-glow);
   
   /* Radii */
   --radius-sm: 10px;
@@ -36,13 +37,13 @@
   --transition-normal: 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Theme Color Signatures */
+/* Theme Variant Signatures */
 body.theme-emerald {
   --primary: #059669;
   --primary-hover: #047857;
   --primary-light: #ECFDF5;
   --primary-border: #A7F3D0;
-  --primary-glow: rgba(5, 150, 105, 0.15);
+  --primary-glow: rgba(5, 150, 105, 0.18);
 }
 
 body.theme-sapphire {
@@ -50,7 +51,7 @@ body.theme-sapphire {
   --primary-hover: #1D4ED8;
   --primary-light: #EFF6FF;
   --primary-border: #BFDBFE;
-  --primary-glow: rgba(37, 99, 235, 0.15);
+  --primary-glow: rgba(37, 99, 235, 0.18);
 }
 
 body.theme-violet {
@@ -58,7 +59,7 @@ body.theme-violet {
   --primary-hover: #6D28D9;
   --primary-light: #F5F3FF;
   --primary-border: #DDD6FE;
-  --primary-glow: rgba(124, 58, 237, 0.15);
+  --primary-glow: rgba(124, 58, 237, 0.18);
 }
 
 body.theme-amber {
@@ -66,7 +67,7 @@ body.theme-amber {
   --primary-hover: #B45309;
   --primary-light: #FFFBEB;
   --primary-border: #FDE68A;
-  --primary-glow: rgba(217, 119, 6, 0.15);
+  --primary-glow: rgba(217, 119, 6, 0.18);
 }
 
 * {
@@ -76,11 +77,11 @@ body.theme-amber {
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-color);
   background-image: 
-    radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.05) 0%, transparent 60%),
-    radial-gradient(ellipse at 100% 100%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+    radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.06) 0%, transparent 65%),
+    radial-gradient(circle at 90% 80%, rgba(5, 150, 105, 0.05) 0%, transparent 50%);
   background-attachment: fixed;
   color: var(--text-main);
   line-height: 1.6;
@@ -90,9 +91,9 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   color: var(--text-main);
-  line-height: 1.18;
+  line-height: 1.15;
 }
 
 a {
@@ -113,9 +114,11 @@ button {
   padding: 0 2rem;
 }
 
-/* Iconic Neomorphic Porcelain Cards */
+/* High-End Glass Cards */
 .aura-card, .nexus-card {
-  background-color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
