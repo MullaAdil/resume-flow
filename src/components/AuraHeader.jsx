@@ -27,7 +27,6 @@ const AuraHeader = () => {
 
   const navLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Studio Builder', path: '/builder' },
     { label: 'Templates', path: '/templates' },
     { label: 'Import Resume', path: '/import' }
   ];
