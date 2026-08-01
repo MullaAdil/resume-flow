@@ -362,6 +362,10 @@ app.get('/api/auth/github/callback', async (req, res) => {
 });
 
 
+// --- IN-MEMORY FALLBACK STORE ---
+const inMemoryResumes = [];
+const inMemoryUsers = [];
+
 // --- RESUME SYNC ROUTES ---
 
 // Get all resumes for a specific sync user key
@@ -372,40 +376,56 @@ app.get('/api/resumes', async (req, res) => {
     return res.status(400).json({ error: 'user_id query parameter is required' });
   }
 
+  const key = user_id.toLowerCase();
+
   try {
-    const resumes = await Resume.find({ user_id: user_id.toLowerCase() })
-      .select('_id name updated_at')
-      .sort({ updated_at: -1 });
+    if (mongoose.connection.readyState === 1) {
+      const resumes = await Resume.find({ user_id: key })
+        .select('_id name updated_at')
+        .sort({ updated_at: -1 });
 
-    // Map _id to id to match Supabase's format
-    const formattedResumes = resumes.map(r => ({
-      id: r._id,
-      name: r.name,
-      updated_at: r.updated_at
-    }));
+      const formattedResumes = resumes.map(r => ({
+        id: r._id,
+        name: r.name,
+        updated_at: r.updated_at
+      }));
 
-    res.json(formattedResumes);
+      return res.json(formattedResumes);
+    }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to retrieve resumes' });
+    console.warn('DB search failed, using in-memory store:', err.message);
   }
+
+  // Fallback to in-memory store
+  const filtered = inMemoryResumes
+    .filter(r => r.user_id === key)
+    .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+    .map(r => ({ id: r.id, name: r.name, updated_at: r.updated_at }));
+
+  res.json(filtered);
 });
 
 // Load a single resume by id
 app.get('/api/resumes/:id', async (req, res) => {
+  const id = req.params.id;
+
   try {
-    const resume = await Resume.findById(req.params.id);
-    if (!resume) {
-      return res.status(404).json({ error: 'Resume not found' });
+    if (mongoose.connection.readyState === 1) {
+      const resume = await Resume.findById(id);
+      if (resume) {
+        return res.json({ name: resume.name, data: resume.data });
+      }
     }
-    res.json({
-      name: resume.name,
-      data: resume.data
-    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch resume details' });
+    console.warn('DB lookup failed, checking in-memory store:', err.message);
   }
+
+  const memResume = inMemoryResumes.find(r => r.id === id);
+  if (memResume) {
+    return res.json({ name: memResume.name, data: memResume.data });
+  }
+
+  res.status(404).json({ error: 'Resume not found' });
 });
 
 // Save or Update a resume (Upsert)
@@ -416,47 +436,72 @@ app.post('/api/resumes', async (req, res) => {
     return res.status(400).json({ error: 'user_id, name, and data are required fields' });
   }
 
+  const lowercaseUser = user_id.toLowerCase();
+  const trimmedName = name.trim();
+
   try {
-    const lowercaseUser = user_id.toLowerCase();
-    
-    // Find if a resume exists with the same user_id and name
-    let resume = await Resume.findOne({ user_id: lowercaseUser, name: name.trim() });
+    if (mongoose.connection.readyState === 1) {
+      let resume = await Resume.findOne({ user_id: lowercaseUser, name: trimmedName });
 
-    if (resume) {
-      resume.data = data;
-      resume.updated_at = new Date();
-      await resume.save();
-    } else {
-      resume = new Resume({
-        user_id: lowercaseUser,
-        name: name.trim(),
-        data,
+      if (resume) {
+        resume.data = data;
+        resume.updated_at = new Date();
+        await resume.save();
+      } else {
+        resume = new Resume({
+          user_id: lowercaseUser,
+          name: trimmedName,
+          data,
+        });
+        await resume.save();
+      }
+
+      return res.status(200).json({
+        message: 'Resume saved successfully',
+        id: resume._id
       });
-      await resume.save();
     }
-
-    res.status(200).json({
-      message: 'Resume saved successfully',
-      id: resume._id
-    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to save resume' });
+    console.warn('DB save failed, falling back to in-memory store:', err.message);
+  }
+
+  // Fallback in-memory save
+  let existingIndex = inMemoryResumes.findIndex(r => r.user_id === lowercaseUser && r.name === trimmedName);
+  const now = new Date().toISOString();
+  if (existingIndex !== -1) {
+    inMemoryResumes[existingIndex].data = data;
+    inMemoryResumes[existingIndex].updated_at = now;
+    return res.status(200).json({ message: 'Resume saved successfully (memory)', id: inMemoryResumes[existingIndex].id });
+  } else {
+    const newId = 'mem_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    const newResume = { id: newId, user_id: lowercaseUser, name: trimmedName, data, updated_at: now };
+    inMemoryResumes.push(newResume);
+    return res.status(200).json({ message: 'Resume saved successfully (memory)', id: newId });
   }
 });
 
 // Delete a saved resume
 app.delete('/api/resumes/:id', async (req, res) => {
+  const id = req.params.id;
+
   try {
-    const result = await Resume.findByIdAndDelete(req.params.id);
-    if (!result) {
-      return res.status(404).json({ error: 'Resume not found' });
+    if (mongoose.connection.readyState === 1) {
+      const result = await Resume.findByIdAndDelete(id);
+      if (result) {
+        return res.json({ message: 'Resume deleted successfully' });
+      }
     }
-    res.json({ message: 'Resume deleted successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to delete resume' });
+    console.warn('DB delete failed, checking in-memory store:', err.message);
   }
+
+  const idx = inMemoryResumes.findIndex(r => r.id === id);
+  if (idx !== -1) {
+    inMemoryResumes.splice(idx, 1);
+    return res.json({ message: 'Resume deleted successfully (memory)' });
+  }
+
+  res.status(404).json({ error: 'Resume not found' });
 });
 
 // Health check endpoint

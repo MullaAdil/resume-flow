@@ -230,21 +230,12 @@ const TemplateShowcase = () => {
                  {/* Reshaped Button */}
                  <div style={{ marginTop: '1.25rem' }}>
                     <button 
+                      className="aura-btn-primary"
                       style={{
                         width: '100%',
-                        backgroundColor: '#059669',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        padding: '0.85rem',
-                        borderRadius: '9999px',
-                        fontSize: '1rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 14px rgba(5, 150, 105, 0.25)',
-                        transition: 'all 0.2s ease'
+                        padding: '0.75rem',
+                        fontSize: '0.95rem'
                       }}
-                      onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#047857'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#059669'; e.currentTarget.style.transform = 'translateY(0)'; }}
                     >
                       Use Template
                     </button>
