@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Default Theme Accent: Emerald Precision */
+  /* Default Signature Palette: Emerald Cyber */
   --primary: #059669;
   --primary-hover: #047857;
   --primary-light: #ECFDF5;
   --primary-border: #A7F3D0;
-  --primary-glow: rgba(5, 150, 105, 0.12);
+  --primary-glow: rgba(5, 150, 105, 0.14);
   
-  --bg-color: #FAFAFC;
+  --bg-color: #F8FAFC;
   --card-bg: #FFFFFF;
-  --panel-bg: #F8FAFC;
+  --panel-bg: #F1F5F9;
   
   --text-main: #0F172A;
-  --text-muted: #64748B;
+  --text-muted: #475569;
   --text-light: #94A3B8;
   
   --border-color: #E2E8F0;
@@ -23,22 +23,22 @@
   --warning: #F59E0B;
   --danger: #EF4444;
 
-  /* Shadows - Light & Subtle */
+  /* Shadows - Ultra-Luxe Multi-Layer Depth */
   --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
-  --shadow-sm: 0 2px 4px -1px rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
-  --shadow-md: 0 8px 16px -4px rgba(15, 23, 42, 0.04), 0 2px 6px -2px rgba(15, 23, 42, 0.02);
-  --shadow-lg: 0 16px 24px -6px rgba(15, 23, 42, 0.05), 0 4px 10px -4px rgba(15, 23, 42, 0.03);
+  --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.02);
+  --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 4px 10px -4px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 8px 16px -6px rgba(15, 23, 42, 0.04);
   
   /* Radii */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
   --radius-pill: 9999px;
   
   /* Transitions */
   --transition-fast: 150ms ease;
-  --transition-normal: 200ms ease;
+  --transition-normal: 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Theme Variant Classes */
@@ -47,7 +47,7 @@ body.theme-emerald {
   --primary-hover: #047857;
   --primary-light: #ECFDF5;
   --primary-border: #A7F3D0;
-  --primary-glow: rgba(5, 150, 105, 0.12);
+  --primary-glow: rgba(5, 150, 105, 0.14);
 }
 
 body.theme-sapphire {
@@ -55,7 +55,7 @@ body.theme-sapphire {
   --primary-hover: #1D4ED8;
   --primary-light: #EFF6FF;
   --primary-border: #BFDBFE;
-  --primary-glow: rgba(37, 99, 235, 0.12);
+  --primary-glow: rgba(37, 99, 235, 0.14);
 }
 
 body.theme-violet {
@@ -63,7 +63,7 @@ body.theme-violet {
   --primary-hover: #6D28D9;
   --primary-light: #F5F3FF;
   --primary-border: #DDD6FE;
-  --primary-glow: rgba(124, 58, 237, 0.12);
+  --primary-glow: rgba(124, 58, 237, 0.14);
 }
 
 body.theme-amber {
@@ -71,7 +71,7 @@ body.theme-amber {
   --primary-hover: #B45309;
   --primary-light: #FFFBEB;
   --primary-border: #FDE68A;
-  --primary-glow: rgba(217, 119, 6, 0.12);
+  --primary-glow: rgba(217, 119, 6, 0.14);
 }
 
 * {
@@ -81,8 +81,12 @@ body.theme-amber {
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-color);
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse at 100% 100%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+  background-attachment: fixed;
   color: var(--text-main);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -90,10 +94,10 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-main);
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 a {
@@ -109,7 +113,7 @@ button {
 
 /* Layout Utilities */
 .aura-container {
-  max-width: 1280px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -119,13 +123,15 @@ button {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  padding: 1.75rem;
+  padding: 1.85rem;
   transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+  position: relative;
 }
 
 .aura-card:hover {
   border-color: var(--primary-border);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 /* Clean Buttons */
@@ -133,12 +139,12 @@ button {
   background-color: var(--primary);
   color: #FFFFFF;
   border: 1px solid transparent;
-  padding: 0.7rem 1.4rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
   font-size: 0.95rem;
-  transition: all 0.15s ease;
-  box-shadow: var(--shadow-xs);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px var(--primary-glow);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -148,18 +154,18 @@ button {
 .aura-btn-primary:hover {
   background-color: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 6px 20px var(--primary-glow);
 }
 
 .aura-btn-secondary {
   background-color: #FFFFFF;
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  padding: 0.7rem 1.4rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
   font-size: 0.95rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   box-shadow: var(--shadow-xs);
   display: inline-flex;
   align-items: center;
@@ -170,21 +176,22 @@ button {
 .aura-btn-secondary:hover {
   background-color: #F8FAFC;
   border-color: #CBD5E1;
+  transform: translateY(-1px);
 }
 
 .aura-btn-subtle {
   background-color: var(--primary-light);
   color: var(--primary);
   border: 1px solid var(--primary-border);
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  padding: 0.65rem 1.3rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
   font-size: 0.9rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .aura-btn-subtle:hover {
@@ -197,10 +204,10 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 0.85rem;
+  padding: 0.4rem 0.95rem;
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.825rem;
+  font-weight: 700;
   background-color: var(--primary-light);
   border: 1px solid var(--primary-border);
   color: var(--primary);
@@ -209,7 +216,7 @@ button {
 /* Form Inputs */
 .aura-label {
   display: block;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.4rem;
   color: var(--text-main);
   font-size: 0.875rem;
@@ -217,12 +224,12 @@ button {
 
 .aura-input {
   width: 100%;
-  height: 44px;
-  padding: 0 1rem;
+  height: 46px;
+  padding: 0 1.1rem;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-family: inherit;
-  font-size: 0.925rem;
+  font-size: 0.95rem;
   color: var(--text-main);
   background-color: #FFFFFF;
   transition: all 0.15s ease;
@@ -236,8 +243,8 @@ button {
 
 textarea.aura-input {
   height: auto;
-  min-height: 100px;
-  padding: 0.75rem 1rem;
+  min-height: 105px;
+  padding: 0.85rem 1.1rem;
   resize: vertical;
 }
 
@@ -268,7 +275,7 @@ textarea.aura-input {
   }
 }
 
-/* Responsive Rules */
+/* Responsive Adjustments */
 @media (max-width: 992px) {
   .aura-container {
     padding: 0 1.25rem;
