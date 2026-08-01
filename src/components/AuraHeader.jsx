@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FileText, Sparkles, Layout, Palette, ArrowRight, Upload, Check } from 'lucide-react';
+import { FileText, Palette, ArrowRight, Check, Sparkles } from 'lucide-react';
 
 const AuraHeader = () => {
   const navigate = useNavigate();
@@ -9,10 +9,10 @@ const AuraHeader = () => {
   const [isThemeOpen, setIsThemeOpen] = useState(false);
 
   const themes = [
-    { id: 'emerald', name: 'Emerald', color: '#059669' },
-    { id: 'sapphire', name: 'Sapphire', color: '#2563EB' },
-    { id: 'violet', name: 'Violet', color: '#7C3AED' },
-    { id: 'amber', name: 'Amber', color: '#D97706' }
+    { id: 'emerald', name: 'Emerald Cyber', color: '#059669' },
+    { id: 'sapphire', name: 'Royal Sapphire', color: '#2563EB' },
+    { id: 'violet', name: 'Hyper Violet', color: '#7C3AED' },
+    { id: 'amber', name: 'Sunset Amber', color: '#D97706' }
   ];
 
   const handleThemeChange = (themeId) => {
@@ -34,46 +34,51 @@ const AuraHeader = () => {
 
   return (
     <header style={{
-      backgroundColor: '#FFFFFF',
-      borderBottom: '1px solid var(--border-color)',
       position: 'sticky',
-      top: 0,
+      top: '12px',
       zIndex: 100,
-      padding: '0.85rem 0'
+      width: '100%',
+      padding: '0 1rem',
+      boxSizing: 'border-box'
     }}>
-      <div className="aura-container" style={{
+      <div style={{
+        maxWidth: '1080px',
+        margin: '0 auto',
+        backgroundColor: 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '9999px',
+        padding: '0.6rem 1.25rem',
+        boxShadow: 'var(--shadow-md)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1.5rem'
+        gap: '1rem'
       }}>
-        {/* Brand Identity */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+        {/* Luminous Brand Emblem */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', textDecoration: 'none' }}>
           <div style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '10px',
+            width: '34px',
+            height: '34px',
+            borderRadius: '50%',
             backgroundColor: 'var(--primary-light)',
             border: '1px solid var(--primary-border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--primary)'
+            color: 'var(--primary)',
+            boxShadow: '0 0 12px var(--primary-glow)'
           }}>
-            <FileText size={20} strokeWidth={2.2} />
+            <Sparkles size={18} strokeWidth={2.2} />
           </div>
-          <div>
-            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-              AURA <span style={{ color: 'var(--primary)', fontWeight: 600 }}>Studio</span>
-            </div>
-            <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-              Career Intelligence Engine
-            </div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.03em' }}>
+            LUMEN <span style={{ color: 'var(--primary)', fontWeight: 600 }}>Studio</span>
           </div>
         </Link>
 
-        {/* Navigation Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {/* Floating Capsule Nav Pills */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           {navLinks.map((link) => {
             const isActive = location.pathname === link.path;
             return (
@@ -81,12 +86,13 @@ const AuraHeader = () => {
                 key={link.path}
                 to={link.path}
                 style={{
-                  padding: '0.5rem 0.9rem',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.875rem',
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? 'var(--primary)' : 'var(--text-muted)',
                   backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
+                  border: isActive ? '1px solid var(--primary-border)' : '1px solid transparent',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -96,9 +102,9 @@ const AuraHeader = () => {
           })}
         </nav>
 
-        {/* Header Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {/* Theme Palette Switcher */}
+        {/* Right Action Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          {/* Theme Palette Switcher Dial */}
           <div style={{ position: 'relative' }}>
             <button
               onClick={() => setIsThemeOpen(!isThemeOpen)}
@@ -106,34 +112,35 @@ const AuraHeader = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                padding: '0.5rem 0.75rem',
-                borderRadius: '8px',
+                padding: '0.45rem 0.75rem',
+                borderRadius: '9999px',
                 border: '1px solid var(--border-color)',
                 backgroundColor: '#FFFFFF',
-                fontSize: '0.85rem',
+                fontSize: '0.825rem',
                 fontWeight: 600,
-                color: 'var(--text-muted)'
+                color: 'var(--text-muted)',
+                cursor: 'pointer'
               }}
             >
-              <Palette size={16} />
-              <span>Theme Accent</span>
+              <Palette size={15} />
+              <span>Accent</span>
             </button>
 
             {isThemeOpen && (
               <div style={{
                 position: 'absolute',
                 right: 0,
-                top: '115%',
+                top: '125%',
                 backgroundColor: '#FFFFFF',
                 border: '1px solid var(--border-color)',
-                borderRadius: '12px',
-                boxShadow: 'var(--shadow-md)',
-                padding: '0.5rem',
-                minWidth: '160px',
+                borderRadius: '16px',
+                boxShadow: 'var(--shadow-lg)',
+                padding: '0.6rem',
+                minWidth: '170px',
                 zIndex: 200
               }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', padding: '0.35rem 0.5rem 0.25rem' }}>
-                  CHOOSE ACCENT
+                <div style={{ fontSize: '0.725rem', fontWeight: 700, color: 'var(--text-muted)', padding: '0.35rem 0.5rem' }}>
+                  THEME ACCENT
                 </div>
                 {themes.map((t) => (
                   <button
@@ -145,7 +152,7 @@ const AuraHeader = () => {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '0.45rem 0.6rem',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       border: 'none',
                       backgroundColor: activeTheme === t.id ? 'var(--primary-light)' : 'transparent',
                       cursor: 'pointer',
@@ -156,7 +163,7 @@ const AuraHeader = () => {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: t.color, display: 'inline-block' }} />
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: t.color, display: 'inline-block' }} />
                       {t.name}
                     </div>
                     {activeTheme === t.id && <Check size={14} color="var(--primary)" />}
@@ -166,42 +173,18 @@ const AuraHeader = () => {
             )}
           </div>
 
-          {/* Auth Nav Buttons */}
-          <Link
-            to="/login"
-            style={{
-              padding: '0.5rem 0.85rem',
-              borderRadius: '8px',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--text-main)',
-              textDecoration: 'none'
-            }}
-          >
-            Sign In
-          </Link>
-
-          <Link
-            to="/signup"
-            className="aura-btn-subtle"
-            style={{
-              padding: '0.5rem 0.95rem',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              textDecoration: 'none'
-            }}
-          >
-            Sign Up
-          </Link>
-
-          {/* Primary CTA */}
+          {/* Single Unified Launch Button */}
           <button
             onClick={() => navigate('/builder')}
             className="aura-btn-primary"
-            style={{ padding: '0.55rem 1.1rem', fontSize: '0.875rem' }}
+            style={{
+              padding: '0.45rem 1.1rem',
+              fontSize: '0.85rem',
+              borderRadius: '9999px'
+            }}
           >
-            <span>Create Resume</span>
-            <ArrowRight size={16} />
+            <span>Launch Studio</span>
+            <ArrowRight size={15} />
           </button>
         </div>
       </div>
