@@ -16,7 +16,8 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage initialMode="login" />} />
+        <Route path="/signup" element={<LoginPage initialMode="signup" />} />
         <Route path="/templates" element={<TemplateShowcase />} />
         <Route path="/choose" element={<ChooseFlow />} />
         <Route path="/import" element={<ImportFlow />} />
