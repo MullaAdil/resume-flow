@@ -40,8 +40,33 @@ const resumeSchema = new mongoose.Schema({
   },
 });
 
-// Compound index to ensure that for a given user, resume name is unique.
-resumeSchema.index({ user_id: 1, name: 1 }, { unique: true });
+const activitySchema = new mongoose.Schema({
+  user_id: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+  },
+  type: {
+    type: String,
+    default: 'pdf_download',
+  },
+  resumeName: {
+    type: String,
+    default: 'Untitled Resume',
+  },
+  templateId: {
+    type: String,
+    default: 'multicolor',
+  },
+  created_at: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+activitySchema.index({ user_id: 1, created_at: -1 });
 
 export const User = mongoose.model('User', userSchema);
 export const Resume = mongoose.model('Resume', resumeSchema);
+export const Activity = mongoose.model('Activity', activitySchema);

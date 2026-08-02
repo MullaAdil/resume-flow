@@ -96,5 +96,19 @@ export const apiClient = {
         method: 'DELETE',
       });
     }
+  },
+
+  activity: {
+    async log(data) {
+      return request('/api/activity', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+
+    async list(userId) {
+      const param = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
+      return request(`/api/activity${param}`);
+    }
   }
 };

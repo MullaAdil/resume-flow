@@ -17,11 +17,43 @@ export const defaultState = {
 };
 
 export const ResumeProvider = ({ children }) => {
-  const [resumeData, setResumeData] = useState(defaultState);
+  const [resumeData, setResumeData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lumen_resume_draft');
+      return saved ? JSON.parse(saved) : defaultState;
+    } catch {
+      return defaultState;
+    }
+  });
 
-  const [selectedTemplate, setSelectedTemplate] = useState('multicolor');
+  const [selectedTemplate, setSelectedTemplate] = useState(() => {
+    try {
+      return localStorage.getItem('lumen_selected_template') || 'multicolor';
+    } catch {
+      return 'multicolor';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lumen_resume_draft', JSON.stringify(resumeData));
+    } catch (e) {
+      console.warn('Failed to save resume draft:', e);
+    }
+  }, [resumeData]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('lumen_selected_template', selectedTemplate);
+    } catch (e) {
+      console.warn('Failed to save selected template:', e);
+    }
+  }, [selectedTemplate]);
 
   const resetResume = () => {
+    try {
+      localStorage.removeItem('lumen_resume_draft');
+    } catch {}
     setResumeData(defaultState);
     setSelectedTemplate('multicolor');
   };

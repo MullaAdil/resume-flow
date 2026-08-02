@@ -37,7 +37,7 @@ const ImportFlow = () => {
   const triggerFileInput = () => fileInputRef.current?.click();
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuraHeader />
 
       <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem' }}>

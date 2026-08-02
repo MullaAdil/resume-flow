@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { apiClient } from '../utils/apiClient';
 
 const AuthContext = createContext({
@@ -6,39 +6,47 @@ const AuthContext = createContext({
   loading: true,
   signUp: async () => {},
   signIn: async () => {},
+  signInWithPassword: async () => {},
   signOut: async () => {},
+  refreshUser: async () => {},
 });
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if there is an active session in local storage
-    const checkSession = async () => {
-      try {
-        const currentUser = await apiClient.auth.getCurrentUser();
-        setUser(currentUser);
-      } catch (err) {
-        console.error('Failed to get current user session:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkSession();
+  const checkSession = useCallback(async () => {
+    try {
+      const currentUser = await apiClient.auth.getCurrentUser();
+      setUser(currentUser);
+      return currentUser;
+    } catch (err) {
+      console.error('Failed to get current user session:', err);
+      setUser(null);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
+
   const signUp = async (email, password) => {
-    const { user: newUser } = await apiClient.auth.signUp({ email, password });
-    setUser(newUser);
-    return newUser;
+    const res = await apiClient.auth.signUp({ email, password });
+    if (res?.user) {
+      setUser(res.user);
+    }
+    return res;
   };
 
-  const signIn = async (email, password) => {
-    const { user: existingUser } = await apiClient.auth.signInWithPassword({ email, password });
-    setUser(existingUser);
-    return existingUser;
+  const signInWithPassword = async (email, password) => {
+    const res = await apiClient.auth.signInWithPassword({ email, password });
+    if (res?.user) {
+      setUser(res.user);
+    }
+    return res;
   };
 
   const signOut = async () => {
@@ -47,11 +55,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{
+      user,
+      loading,
+      signUp,
+      signIn: signInWithPassword,
+      signInWithPassword,
+      signOut,
+      refreshUser: checkSession
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-

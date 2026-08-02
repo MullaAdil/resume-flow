@@ -6,7 +6,7 @@ import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { User, Resume } from './models.js';
+import { User, Resume, Activity } from './models.js';
 
 // Load .env.local first (prioritized), then load .env for defaults
 dotenv.config({ path: '.env.local' });
@@ -77,33 +77,52 @@ app.post('/api/auth/signup', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
+  const lowercaseEmail = email.toLowerCase();
+
   try {
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      return res.status(400).json({ error: 'An account with this email already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
-      email: email.toLowerCase(),
-      password: hashedPassword,
-    });
-
-    await newUser.save();
-
-    const token = jwt.sign({ id: newUser._id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
-
-    res.status(201).json({
-      token,
-      user: {
-        id: newUser._id,
-        email: newUser.email,
+    if (mongoose.connection.readyState === 1) {
+      const existingUser = await User.findOne({ email: lowercaseEmail });
+      if (existingUser) {
+        return res.status(400).json({ error: 'An account with this email already exists' });
       }
-    });
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({
+        email: lowercaseEmail,
+        password: hashedPassword,
+      });
+
+      await newUser.save();
+
+      const token = jwt.sign({ id: newUser._id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
+
+      return res.status(201).json({
+        token,
+        user: {
+          id: newUser._id,
+          email: newUser.email,
+        }
+      });
+    }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error during registration' });
+    console.warn('DB Signup failed, checking in-memory store fallback:', err.message);
   }
+
+  // In-Memory Fallback
+  const existingMem = inMemoryUsers.find(u => u.email === lowercaseEmail);
+  if (existingMem) {
+    return res.status(400).json({ error: 'An account with this email already exists' });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const memUser = { id: 'mem_u_' + Date.now(), email: lowercaseEmail, password: hashedPassword };
+  inMemoryUsers.push(memUser);
+
+  const token = jwt.sign({ id: memUser.id, email: memUser.email }, JWT_SECRET, { expiresIn: '7d' });
+  return res.status(201).json({
+    token,
+    user: { id: memUser.id, email: memUser.email }
+  });
 });
 
 // Sign In
@@ -114,30 +133,46 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
+  const lowercaseEmail = email.toLowerCase();
+
   try {
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid email or password' });
-    }
+    if (mongoose.connection.readyState === 1) {
+      const user = await User.findOne({ email: lowercaseEmail });
+      if (user) {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return res.status(400).json({ error: 'Invalid email or password' });
+        }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid email or password' });
-    }
+        const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        email: user.email,
+        return res.json({
+          token,
+          user: {
+            id: user._id,
+            email: user.email,
+          }
+        });
       }
-    });
+    }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error during authentication' });
+    console.warn('DB Login failed, checking in-memory store fallback:', err.message);
   }
+
+  // In-Memory Fallback
+  const memUser = inMemoryUsers.find(u => u.email === lowercaseEmail);
+  if (memUser) {
+    const isMatch = await bcrypt.compare(password, memUser.password);
+    if (isMatch) {
+      const token = jwt.sign({ id: memUser.id, email: memUser.email }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({
+        token,
+        user: { id: memUser.id, email: memUser.email }
+      });
+    }
+  }
+
+  return res.status(400).json({ error: 'Invalid email or password' });
 });
 
 // Get Current User
@@ -502,6 +537,66 @@ app.delete('/api/resumes/:id', async (req, res) => {
   }
 
   res.status(404).json({ error: 'Resume not found' });
+});
+
+// --- USER ACTIVITY & DOWNLOAD TRACKING ROUTES ---
+const inMemoryActivities = [];
+
+// Log User Activity (e.g. PDF Download, Resume Save)
+app.post('/api/activity', optionalAuthenticate, async (req, res) => {
+  const { user_id, type, resumeName, templateId } = req.body;
+  const targetUser = req.user?.email || user_id || 'anonymous';
+  const key = targetUser.toLowerCase();
+
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const newAct = new Activity({
+        user_id: key,
+        type: type || 'pdf_download',
+        resumeName: resumeName || 'Untitled Resume',
+        templateId: templateId || 'multicolor',
+      });
+      await newAct.save();
+      return res.status(201).json({ message: 'Activity logged', activity: newAct });
+    }
+  } catch (err) {
+    console.warn('DB activity log failed, using memory store fallback:', err.message);
+  }
+
+  const memAct = {
+    id: 'act_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+    user_id: key,
+    type: type || 'pdf_download',
+    resumeName: resumeName || 'Untitled Resume',
+    templateId: templateId || 'multicolor',
+    created_at: new Date().toISOString()
+  };
+  inMemoryActivities.push(memAct);
+  res.status(201).json({ message: 'Activity logged (memory)', activity: memAct });
+});
+
+// Get User Activity History
+app.get('/api/activity', optionalAuthenticate, async (req, res) => {
+  const user_id = req.query.user_id || req.user?.email || 'anonymous';
+  const key = user_id.toLowerCase();
+
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const activities = await Activity.find({ user_id: key })
+        .sort({ created_at: -1 })
+        .limit(20);
+      return res.json(activities);
+    }
+  } catch (err) {
+    console.warn('DB activity fetch failed, using memory store fallback:', err.message);
+  }
+
+  const filtered = inMemoryActivities
+    .filter(a => a.user_id === key || a.user_id === 'anonymous')
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 20);
+
+  res.json(filtered);
 });
 
 // Health check endpoint

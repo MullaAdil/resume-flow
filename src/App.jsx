@@ -6,8 +6,8 @@ import ChooseFlow from './components/ChooseFlow';
 import ImportFlow from './components/ImportFlow';
 import BuilderFlow from './components/BuilderFlow';
 import TemplateShowcase from './components/TemplateShowcase';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FileText } from 'lucide-react';
+import EmbeddedThemeBackground from './components/EmbeddedThemeBackground';
+import { AnimatePresence } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
 
 const AnimatedRoutes = () => {
@@ -31,8 +31,11 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)' }}>
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', position: 'relative' }}>
+          {/* Quantum Matrix Grid & Floating Light Orbs */}
+          <EmbeddedThemeBackground />
+
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
             <AnimatedRoutes />
           </main>
         </div>

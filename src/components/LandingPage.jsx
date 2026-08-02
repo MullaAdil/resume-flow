@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { templates } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
 import { mockResumeData } from '../utils/mockResumeData';
+import { useResume } from '../context/ResumeContext';
+import { useAuth } from '../context/AuthContext';
 import AuraHeader from './AuraHeader';
+import { apiClient } from '../utils/apiClient';
 import { 
   ArrowRight, Sparkles, CheckCircle, Zap, FileText, ChevronRight, 
-  Layout, ShieldCheck, Download, Award, Layers 
+  Layout, ShieldCheck, Download, Award, Layers, Heart, Edit3, RotateCcw,
+  Database, Clock, HardDrive, History
 } from 'lucide-react';
 
 // ── Ultra-Clean Hero Interactive Sandbox ──
@@ -117,6 +121,53 @@ const HeroSandbox = () => {
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { resumeData, resetResume, selectedTemplate } = useResume();
+  const { user } = useAuth();
+
+  const hasSavedDraft = Boolean(
+    resumeData?.personalInfo?.fullName ||
+    resumeData?.personalInfo?.email ||
+    resumeData?.experience?.length > 0 ||
+    resumeData?.projects?.length > 0 ||
+    resumeData?.skills?.programming?.length > 0
+  );
+
+  const [activities, setActivities] = useState([]);
+
+  React.useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const data = await apiClient.activity.list(user?.email || '');
+        if (Array.isArray(data)) {
+          setActivities(data);
+        }
+      } catch (e) {
+        console.warn('Could not load activity log:', e);
+      }
+    };
+    fetchActivities();
+  }, [user?.email]);
+
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('template_wishlist') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
+  const handleToggleWishlist = (id) => {
+    setWishlist((prev) => {
+      let next;
+      if (prev.includes(id)) {
+        next = prev.filter((item) => item !== id);
+      } else {
+        next = [...prev, id];
+      }
+      localStorage.setItem('template_wishlist', JSON.stringify(next));
+      return next;
+    });
+  };
 
   const features = [
     {
@@ -142,7 +193,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuraHeader />
 
       <main style={{ flex: 1 }}>
@@ -184,7 +235,7 @@ export default function LandingPage() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                   <button
-                    onClick={() => navigate('/builder')}
+                    onClick={() => navigate('/templates')}
                     className="aura-btn-primary"
                     style={{ padding: '0.85rem 1.8rem', fontSize: '1rem' }}
                   >
@@ -236,49 +287,350 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* FEATURES GRID */}
-        <section style={{ padding: '4.5rem 0', backgroundColor: '#FFFFFF', borderTop: '1px solid var(--border-color)' }}>
-          <div className="aura-container">
-            <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 3.5rem' }}>
-              <div className="aura-badge" style={{ marginBottom: '0.85rem' }}>
-                <Zap size={15} />
-                <span>Core Engineering</span>
-              </div>
-              <h2 style={{ fontSize: '2.2rem', marginBottom: '0.85rem' }}>
-                Designed for modern job markets
-              </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem' }}>
-                Every component structured to highlight your skills and achievements.
-              </p>
-            </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '1.75rem'
-            }}>
-              {features.map((feat, idx) => (
-                <div key={idx} className="aura-card" style={{ backgroundColor: '#FAF9F6' }}>
-                  <div style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    backgroundColor: 'var(--primary-light)',
-                    border: '1px solid var(--primary-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '1.25rem'
-                  }}>
-                    {feat.icon}
+        {/* LARGE EXPANDED SAVED ASSETS & ACTIVITY VAULT DASHBOARD SECTION */}
+        {(hasSavedDraft || user) && (
+          <section style={{ padding: '4.5rem 0', backgroundColor: 'transparent', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative' }}>
+            <div className="aura-container">
+              
+              {/* Section Header with Theme & Database Status Pills */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
+                <div>
+                  <div className="aura-badge" style={{ marginBottom: '0.6rem' }}>
+                    <Database size={15} />
+                    <span>DATABASE SECURED & THEME SYNCED</span>
                   </div>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{feat.title}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.6 }}>{feat.desc}</p>
+                  <h2 style={{ fontSize: '2.3rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.03em' }}>
+                    Career Assets & Activity Studio
+                  </h2>
                 </div>
-              ))}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    padding: '0.45rem 0.9rem',
+                    borderRadius: '9999px',
+                    backgroundColor: 'var(--primary-light)',
+                    border: '1.5px solid var(--primary-border)',
+                    color: 'var(--primary)',
+                    fontSize: '0.825rem',
+                    fontWeight: 700
+                  }}>
+                    <Sparkles size={14} />
+                    <span>Active Theme Synced</span>
+                  </div>
+
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    padding: '0.45rem 0.9rem',
+                    borderRadius: '9999px',
+                    backgroundColor: '#ECFDF5',
+                    border: '1px solid #A7F3D0',
+                    color: '#065F46',
+                    fontSize: '0.825rem',
+                    fontWeight: 700
+                  }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+                    <span>MongoDB Database Connected</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Wide 2-Column Multi-Paper Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                gap: '2.5rem',
+                alignItems: 'stretch'
+              }}>
+
+                {/* Left Column: Multi-Paper Stacked Card - Active Resume Draft */}
+                <div style={{ position: 'relative' }}>
+                  {/* Paper Sheet 3: Cool Slate */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '24px',
+                    background: '#F1F5F9',
+                    border: '1px solid #CBD5E1',
+                    transform: 'translate(10px, 11px) rotate(1.4deg)',
+                    zIndex: 0,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.03)'
+                  }} />
+
+                  {/* Paper Sheet 2: Soft Warm Linen / Theme Tint */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '24px',
+                    background: 'var(--primary-light, #FAF9F5)',
+                    border: '1.5px solid var(--primary-border, #E7E5E0)',
+                    transform: 'translate(5px, 6px) rotate(0.7deg)',
+                    zIndex: 1,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.04)'
+                  }} />
+
+                  {/* Paper Sheet 1: Main Top Card */}
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 2,
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '24px',
+                    border: '1.5px solid var(--primary-border)',
+                    padding: '2.25rem 2rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    boxShadow: 'var(--shadow-md)',
+                    overflow: 'hidden'
+                  }}>
+                    {/* Background Radial Glow */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '-60px',
+                      right: '-60px',
+                      width: '220px',
+                      height: '220px',
+                      borderRadius: '50%',
+                      background: 'var(--primary-glow)',
+                      filter: 'blur(45px)',
+                      pointerEvents: 'none'
+                    }} />
+
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                        <span style={{
+                          fontSize: '0.775rem',
+                          fontWeight: 800,
+                          letterSpacing: '0.06em',
+                          color: 'var(--primary)',
+                          textTransform: 'uppercase',
+                          backgroundColor: 'var(--primary-light)',
+                          padding: '0.35rem 0.85rem',
+                          borderRadius: '9999px',
+                          border: '1px solid var(--primary-border)'
+                        }}>
+                          ACTIVE RESUME DRAFT
+                        </span>
+                        <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {user ? `User: ${user.email}` : 'Local Draft Synced'}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: '1.75rem' }}>
+                        {/* Mini Live Preview */}
+                        <div style={{
+                          width: '140px',
+                          height: '190px',
+                          borderRadius: '14px',
+                          backgroundColor: '#FFFFFF',
+                          border: '1.5px solid var(--primary-border)',
+                          overflow: 'hidden',
+                          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.1)',
+                          position: 'relative',
+                          flexShrink: 0
+                        }}>
+                          <div style={{
+                            transform: 'scale(0.18)',
+                            transformOrigin: 'top left',
+                            width: '794px',
+                            height: '1123px',
+                            pointerEvents: 'none'
+                          }}>
+                            <TemplateRenderer templateId={selectedTemplate || 'multicolor'} data={resumeData} />
+                          </div>
+                        </div>
+
+                        {/* Resume Metadata */}
+                        <div style={{ flex: 1, minWidth: '180px' }}>
+                          <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.4rem 0' }}>
+                            {resumeData?.personalInfo?.fullName || 'Untitled Resume Draft'}
+                          </h3>
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0 0 1rem 0', fontWeight: 600 }}>
+                            {resumeData?.personalInfo?.jobTitle || 'Executive Professional'}
+                          </p>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', fontSize: '0.825rem', color: 'var(--text-muted)' }}>
+                            <div>🎨 Active Template: <strong style={{ color: 'var(--primary)', textTransform: 'capitalize' }}>{selectedTemplate}</strong></div>
+                            <div>📄 Experience Entries: <strong>{resumeData?.experience?.length || 0}</strong></div>
+                            <div>⚡ Skills Added: <strong>{Object.values(resumeData?.skills || {}).flat().length}</strong></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action CTA Buttons */}
+                    <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+                      <button
+                        onClick={() => navigate('/builder')}
+                        className="aura-btn-primary"
+                        style={{ flex: 1, minWidth: '180px', padding: '0.8rem 1.25rem', fontSize: '0.925rem', borderRadius: '12px', justifyContent: 'center' }}
+                      >
+                        <Edit3 size={17} />
+                        <span>Rebuild & Edit Resume</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Start a fresh blank resume? Your current progress will be reset.')) {
+                            resetResume();
+                            navigate('/choose');
+                          }
+                        }}
+                        className="aura-btn-secondary"
+                        style={{ padding: '0.8rem 1.1rem', fontSize: '0.925rem', borderRadius: '12px' }}
+                        title="Start Fresh"
+                      >
+                        <RotateCcw size={17} />
+                        <span>Start Fresh</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Multi-Paper Stacked Card - Activity History Log */}
+                <div style={{ position: 'relative' }}>
+                  {/* Paper Sheet 3: Warm Linen */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '24px',
+                    background: '#FAF9F5',
+                    border: '1px solid #E7E5E0',
+                    transform: 'translate(10px, 11px) rotate(-1.2deg)',
+                    zIndex: 0,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.03)'
+                  }} />
+
+                  {/* Paper Sheet 2: Cool Slate */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '24px',
+                    background: '#F1F5F9',
+                    border: '1px solid #CBD5E1',
+                    transform: 'translate(5px, 6px) rotate(-0.6deg)',
+                    zIndex: 1,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.04)'
+                  }} />
+
+                  {/* Paper Sheet 1: Main Card */}
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 2,
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '24px',
+                    border: '1.5px solid var(--primary-border)',
+                    padding: '2.25rem 2rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    boxShadow: 'var(--shadow-md)'
+                  }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                          <div style={{ width: '34px', height: '34px', borderRadius: '10px', backgroundColor: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <History size={18} />
+                          </div>
+                          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                            Download & Activity Vault
+                          </h3>
+                        </div>
+                        <span style={{ fontSize: '0.775rem', fontWeight: 700, color: 'var(--primary)', backgroundColor: 'var(--primary-light)', border: '1px solid var(--primary-border)', padding: '0.25rem 0.75rem', borderRadius: '9999px' }}>
+                          DB Logged ({activities.length})
+                        </span>
+                      </div>
+
+                      {/* Timeline Log List */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', maxHeight: '250px', overflowY: 'auto', paddingRight: '0.25rem' }}>
+                        {activities.length > 0 ? (
+                          activities.slice(0, 5).map((act, index) => (
+                            <div key={act.id || act._id || index} style={{
+                              padding: '0.85rem 1rem',
+                              borderRadius: '14px',
+                              backgroundColor: 'var(--primary-light)',
+                              border: '1px solid var(--primary-border)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '0.75rem'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <div style={{
+                                  width: '34px',
+                                  height: '34px',
+                                  borderRadius: '8px',
+                                  backgroundColor: '#FFFFFF',
+                                  color: 'var(--primary)',
+                                  border: '1px solid var(--primary-border)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  {act.type === 'pdf_download' ? <Download size={16} /> : <FileText size={16} />}
+                                </div>
+                                <div>
+                                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                                    {act.type === 'pdf_download' ? 'PDF Export Generated' : 'Resume Saved to Cloud'}
+                                  </div>
+                                  <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
+                                    {act.resumeName || 'Executive Resume'} • Template: {act.templateId || selectedTemplate}
+                                  </div>
+                                </div>
+                              </div>
+                              <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 600, flexShrink: 0 }}>
+                                {act.created_at ? new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Saved'}
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
+                            <Clock size={32} color="var(--primary)" style={{ marginBottom: '0.5rem' }} />
+                            <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)' }}>No PDF Downloads Logged Yet</div>
+                            <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>Click "Rebuild & Edit Resume" to export your first PDF!</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Bottom Stats Footer Bar */}
+                    <div style={{
+                      marginTop: '1.5rem',
+                      paddingTop: '1rem',
+                      borderTop: '1px solid var(--border-color)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      fontSize: '0.825rem',
+                      color: 'var(--text-muted)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <HardDrive size={15} color="var(--primary)" />
+                        <span>Saved to MongoDB Account</span>
+                      </div>
+                      <button
+                        onClick={() => navigate('/builder')}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', padding: 0 }}
+                      >
+                        Open Builder Studio →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>{/* End 2-Column Grid */}
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* TEMPLATE GALLERY */}
         <section style={{ padding: '4.5rem 0' }}>
@@ -324,7 +676,7 @@ export default function LandingPage() {
                     display: 'flex',
                     flexDirection: 'column'
                   }}
-                  onClick={() => navigate('/builder')}
+                  onClick={() => navigate('/choose')}
                 >
                   <div style={{
                     height: '240px',
@@ -347,13 +699,46 @@ export default function LandingPage() {
                     }}>
                       <TemplateRenderer templateId={tmpl.id} data={mockResumeData} />
                     </div>
+
+                    {/* Top Heart Wishlist Overlay Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleWishlist(tmpl.id);
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: wishlist.includes(tmpl.id) ? '#FFF1F2' : 'rgba(255,255,255,0.92)',
+                        border: wishlist.includes(tmpl.id) ? '1.5px solid #FECDD3' : '1px solid #E2E8F0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                        transition: 'all 0.15s ease',
+                        zIndex: 10
+                      }}
+                      title={wishlist.includes(tmpl.id) ? 'Remove from Wishlist' : 'Save to Wishlist'}
+                    >
+                      <Heart
+                        size={16}
+                        color={wishlist.includes(tmpl.id) ? '#E11D48' : '#94A3B8'}
+                        fill={wishlist.includes(tmpl.id) ? '#E11D48' : 'none'}
+                      />
+                    </button>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
                       <h4 style={{ fontSize: '1.05rem', fontWeight: 800 }}>{tmpl.name}</h4>
                       <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                        {tmpl.tags?.join(' • ')}
+                        {tmpl.tags?.slice(0, 2).join(' • ')}
                       </span>
                     </div>
 
@@ -373,7 +758,8 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'rgba(255, 255, 255, 0.88)',
+        backdropFilter: 'blur(4px)',
         padding: '2.5rem 0',
         borderTop: '1px solid var(--border-color)',
         fontSize: '0.9rem',

@@ -1,40 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// ── Deckled Torn Paper Edges ──
-const TornEdge = ({ isBottom }) => (
-  <svg 
-    width="100%" 
-    height="10" 
-    viewBox="0 0 1200 10" 
-    preserveAspectRatio="none"
-    style={{ 
-      position: 'absolute', 
-      left: 0, 
-      right: 0, 
-      [isBottom ? 'bottom' : 'top']: '-5px', 
-      zIndex: 10,
-      pointerEvents: 'none'
-    }}
-  >
-    <path 
-      d={isBottom 
-        ? "M0,5 L20,10 L40,5 L60,10 L80,5 L100,10 L120,5 L140,10 L160,5 L180,10 L200,5 L220,10 L240,5 L260,10 L280,5 L300,10 L320,5 L340,10 L360,5 L380,10 L400,5 L420,10 L440,5 L460,10 L480,5 L500,10 L520,5 L540,10 L560,5 L580,10 L600,5 L620,10 L640,5 L660,10 L680,5 L700,10 L720,5 L740,10 L760,5 L780,10 L800,5 L840,10 L880,5 L920,10 L960,5 L1000,10 L1040,5 L1080,10 L1120,5 L1160,10 L1200,5 L1200,0 L0,0 Z"
-        : "M0,5 L20,0 L40,5 L60,0 L80,5 L100,0 L120,5 L140,0 L160,5 L180,0 L200,5 L220,0 L240,5 L260,0 L280,5 L300,0 L320,5 L340,0 L360,5 L380,0 L400,5 L420,0 L440,5 L460,0 L480,5 L500,0 L520,5 L540,0 L560,5 L580,0 L600,5 L620,0 L640,5 L660,0 L680,5 L700,0 L720,5 L740,0 L760,5 L780,0 L800,5 L840,0 L880,5 L920,0 L960,5 L1000,0 L1040,5 L1080,0 L1120,5 L1160,0 L1200,5 L1200,10 L0,10 Z"
-      } 
-      fill="#FFFFFF" 
-      stroke="#CBD5E1"
-      strokeWidth="1.5"
-    />
-  </svg>
-);
-
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useResume } from '../context/ResumeContext';
 import { templates, allTags } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
 import { mockResumeData, templateMockData } from '../utils/mockResumeData';
 import AuraHeader from './AuraHeader';
-import { ZoomIn, Eye, X, Check, Layout, Search } from 'lucide-react';
+import { ZoomIn, Eye, X, Check, Layout, Search, Heart } from 'lucide-react';
 
 const TemplateShowcase = () => {
   const [selectedColor, setSelectedColor] = React.useState(null);
@@ -46,9 +18,33 @@ const TemplateShowcase = () => {
   const gridRef = useRef(null);
   const [cardWidth, setCardWidth] = useState(360);
 
-  const filteredTemplates = activeTag === 'All templates' 
-    ? templates 
-    : templates.filter(t => t.tags.includes(activeTag));
+  // Persistent Wishlist State
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('template_wishlist') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
+  const handleToggleWishlist = (id) => {
+    setWishlist((prev) => {
+      let next;
+      if (prev.includes(id)) {
+        next = prev.filter((item) => item !== id);
+      } else {
+        next = [...prev, id];
+      }
+      localStorage.setItem('template_wishlist', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const filteredTemplates = activeTag === '❤️ Wishlist'
+    ? templates.filter(t => wishlist.includes(t.id))
+    : activeTag === 'All templates' 
+      ? templates 
+      : templates.filter(t => t.tags.includes(activeTag));
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
@@ -85,7 +81,7 @@ const TemplateShowcase = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      style={{ minHeight: '100%', backgroundColor: 'var(--bg-color)', display: 'flex', flexDirection: 'column' }}>
+      style={{ minHeight: '100%', backgroundColor: 'transparent', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header Navigation */}
       <AuraHeader />
@@ -98,24 +94,45 @@ const TemplateShowcase = () => {
         {/* Filter Controls */}
         <div style={{ 
           display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
-          background: 'linear-gradient(90deg, rgba(29, 78, 216, 0.03) 0%, #FFFFFF 15%)', 
-          padding: '1.5rem 1.75rem', 
-          maxWidth: '800px', margin: '0 auto', 
-          borderLeft: '4px solid #1D4ED8', // slight ink color (fountain pen ink blue) in one edge
-          borderRight: '1.5px solid #CBD5E1',
-          borderTop: 'none',
-          borderBottom: 'none',
-          boxShadow: '0 10px 30px -10px rgba(15, 23, 42, 0.08)',
+          background: '#FFFFFF', 
+          padding: '1.25rem 1.75rem', 
+          maxWidth: '850px', margin: '0 auto', 
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          boxShadow: 'var(--shadow-md)',
           position: 'relative'
         }}>
-          <TornEdge />
-          <TornEdge isBottom />
-          <span style={{ fontWeight: 600, color: '#374151', marginRight: '1rem' }}>Filter by</span>
-            <select value={activeTag} onChange={(e) => setActiveTag(e.target.value)} style={{ padding: '0.6rem 1rem', borderRadius: '6px', border: '1px solid #D1D5DB', background: '#FFFFFF', outline: 'none' }}>
-              {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
-            </select>
-          <div style={{ height: '24px', width: '1px', background: '#E5E7EB', margin: '0 1rem' }}></div>
-          <span style={{ fontWeight: 600, color: '#374151', marginRight: '0.5rem' }}>Colors</span>
+          <span style={{ fontWeight: 600, color: '#374151', marginRight: '0.25rem' }}>Filter by</span>
+          <select value={activeTag} onChange={(e) => setActiveTag(e.target.value)} style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #D1D5DB', background: '#FFFFFF', outline: 'none', fontWeight: 600, cursor: 'pointer' }}>
+            <option value="All templates">All templates</option>
+            <option value="❤️ Wishlist">❤️ Wishlist ({wishlist.length})</option>
+            {allTags.filter(t => t !== 'All templates').map(tag => <option key={tag} value={tag}>{tag}</option>)}
+          </select>
+
+          {/* Wishlist Quick Filter Button */}
+          <button
+            onClick={() => setActiveTag(activeTag === '❤️ Wishlist' ? 'All templates' : '❤️ Wishlist')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.55rem 1rem',
+              borderRadius: '9999px',
+              border: activeTag === '❤️ Wishlist' ? '1.5px solid #E11D48' : '1px solid #CBD5E1',
+              backgroundColor: activeTag === '❤️ Wishlist' ? '#FFF1F2' : '#FFFFFF',
+              color: activeTag === '❤️ Wishlist' ? '#BE123C' : '#374151',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Heart size={15} color="#E11D48" fill={wishlist.length > 0 ? '#E11D48' : 'none'} />
+            <span>Wishlist ({wishlist.length})</span>
+          </button>
+
+          <div style={{ height: '24px', width: '1px', background: '#E5E7EB', margin: '0 0.5rem' }}></div>
+          <span style={{ fontWeight: 600, color: '#374151', marginRight: '0.25rem' }}>Colors</span>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             {['#1E3A8A', '#1F2937', '#991B1B', '#065F46', '#D97706'].map(color => (
                <div key={color} onClick={() => setSelectedColor(selectedColor === color ? null : color)} style={{ width: '24px', height: '24px', borderRadius: '50%', background: color, cursor: 'pointer', border: selectedColor === color ? '2.5px solid #111827' : '2px solid transparent' }} className="color-dot" role="button" aria-label={`select-color-${color}`} />
@@ -166,12 +183,45 @@ const TemplateShowcase = () => {
                >
                  {/* Top Template Header Info */}
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', padding: '0 0.25rem' }}>
-                   <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                     {template.name}
-                   </h3>
-                   <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#059669', background: 'rgba(5, 150, 105, 0.1)', padding: '0.2rem 0.6rem', borderRadius: '9999px' }}>
-                     Recommended
-                   </span>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                     <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                       {template.name}
+                     </h3>
+                     {index === 0 && (
+                       <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', background: 'rgba(5, 150, 105, 0.1)', padding: '0.15rem 0.55rem', borderRadius: '9999px' }}>
+                         Popular
+                       </span>
+                     )}
+                   </div>
+
+                   {/* Heart Wishlist Toggle */}
+                   <button
+                     type="button"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleToggleWishlist(template.id);
+                     }}
+                     style={{
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center',
+                       width: '34px',
+                       height: '34px',
+                       borderRadius: '50%',
+                       backgroundColor: wishlist.includes(template.id) ? '#FFF1F2' : '#F8FAFC',
+                       border: wishlist.includes(template.id) ? '1.5px solid #FECDD3' : '1px solid #E2E8F0',
+                       cursor: 'pointer',
+                       transition: 'all 0.15s ease',
+                       boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                     }}
+                     title={wishlist.includes(template.id) ? 'Remove from Wishlist' : 'Save to Wishlist'}
+                   >
+                     <Heart
+                       size={17}
+                       color={wishlist.includes(template.id) ? '#E11D48' : '#94A3B8'}
+                       fill={wishlist.includes(template.id) ? '#E11D48' : 'none'}
+                     />
+                   </button>
                  </div>
                  
                  {/* Preview Container */}
@@ -252,6 +302,47 @@ const TemplateShowcase = () => {
              );
           })}
         </div>
+
+        {filteredTemplates.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '4rem 2rem',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '20px',
+            border: '1px solid #E2E8F0',
+            maxWidth: '520px',
+            margin: '2rem auto',
+            boxShadow: 'var(--shadow-md)'
+          }}>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              backgroundColor: '#FFF1F2',
+              border: '1px solid #FECDD3',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem',
+              boxShadow: '0 0 16px rgba(225, 29, 72, 0.15)'
+            }}>
+              <Heart size={26} color="#E11D48" fill="#E11D48" />
+            </div>
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginBottom: '0.5rem' }}>
+              Your Wishlist is Empty
+            </h3>
+            <p style={{ color: '#64748B', fontSize: '0.925rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+              Save your favorite resume templates to your personal account collection by tapping the heart symbol on any template card!
+            </p>
+            <button
+              className="aura-btn-primary"
+              onClick={() => setActiveTag('All templates')}
+              style={{ padding: '0.65rem 1.4rem', fontSize: '0.9rem' }}
+            >
+              Explore All Designs
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Fullscreen Preview Modal */}

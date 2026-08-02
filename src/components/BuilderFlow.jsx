@@ -2,33 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CreatableSelect from 'react-select/creatable';
 import { SKILL_OPTIONS_BY_CATEGORY, ALL_TECH_OPTIONS, getSuggestedTechs, WORLDWIDE_JOB_ROLES, getTechsForRole } from '../constants/skillsData';
-// ── Deckled Torn Paper Edges ──
-const TornEdge = ({ isBottom }) => (
-  <svg 
-    width="100%" 
-    height="12" 
-    viewBox="0 0 1200 12" 
-    preserveAspectRatio="none"
-    style={{ 
-      position: 'absolute', 
-      left: 0, 
-      right: 0, 
-      [isBottom ? 'bottom' : 'top']: '-6px', 
-      zIndex: 10,
-      pointerEvents: 'none'
-    }}
-  >
-    <path 
-      d={isBottom 
-        ? "M0,6 L20,12 L40,6 L60,12 L80,6 L100,12 L120,6 L140,12 L160,6 L180,12 L200,6 L220,12 L240,6 L260,12 L280,6 L300,12 L320,6 L340,12 L360,6 L380,12 L400,6 L420,12 L440,6 L460,12 L480,6 L500,12 L520,6 L540,12 L560,6 L580,12 L600,6 L620,12 L640,6 L660,12 L680,6 L700,12 L720,6 L740,12 L760,6 L780,12 L800,6 L840,12 L880,6 L920,12 L960,6 L1000,12 L1040,6 L1080,12 L1120,6 L1160,12 L1200,6 L1200,0 L0,0 Z"
-        : "M0,6 L20,0 L40,6 L60,0 L80,6 L100,0 L120,6 L140,0 L160,6 L180,0 L200,6 L220,0 L240,6 L260,0 L280,6 L300,0 L320,6 L340,0 L360,6 L380,0 L400,6 L420,0 L440,6 L460,0 L480,6 L500,0 L520,6 L540,0 L560,6 L580,0 L600,6 L620,0 L640,6 L660,0 L680,6 L700,0 L720,6 L740,0 L760,6 L780,0 L800,6 L840,0 L880,6 L920,0 L960,6 L1000,0 L1040,6 L1080,0 L1120,6 L1160,0 L1200,6 L1200,12 L0,12 Z"
-      } 
-      fill="#FFFFFF" 
-      stroke="#CBD5E1"
-      strokeWidth="1.5"
-    />
-  </svg>
-);
 
 import { useResume, defaultState } from '../context/ResumeContext';
 import { useNavigate } from 'react-router-dom';
@@ -381,6 +354,18 @@ const BuilderFlow = () => {
       ? `${resumeData.personalInfo.fullName.trim().replace(/\s+/g, '_')}_Resume.pdf`
       : 'Resume.pdf';
     await downloadPDF('resume-pdf-content', filename);
+
+    try {
+      await apiClient.activity.log({
+        type: 'pdf_download',
+        resumeName: resumeData?.personalInfo?.fullName
+          ? `${resumeData.personalInfo.fullName}'s Resume`
+          : 'Executive Resume',
+        templateId: selectedTemplate || 'multicolor'
+      });
+    } catch (err) {
+      console.warn('Activity logging failed:', err);
+    }
   };
 
   // Skill categories matching the screenshot order
@@ -876,7 +861,7 @@ const BuilderFlow = () => {
             onClick={handleStartAIAudit}
             style={{
               padding: '0.45rem 1rem',
-              background: '#059669',
+              background: 'var(--primary)',
               border: 'none',
               borderRadius: '24px',
               color: '#FFFFFF',
@@ -898,10 +883,6 @@ const BuilderFlow = () => {
           {/* ── Personal ── */}
           {activeStep.id === 'personal' && (
             <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <TornEdge />
-              <TornEdge isBottom />
-              <TornEdge />
-              <TornEdge isBottom />
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={labelStyle}>Full Name</label>
@@ -1154,7 +1135,7 @@ const BuilderFlow = () => {
                 disabled={isGeneratingAI}
                 style={{ 
                   background: 'rgba(5, 150, 105, 0.08)',
-                  color: '#059669', 
+                  color: 'var(--primary)', 
                   border: '1.5px solid rgba(5, 150, 105, 0.3)', 
                   padding: '0.75rem 1.5rem', 
                   borderRadius: '8px', 
@@ -1184,8 +1165,6 @@ const BuilderFlow = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {!resumeData.experience || resumeData.experience.length === 0 ? (
                 <div className="torn-paper">
-          <TornEdge />
-          <TornEdge isBottom />
                   <p style={{ color: '#18181B', fontSize: '1.1rem', margin: 0, fontWeight: 700 }}>
                     No work experience added yet. Tell recruiters about your professional history!
                   </p>
@@ -1202,8 +1181,6 @@ const BuilderFlow = () => {
                           onClick={() => setActiveExpIndex(index)} 
                           className="premium-card" data-tag="exp_collapsed" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 1.5rem', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.9)' }}
                         >
-                          <TornEdge />
-                          <TornEdge isBottom />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                             <strong style={{ fontSize: '1.25rem', color: '#111827' }}>
                               {exp.title || exp.jobTitle || 'Untitled Role'}
@@ -1237,8 +1214,6 @@ const BuilderFlow = () => {
                         key={exp.id || index} 
                         className="premium-card" data-tag="exp" style={{ position: 'relative' }}
                       >
-                        <TornEdge />
-                        <TornEdge isBottom />
                         <button onClick={() => removeExperience(index)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                           <Trash2 size={16} />
                         </button>
@@ -1283,8 +1258,6 @@ const BuilderFlow = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {!resumeData.education || resumeData.education.length === 0 ? (
                 <div className="torn-paper">
-          <TornEdge />
-          <TornEdge isBottom />
                   <p style={{ color: '#18181B', fontSize: '0.9rem', margin: 0, fontWeight: 700 }}>
                     No education history added yet. Show where you studied!
                   </p>
@@ -1301,8 +1274,6 @@ const BuilderFlow = () => {
                           onClick={() => setActiveEduIndex(index)} 
                           className="premium-card" data-tag="exp_collapsed" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 1.5rem', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.9)' }}
                         >
-                          <TornEdge />
-                          <TornEdge isBottom />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                             <strong style={{ fontSize: '1.25rem', color: '#111827' }}>
                               {edu.degree || 'Untitled Degree'}
@@ -1336,8 +1307,6 @@ const BuilderFlow = () => {
                         key={edu.id || index} 
                         className="premium-card" data-tag="education" style={{ position: 'relative' }}
                       >
-                        <TornEdge />
-                        <TornEdge isBottom />
                         <button onClick={() => removeEducation(index)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                           <Trash2 size={16} />
                         </button>
@@ -1378,8 +1347,6 @@ const BuilderFlow = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {!resumeData.projects || resumeData.projects.length === 0 ? (
                 <div className="torn-paper">
-          <TornEdge />
-          <TornEdge isBottom />
                   <p style={{ color: '#18181B', fontSize: '0.9rem', margin: 0, fontWeight: 700 }}>
                     No projects added yet. Showcase your custom works to stand out!
                   </p>
@@ -1398,8 +1365,6 @@ const BuilderFlow = () => {
                           onClick={() => setActiveProjIndex(index)} 
                           className="premium-card" data-tag="exp_collapsed" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 1.5rem', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.9)' }}
                         >
-                          <TornEdge />
-                          <TornEdge isBottom />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                             <strong style={{ fontSize: '1.25rem', color: '#111827' }}>
                               {proj.name || 'Untitled Project'}
@@ -1433,8 +1398,6 @@ const BuilderFlow = () => {
                         key={proj.id || index} 
                         className="premium-card" data-tag="project" style={{ position: 'relative' }}
                       >
-                        <TornEdge />
-                        <TornEdge isBottom />
                         <button onClick={() => removeItem('projects', proj.id)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                           <Trash2 size={16} />
                         </button>
@@ -1579,8 +1542,6 @@ const BuilderFlow = () => {
           {/* ── Skills ── */}
           {activeStep.id === 'skills' && (
             <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              <TornEdge />
-              <TornEdge isBottom />
               {skillCategories.map(({ key, label }) => {
                 const categorySkills = resumeData.skills?.[key] || [];
                 const hasSkills = categorySkills.length > 0;
@@ -1709,8 +1670,6 @@ const BuilderFlow = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {resumeData.certifications?.map((cert) => (
                 <div key={cert.id} className="premium-card" data-tag="active_block" style={{ position: 'relative' }}>
-                  <TornEdge />
-                  <TornEdge isBottom />
                   <button onClick={() => removeItem('certifications', cert.id)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                     <Trash2 size={16} />
                   </button>
@@ -1735,8 +1694,6 @@ const BuilderFlow = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {resumeData.languages?.map((lang) => (
                 <div key={lang.id} className="premium-card" data-tag="active_block" style={{ position: 'relative' }}>
-                  <TornEdge />
-                  <TornEdge isBottom />
                   <button onClick={() => removeItem('languages', lang.id)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
                     <Trash2 size={16} />
                   </button>
@@ -1978,7 +1935,7 @@ const BuilderFlow = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: '#F8FAFC', fontFamily: "'Inter', sans-serif" }}>
+      style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: 'var(--bg-color)', fontFamily: "'Inter', sans-serif" }}>
       <style>{`
         /* Custom Scrollbar for editor */
         ::-webkit-scrollbar {
@@ -1997,28 +1954,90 @@ const BuilderFlow = () => {
 
         /* Focus & Hover states for inputs */
         input:focus, textarea:focus, select:focus {
-          border-color: #059669 !important;
-          box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12) !important;
+          border-color: var(--primary) !important;
+          box-shadow: 0 0 0 3px var(--primary-glow) !important;
           background: #FFFFFF !important;
         }
         input:hover:not(:focus), textarea:hover:not(:focus), select:hover:not(:focus) {
           border-color: #CBD5E1 !important;
         }
+
+        /* Studio back button - always uses current --primary */
+        .studio-back-btn {
+          background: transparent;
+          border: none;
+          color: #64748B;
+          font-weight: 600;
+          font-size: 0.85rem;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          padding: 6px 10px;
+          border-radius: 6px;
+          transition: all 0.15s ease;
+        }
+        .studio-back-btn:hover {
+          color: var(--primary) !important;
+          background: var(--primary-light) !important;
+        }
         
-        /* Premium Card style - soft floating drop shadows */
+        /* ── Multi-Paper Stack Card ──
+           Architectural physical paper stack with distinct minimal paper tones:
+           Sheet 1 (Top): Pure White #FFFFFF
+           Sheet 2 (Middle): Soft Warm Linen Ivory #FAF9F5
+           Sheet 3 (Bottom): Soft Cool Studio Slate #F1F5F9
+        */
         .premium-card {
           background: #FFFFFF;
           border: 1px solid #E2E8F0;
           border-radius: 14px;
           padding: 1.75rem 1.5rem 1.5rem 1.5rem;
           position: relative;
-          box-shadow: 0 10px 30px -10px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02);
-          transition: all 0.2s ease;
+          box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.02);
+          transition: all 0.22s ease;
           overflow: visible;
+          z-index: 1;
         }
+
+        /* Sheet 2 — Soft Warm Linen Ivory */
+        .premium-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 14px;
+          border: 1px solid #E7E5E0;
+          background: #FAF9F5;
+          transform: translate(5px, 6px) rotate(0.8deg);
+          z-index: -1;
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+          transition: transform 0.22s ease, border-color 0.22s ease;
+        }
+
+        /* Sheet 3 — Soft Cool Studio Slate */
+        .premium-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 14px;
+          border: 1px solid #CBD5E1;
+          background: #F1F5F9;
+          transform: translate(10px, 11px) rotate(1.6deg);
+          z-index: -2;
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.025);
+          transition: transform 0.22s ease, border-color 0.22s ease;
+        }
+
         .premium-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 35px -10px rgba(0,0,0,0.06), 0 2px 5px rgba(0,0,0,0.03);
+          transform: translateY(-3px);
+          box-shadow: 0 16px 38px -10px rgba(15, 23, 42, 0.09), 0 4px 8px rgba(15, 23, 42, 0.03);
+        }
+        .premium-card:hover::before {
+          transform: translate(7px, 9px) rotate(1.2deg);
+          border-color: var(--primary-border);
+        }
+        .premium-card:hover::after {
+          transform: translate(13px, 15px) rotate(2.2deg);
         }
 
         /* Add Item Buttons */
@@ -2038,9 +2057,9 @@ const BuilderFlow = () => {
           transition: all 0.15s ease;
         }
         .premium-btn-add:hover {
-          background: #F8FAFC;
-          border-color: #CBD5E1;
-          color: #1E293B;
+          background: var(--primary-light);
+          border-color: var(--primary-border);
+          color: var(--primary);
         }
 
         .premium-btn-delete {
@@ -2081,22 +2100,35 @@ const BuilderFlow = () => {
           color: #EF4444;
         }
 
-        /* Torn Paper Block styling */
-        .torn-paper {
+        /* Paper stack card for login / forms outside studio */
+        .paper-stack-card {
           background: #FFFFFF;
-          padding: 3rem 2.5rem;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-          align-items: center;
+          border: 1px solid #E2E8F0;
+          border-radius: 18px;
           position: relative;
-          border-left: 1.5px solid #CBD5E1;
-          border-right: 1.5px solid #CBD5E1;
-          border-top: none;
-          border-bottom: none;
-          box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
-          border-radius: 0;
+          z-index: 1;
+          box-shadow: 0 12px 36px -10px rgba(15, 23, 42, 0.08);
+          overflow: visible;
+        }
+        .paper-stack-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 18px;
+          border: 1px solid #E7E5E0;
+          background: #FAF9F5;
+          transform: translate(6px, 7px) rotate(0.9deg);
+          z-index: -1;
+        }
+        .paper-stack-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 18px;
+          border: 1px solid #CBD5E1;
+          background: #F1F5F9;
+          transform: translate(12px, 13px) rotate(1.8deg);
+          z-index: -2;
         }
       `}</style>
       
@@ -2106,22 +2138,7 @@ const BuilderFlow = () => {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <button 
             onClick={() => navigate('/templates')}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#64748B',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              cursor: 'pointer',
-              padding: '6px 10px',
-              borderRadius: '6px',
-              transition: 'all 0.15s ease'
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.color = '#059669'; e.currentTarget.style.background = '#F1F5F9'; }}
-            onMouseOut={(e) => { e.currentTarget.style.color = '#64748B'; e.currentTarget.style.background = 'transparent'; }}
+            className="studio-back-btn"
           >
             <ChevronLeft size={16} /> Change Template
           </button>
@@ -2220,7 +2237,7 @@ const BuilderFlow = () => {
           borderRight: '1.5px solid #E2E8F0', 
           display: 'flex', 
           flexDirection: 'column', 
-          background: '#F8FAFC',
+          background: 'var(--bg-color)',
           backgroundImage: 'linear-gradient(rgba(226, 232, 240, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 232, 240, 0.4) 1px, transparent 1px)',
           backgroundSize: '24px 24px',
           position: 'relative', 
@@ -2676,7 +2693,7 @@ const BuilderFlow = () => {
                                 type="button"
                                 onClick={() => handleLoadResume(res.id)}
                                 style={{
-                                  background: '#059669', color: '#FFFFFF', border: 'none',
+                                  background: 'var(--primary)', color: '#FFFFFF', border: 'none',
                                   padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem',
                                   fontWeight: 700, cursor: 'pointer'
                                 }}
