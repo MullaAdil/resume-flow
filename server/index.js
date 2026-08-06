@@ -215,6 +215,15 @@ const getServerUrl = (req) => {
     host = host.split(',')[0].trim();
   }
   let proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  // Check Cloudflare's cf-visitor header
+  if (req.headers['cf-visitor']) {
+    try {
+      const visitor = JSON.parse(req.headers['cf-visitor']);
+      if (visitor.scheme) {
+        proto = visitor.scheme;
+      }
+    } catch (e) {}
+  }
   if (proto.includes(',')) {
     proto = proto.split(',')[0].trim();
   }

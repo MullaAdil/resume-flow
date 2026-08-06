@@ -1,0 +1,36 @@
+# Nginx Configuration Template for Resume Builder on AWS EC2
+# Place this file at /etc/nginx/sites-available/resume-builder
+# Then link it: sudo ln -s /etc/nginx/sites-available/resume-builder /etc/nginx/sites-enabled/
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name _; # Replace with your domain name if you have one (e.g. example.com)
+
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # Client body size limit for resume uploads (DOCX / PDF parsing)
+    client_max_body_size 15M;
+
+    # 1. Serve Vite React Frontend static assets
+    location / {
+        root /home/ubuntu/resume-builder/dist; # Change /home/ubuntu to /home/ec2-user if using Amazon Linux
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 2. Proxy API and Auth requests to Express Node.js Backend on port 5001
+    location /api/ {
+        proxy_pass http://127.0.0.1:5001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}

@@ -74,8 +74,9 @@ const LoginPage = ({ initialMode = 'login' }) => {
   };
 
   const handleOAuthLogin = (provider) => {
-    const backendUrl = import.meta.env.VITE_API_BASE_URL || '';
-    window.location.href = `${backendUrl}/api/auth/${provider}`;
+    let backendUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+    const currentOrigin = window.location.origin;
+    window.location.href = `${backendUrl}/api/auth/${provider}?origin=${encodeURIComponent(currentOrigin)}`;
   };
 
   return (

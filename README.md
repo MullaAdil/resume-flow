@@ -49,16 +49,25 @@ Navigate to `http://localhost:5173` to start building!
 
 ## 📦 Deployment
 
-The application is completely static and ready to be deployed to Vercel, Netlify, or Cloudflare Pages.
+### Deploying to AWS Amplify Hosting
 
-1. Build the app:
-```bash
-npm run build
-```
-2. **Note on Routing:** A `_redirects` file is included in `/public` to ensure React Router client-side routing works cleanly across page refreshes on platforms like Netlify.
+1. **Push your code to GitHub / GitLab / Bitbucket**.
+2. Go to the **[AWS Amplify Console](https://console.aws.amazon.com/amplify/)** and click **Host web app**.
+3. Connect your repository and choose your branch.
+4. AWS Amplify will automatically detect `amplify.yml` at the root of your repository:
+   - **Build output directory:** `dist`
+   - **Build command:** `npm run build`
+5. **Environment Variables:** In **App settings > Environment variables**, add:
+   - `VITE_GROQ_API_KEY`: Your Groq API Key
+   - `VITE_API_BASE_URL`: Your backend API URL (e.g. `https://api.yourdomain.com` or EC2 IP)
+6. **SPA Rewrites & Redirects:** In **App settings > Rewrites and redirects**, add the following rule to support React Router client-side routes:
+   - **Source address:** `</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json)$)([^.]+$)/>`
+   - **Target address:** `/index.html`
+   - **Type:** `200 (Rewrite)`
 
 > **⚠️ Security Warning:**
-> The `VITE_GROQ_API_KEY` is bundled in the client code for ease of setup. If you plan to deploy this app to production, it is highly recommended to move the AI extraction logic into a Serverless Backend function to protect your API key from being exposed.
+> `VITE_GROQ_API_KEY` is bundled in client code for direct client-side parsing. For production environments with higher traffic, consider proxying AI requests through your backend API server.
+
 
 ## 🤝 Contributing
 
