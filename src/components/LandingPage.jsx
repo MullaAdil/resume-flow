@@ -774,11 +774,11 @@ export default function LandingPage() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--text-main)' }}>
             <FileText size={18} color="var(--primary)" />
-            <span>AURA AI Studio</span>
+            <span>LUMEN Studio</span>
           </div>
 
           <div>
-            © {new Date().getFullYear()} AURA Career Intelligence. All rights reserved.
+            © {new Date().getFullYear()} LUMEN Career Intelligence. All rights reserved.
           </div>
         </div>
       </footer>

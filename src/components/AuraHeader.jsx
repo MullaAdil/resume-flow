@@ -96,26 +96,28 @@ const AuraHeader = () => {
         {/* Brand */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', textDecoration: 'none' }}>
           <div style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--primary-light)',
-            border: '1px solid var(--primary-border)',
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--primary)',
-            boxShadow: '0 0 12px var(--primary-glow)'
+            color: '#FFFFFF',
+            fontWeight: 900,
+            fontSize: '1.05rem',
+            boxShadow: '0 4px 12px var(--primary-glow)',
+            letterSpacing: '-0.02em'
           }}>
-            <Sparkles size={18} strokeWidth={2.2} />
+            L
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.03em' }}>
+          <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.03em' }}>
             LUMEN <span style={{ color: 'var(--primary)', fontWeight: 600 }}>Studio</span>
           </div>
         </Link>
 
-        {/* Nav Pills */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+        {/* Nav Pills - Creative Equal Size Buttons */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           {navLinks.map((link) => {
             const isActive = location.pathname === link.path;
             return (
@@ -123,14 +125,35 @@ const AuraHeader = () => {
                 key={link.path}
                 to={link.path}
                 style={{
-                  padding: '0.45rem 0.85rem',
+                  width: '125px',
+                  height: '38px',
                   borderRadius: '9999px',
-                  fontSize: '0.875rem',
-                  fontWeight: isActive ? 700 : 500,
+                  fontSize: '0.85rem',
+                  fontWeight: isActive ? 700 : 600,
                   color: isActive ? 'var(--primary)' : 'var(--text-muted)',
                   backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
-                  border: isActive ? '1px solid var(--primary-border)' : '1px solid transparent',
-                  transition: 'all 0.15s ease'
+                  border: isActive ? '1.5px solid var(--primary-border)' : '1.5px solid transparent',
+                  boxShadow: isActive ? '0 2px 10px var(--primary-glow)' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                onMouseOver={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'var(--primary-light)';
+                    e.currentTarget.style.color = 'var(--primary)';
+                    e.currentTarget.style.borderColor = 'var(--primary-border)';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-muted)';
+                    e.currentTarget.style.borderColor = 'transparent';
+                  }
                 }}
               >
                 {link.label}
@@ -148,15 +171,18 @@ const AuraHeader = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '0.4rem',
-                padding: '0.45rem 0.75rem',
+                height: '38px',
+                padding: '0 0.85rem',
                 borderRadius: '9999px',
                 border: '1.5px solid var(--primary-border)',
                 backgroundColor: 'var(--primary-light)',
                 fontSize: '0.825rem',
                 fontWeight: 700,
                 color: 'var(--primary)',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
               }}
             >
               <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: activeThemeColor, display: 'inline-block' }} />
@@ -219,7 +245,8 @@ const AuraHeader = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  padding: '0.3rem 0.75rem 0.3rem 0.4rem',
+                  height: '38px',
+                  padding: '0 0.85rem 0 0.4rem',
                   borderRadius: '9999px',
                   border: '1.5px solid var(--primary-border)',
                   backgroundColor: 'var(--primary-light)',
@@ -330,7 +357,7 @@ const AuraHeader = () => {
                       onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-light)'}
                       onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      <Sparkles size={15} color="var(--primary)" />
+                      <FileText size={15} color="var(--primary)" />
                       <span>Open Resume Studio</span>
                     </button>
 
@@ -367,8 +394,10 @@ const AuraHeader = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '0.4rem',
-                padding: '0.45rem 0.9rem',
+                height: '38px',
+                padding: '0 0.9rem',
                 borderRadius: '9999px',
                 border: '1px solid var(--border-color)',
                 backgroundColor: '#FFFFFF',
@@ -395,14 +424,17 @@ const AuraHeader = () => {
           )}
 
           {/* Launch Studio CTA */}
-
           <button
             onClick={() => navigate('/builder')}
             className="aura-btn-primary"
             style={{
-              padding: '0.45rem 1.1rem',
+              height: '38px',
+              padding: '0 1.1rem',
               fontSize: '0.85rem',
-              borderRadius: '9999px'
+              borderRadius: '9999px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
             <span>Launch Studio</span>

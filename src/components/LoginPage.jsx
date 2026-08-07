@@ -173,7 +173,7 @@ const LoginPage = ({ initialMode = 'login' }) => {
                   marginBottom: '2rem',
                   boxShadow: '0 2px 10px var(--primary-glow)'
                 }}>
-                  <Sparkles size={16} />
+                  <ShieldCheck size={16} />
                   <span>LUMEN CAREER STUDIO</span>
                 </div>
 
