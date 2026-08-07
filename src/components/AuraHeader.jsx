@@ -47,6 +47,7 @@ const AuraHeader = () => {
     return localStorage.getItem('app-theme') || 'indigo';
   });
   const [isThemeOpen, setIsThemeOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleThemeChange = (themeId) => {
     setActiveTheme(themeId);
@@ -209,29 +210,157 @@ const AuraHeader = () => {
             )}
           </div>
 
-          {/* Login / Auth Button */}
+          {/* Creative Username Logo & Profile Dropdown */}
           {user ? (
-            <button
-              onClick={signOut}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                padding: '0.45rem 0.85rem',
-                borderRadius: '9999px',
-                border: '1px solid var(--border-color)',
-                backgroundColor: '#FFFFFF',
-                fontSize: '0.825rem',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
-              title={`Signed in as ${user.email}`}
-            >
-              <LogOut size={14} />
-              <span>Sign Out</span>
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.3rem 0.75rem 0.3rem 0.4rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid var(--primary-border)',
+                  backgroundColor: 'var(--primary-light)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: isUserMenuOpen ? '0 0 0 3px var(--primary-glow)' : '0 2px 8px var(--primary-glow)'
+                }}
+              >
+                {/* Initial Avatar Sphere with Glow */}
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%)',
+                  color: '#FFFFFF',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px var(--primary-glow)',
+                  textTransform: 'uppercase'
+                }}>
+                  {(user?.name || user?.email || 'U').charAt(0)}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <span style={{
+                    fontSize: '0.825rem',
+                    fontWeight: 700,
+                    color: 'var(--primary)',
+                    maxWidth: '120px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {user?.name || user?.email?.split('@')[0] || 'Member'}
+                  </span>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
+                </div>
+              </button>
+
+              {/* User Dropdown Menu */}
+              {isUserMenuOpen && (
+                <div style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: '130%',
+                  backgroundColor: '#FFFFFF',
+                  border: '1.5px solid var(--primary-border)',
+                  borderRadius: '18px',
+                  boxShadow: '0 16px 40px rgba(15, 23, 42, 0.15)',
+                  padding: '0.85rem',
+                  minWidth: '240px',
+                  zIndex: 250
+                }}>
+                  {/* Account Summary Pill */}
+                  <div style={{
+                    padding: '0.75rem',
+                    borderRadius: '12px',
+                    backgroundColor: 'var(--primary-light)',
+                    marginBottom: '0.6rem',
+                    border: '1px solid var(--primary-border)'
+                  }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {user?.name || user?.email?.split('@')[0]}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {user?.email}
+                    </div>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                      marginTop: '0.4rem',
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      color: '#065F46',
+                      backgroundColor: '#ECFDF5',
+                      padding: '0.2rem 0.5rem',
+                      borderRadius: '9999px',
+                      border: '1px solid #A7F3D0'
+                    }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+                      <span>Studio Member</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <button
+                      onClick={() => { setIsUserMenuOpen(false); navigate('/builder'); }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 0.65rem',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: 'var(--text-main)',
+                        fontSize: '0.825rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-light)'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <Sparkles size={15} color="var(--primary)" />
+                      <span>Open Resume Studio</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setIsUserMenuOpen(false); signOut(); }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 0.65rem',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: '#EF4444',
+                        fontSize: '0.825rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#FEF2F2'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <LogOut size={15} />
+                      <span>Sign Out Account</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <button
               onClick={() => navigate('/login')}

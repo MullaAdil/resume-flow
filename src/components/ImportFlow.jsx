@@ -23,7 +23,7 @@ const ImportFlow = () => {
     try {
       const success = await processRealFile(file);
       if (success) {
-        navigate('/templates', { state: { skipPathSelection: true } });
+        navigate('/builder');
       } else {
         alert("Extraction failed.");
         setIsProcessing(false);

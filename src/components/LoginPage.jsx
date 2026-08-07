@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuraHeader from './AuraHeader';
-import { Sparkles, Mail, Lock, ArrowRight, CheckCircle, AlertCircle, ShieldCheck, Zap, BarChart3, Layers } from 'lucide-react';
+import { Sparkles, Mail, Lock, ArrowRight, CheckCircle, AlertCircle, ShieldCheck, Zap, BarChart3, Layers, Eye, EyeOff, Check, X } from 'lucide-react';
 
 const LoginPage = ({ initialMode = 'login' }) => {
   const navigate = useNavigate();
@@ -14,9 +14,21 @@ const LoginPage = ({ initialMode = 'login' }) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const isJustSignedUpRef = useRef(false);
+
+  // Password constraints validation
+  const pwdConstraints = {
+    minChar: password.length >= 8,
+    hasUpper: /[A-Z]/.test(password),
+    hasLower: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  };
+  const isPasswordValid = Object.values(pwdConstraints).every(Boolean);
 
   useEffect(() => {
     setIsSignUp(location.pathname === '/signup' || initialMode === 'signup');
@@ -39,7 +51,7 @@ const LoginPage = ({ initialMode = 'login' }) => {
   }, [location.search, refreshUser, navigate]);
 
   useEffect(() => {
-    if (user && !location.search.includes('token=')) {
+    if (user && !location.search.includes('token=') && !isJustSignedUpRef.current) {
       navigate('/builder');
     }
   }, [user, navigate, location.search]);
@@ -54,13 +66,19 @@ const LoginPage = ({ initialMode = 'login' }) => {
       return;
     }
 
+    if (isSignUp && !isPasswordValid) {
+      setError('Please satisfy all password security requirements before signing up.');
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isSignUp) {
+        isJustSignedUpRef.current = true;
         await signUp(email, password);
-        setSuccessMsg('Account created successfully! Entering Studio...');
-        setTimeout(() => navigate('/builder'), 700);
+        setSuccessMsg('Account created successfully! Directing to Home...');
+        setTimeout(() => navigate('/'), 700);
       } else {
         await signInWithPassword(email, password);
         setSuccessMsg('Access granted! Entering Studio...');
@@ -301,16 +319,75 @@ const LoginPage = ({ initialMode = 'login' }) => {
                   <label className="aura-label">Password</label>
                   <div style={{ position: 'relative' }}>
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       className="aura-input"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      style={{ paddingLeft: '2.5rem', height: '50px' }}
+                      style={{ paddingLeft: '2.5rem', paddingRight: '2.75rem', height: '50px' }}
                     />
                     <Lock size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '16px' }} />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '12px',
+                        background: 'none',
+                        border: 'none',
+                        padding: '6px',
+                        cursor: 'pointer',
+                        color: 'var(--text-muted)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '6px'
+                      }}
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
+
+                  {/* Password Constraints Checklist for Sign Up */}
+                  {isSignUp && (
+                    <div style={{
+                      marginTop: '0.85rem',
+                      padding: '0.85rem 1rem',
+                      backgroundColor: 'var(--primary-light)',
+                      border: '1px solid var(--primary-border)',
+                      borderRadius: '12px',
+                      fontSize: '0.8rem'
+                    }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
+                        Password Requirements:
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem 0.75rem', color: 'var(--text-muted)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.minChar ? '#059669' : 'var(--text-muted)' }}>
+                          {pwdConstraints.minChar ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
+                          <span>At least 8 characters</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.hasUpper ? '#059669' : 'var(--text-muted)' }}>
+                          {pwdConstraints.hasUpper ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
+                          <span>One uppercase letter (A-Z)</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.hasLower ? '#059669' : 'var(--text-muted)' }}>
+                          {pwdConstraints.hasLower ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
+                          <span>One lowercase letter (a-z)</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.hasNumber ? '#059669' : 'var(--text-muted)' }}>
+                          {pwdConstraints.hasNumber ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
+                          <span>One number (0-9)</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', gridColumn: 'span 2', color: pwdConstraints.hasSpecial ? '#059669' : 'var(--text-muted)' }}>
+                          {pwdConstraints.hasSpecial ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
+                          <span>One special character (!@#$%^&*)</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Submit CTA */}
