@@ -18,17 +18,7 @@ const LoginPage = ({ initialMode = 'login' }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const isJustSignedUpRef = useRef(false);
-
-  // Password constraints validation
-  const pwdConstraints = {
-    minChar: password.length >= 8,
-    hasUpper: /[A-Z]/.test(password),
-    hasLower: /[a-z]/.test(password),
-    hasNumber: /[0-9]/.test(password),
-    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
-  const isPasswordValid = Object.values(pwdConstraints).every(Boolean);
+  const isAuthActionRef = useRef(false);
 
   useEffect(() => {
     setIsSignUp(location.pathname === '/signup' || initialMode === 'signup');
@@ -42,17 +32,17 @@ const LoginPage = ({ initialMode = 'login' }) => {
 
     if (oauthToken) {
       localStorage.setItem('auth_token', oauthToken);
-      setSuccessMsg('Google / OAuth authentication successful! Entering Studio...');
+      setSuccessMsg('Google / OAuth authentication successful! Entering Home Page...');
       if (refreshUser) refreshUser();
-      setTimeout(() => navigate('/builder'), 600);
+      setTimeout(() => navigate('/'), 600);
     } else if (oauthError) {
       setError(decodeURIComponent(oauthError));
     }
   }, [location.search, refreshUser, navigate]);
 
   useEffect(() => {
-    if (user && !location.search.includes('token=') && !isJustSignedUpRef.current) {
-      navigate('/builder');
+    if (user && !location.search.includes('token=') && !isAuthActionRef.current) {
+      navigate('/');
     }
   }, [user, navigate, location.search]);
 
@@ -66,23 +56,23 @@ const LoginPage = ({ initialMode = 'login' }) => {
       return;
     }
 
-    if (isSignUp && !isPasswordValid) {
-      setError('Please satisfy all password security requirements before signing up.');
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
       return;
     }
 
     setLoading(true);
 
     try {
+      isAuthActionRef.current = true;
       if (isSignUp) {
-        isJustSignedUpRef.current = true;
         await signUp(email, password);
         setSuccessMsg('Account created successfully! Directing to Home...');
         setTimeout(() => navigate('/'), 700);
       } else {
         await signInWithPassword(email, password);
-        setSuccessMsg('Access granted! Entering Studio...');
-        setTimeout(() => navigate('/builder'), 700);
+        setSuccessMsg('Signed in successfully! Directing to Home...');
+        setTimeout(() => navigate('/'), 700);
       }
     } catch (err) {
       setError(err.message || 'Authentication failed. Please check your details.');
@@ -350,44 +340,6 @@ const LoginPage = ({ initialMode = 'login' }) => {
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-
-                  {/* Password Constraints Checklist for Sign Up */}
-                  {isSignUp && (
-                    <div style={{
-                      marginTop: '0.85rem',
-                      padding: '0.85rem 1rem',
-                      backgroundColor: 'var(--primary-light)',
-                      border: '1px solid var(--primary-border)',
-                      borderRadius: '12px',
-                      fontSize: '0.8rem'
-                    }}>
-                      <div style={{ fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
-                        Password Requirements:
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem 0.75rem', color: 'var(--text-muted)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.minChar ? '#059669' : 'var(--text-muted)' }}>
-                          {pwdConstraints.minChar ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
-                          <span>At least 8 characters</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.hasUpper ? '#059669' : 'var(--text-muted)' }}>
-                          {pwdConstraints.hasUpper ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
-                          <span>One uppercase letter (A-Z)</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.hasLower ? '#059669' : 'var(--text-muted)' }}>
-                          {pwdConstraints.hasLower ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
-                          <span>One lowercase letter (a-z)</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: pwdConstraints.hasNumber ? '#059669' : 'var(--text-muted)' }}>
-                          {pwdConstraints.hasNumber ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
-                          <span>One number (0-9)</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', gridColumn: 'span 2', color: pwdConstraints.hasSpecial ? '#059669' : 'var(--text-muted)' }}>
-                          {pwdConstraints.hasSpecial ? <Check size={14} strokeWidth={2.5} /> : <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--text-muted)', margin: '0 4px' }} />}
-                          <span>One special character (!@#$%^&*)</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Submit CTA */}
