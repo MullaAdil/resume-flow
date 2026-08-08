@@ -99,6 +99,13 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
       format: [800, actualHeight]
     });
 
+    // Set PDF document metadata so it doesn't show as "Untitled" in PDF readers
+    pdf.setProperties({
+      title: filename.replace(/\.pdf$/i, ''),
+      creator: 'LUMEN Resume Builder',
+      subject: 'Resume'
+    });
+
     pdf.addImage(imgData, 'JPEG', 0, 0, 800, actualHeight);
     pdf.save(filename);
   } catch (error) {

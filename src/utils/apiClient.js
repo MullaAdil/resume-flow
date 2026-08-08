@@ -4,8 +4,8 @@ if (API_BASE_URL && !API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsW
   API_BASE_URL = `https://${API_BASE_URL}`;
 }
 
-// Helper function to perform fetch requests with JWT token automatically attached
-async function request(url, options = {}) {
+// Helper function to perform fetch requests with JWT token automatically attached, timeout, and fallback
+async function request(url, options = {}, timeoutMs = 6000) {
   const token = localStorage.getItem(TOKEN_KEY);
   
   const headers = {
@@ -17,10 +17,40 @@ async function request(url, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${url}`, {
-    ...options,
-    headers,
-  });
+  const fetchWithTimeout = async (targetUrl) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(targetUrl, {
+        ...options,
+        headers,
+        signal: controller.signal,
+      });
+      return res;
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  let response;
+  const primaryUrl = `${API_BASE_URL}${url}`;
+
+  try {
+    response = await fetchWithTimeout(primaryUrl);
+  } catch (err) {
+    // If primary URL failed (e.g., connection timed out or unreachable host) and API_BASE_URL was set,
+    // attempt fallback to relative URL (which uses Vite dev proxy or current domain origin)
+    if (API_BASE_URL) {
+      console.warn(`Primary API endpoint ${primaryUrl} failed (${err.message}). Trying fallback relative path...`);
+      try {
+        response = await fetchWithTimeout(url);
+      } catch (fallbackErr) {
+        throw new Error(`API request to ${url} failed: ${err.message}`);
+      }
+    } else {
+      throw new Error(`API request to ${url} failed: ${err.message}`);
+    }
+  }
 
   const data = await response.json().catch(() => ({}));
 

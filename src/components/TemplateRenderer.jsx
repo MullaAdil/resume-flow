@@ -207,6 +207,19 @@ const TemplateRenderer = ({ templateId, resumeData, isPreview = false }) => {
   const fallbackCertifications = isPreview ? [] : (isAslam ? (aslamDummyData.certifications || []) : dummyData.certifications);
   const fallbackLanguages = isPreview ? [] : (isAslam ? (aslamDummyData.languages || []) : dummyData.languages);
 
+  const activeSettings = {
+    showSummary: true,
+    showExperience: true,
+    showEducation: true,
+    showProjects: true,
+    showSkills: true,
+    showCertifications: true,
+    showLanguages: true,
+    showCustomSections: true,
+    ...dummyData.settings,
+    ...resumeData?.settings
+  };
+
   const mergedData = {
     ...resumeData,
     personalInfo: {
@@ -221,35 +234,49 @@ const TemplateRenderer = ({ templateId, resumeData, isPreview = false }) => {
       github: p.github || d.github || '',
       website: p.website || d.website || '',
       portfolio: p.portfolio || d.portfolio || '',
-      summary: p.summary || d.summary || '',
+      summary: (activeSettings.showSummary !== false) ? (p.summary || d.summary || '') : '',
       address: p.address || d.address || '',
       city: p.city || d.city || '',
       country: p.country || d.country || '',
     },
-    experience: (hasUserExperience ? resumeData.experience : fallbackExperience).map(exp => ({
-      ...exp,
-      title: exp.title || exp.jobTitle || '',
-      jobTitle: exp.jobTitle || exp.title || '',
-      school: exp.school || exp.institution || '',
-      institution: exp.institution || exp.school || '',
-      date: (exp.startDate || exp.endDate) ? `${exp.startDate || ''} - ${exp.endDate || ''}`.replace(/^ - | - $/g, '') : exp.date || '',
-    })),
-    education: (hasUserEducation ? resumeData.education : fallbackEducation).map(edu => ({
-      ...edu,
-      school: edu.school || edu.institution || '',
-      institution: edu.institution || edu.school || '',
-      date: (edu.startDate || edu.endDate) ? `${edu.startDate || ''} - ${edu.endDate || ''}`.replace(/^ - | - $/g, '') : edu.date || '',
-    })),
-    projects: hasUserProjects ? resumeData.projects : fallbackProjects,
-    skills: isAslam
-      ? (hasUserSkills ? aslamUserSkills : dummySkills)
-      : (templateId === 'boxedmodern' || templateId === 'letscode')
-        ? (hasUserSkills ? userSkills : dummySkills)
-        : (hasUserSkills ? userSkills.map(s => typeof s === 'object' ? s.name : s) : dummySkills.map(s => typeof s === 'object' ? s.name : s)),
-    certifications: hasUserCertifications ? resumeData.certifications : fallbackCertifications,
-    languages: hasUserLanguages ? resumeData.languages : fallbackLanguages,
-    customSections: resumeData?.customSections || [],
-    settings: resumeData?.settings || dummyData.settings || {}
+    experience: (activeSettings.showExperience !== false)
+      ? (hasUserExperience ? resumeData.experience : fallbackExperience).map(exp => ({
+        ...exp,
+        title: exp.title || exp.jobTitle || '',
+        jobTitle: exp.jobTitle || exp.title || '',
+        school: exp.school || exp.institution || '',
+        institution: exp.institution || exp.school || '',
+        date: (exp.startDate || exp.endDate) ? `${exp.startDate || ''} - ${exp.endDate || ''}`.replace(/^ - | - $/g, '') : exp.date || '',
+      }))
+      : [],
+    education: (activeSettings.showEducation !== false)
+      ? (hasUserEducation ? resumeData.education : fallbackEducation).map(edu => ({
+        ...edu,
+        school: edu.school || edu.institution || '',
+        institution: edu.institution || edu.school || '',
+        date: (edu.startDate || edu.endDate) ? `${edu.startDate || ''} - ${edu.endDate || ''}`.replace(/^ - | - $/g, '') : edu.date || '',
+      }))
+      : [],
+    projects: (activeSettings.showProjects !== false)
+      ? (hasUserProjects ? resumeData.projects : fallbackProjects)
+      : [],
+    skills: (activeSettings.showSkills !== false)
+      ? (isAslam
+        ? (hasUserSkills ? aslamUserSkills : dummySkills)
+        : (templateId === 'boxedmodern' || templateId === 'letscode')
+          ? (hasUserSkills ? userSkills : dummySkills)
+          : (hasUserSkills ? userSkills.map(s => typeof s === 'object' ? s.name : s) : dummySkills.map(s => typeof s === 'object' ? s.name : s)))
+      : [],
+    certifications: (activeSettings.showCertifications !== false)
+      ? (hasUserCertifications ? resumeData.certifications : fallbackCertifications)
+      : [],
+    languages: (activeSettings.showLanguages !== false)
+      ? (hasUserLanguages ? resumeData.languages : fallbackLanguages)
+      : [],
+    customSections: (activeSettings.showCustomSections !== false)
+      ? (resumeData?.customSections || [])
+      : [],
+    settings: activeSettings
   };
 
   // Choose the template component
@@ -274,35 +301,44 @@ const TemplateRenderer = ({ templateId, resumeData, isPreview = false }) => {
     default: TemplateComponent = MultiColorTemplate; break;
   }
 
-  const renderCustomSections = (sections = [], settings = {}) => {
-    if (settings.showCustomSections === false) return null;
-    if (!sections || sections.length === 0) return null;
-    const filtered = sections.filter(s => s && s.title);
-    if (filtered.length === 0) return null;
-
-    const primary = mergedData.settings?.primaryColor || '#1e40af';
-
-    return (
-      <div style={{ marginTop: '1.25rem' }}>
-        {filtered.map((sec, idx) => (
-          <div key={sec.id || idx} style={{ marginBottom: '0.8rem' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: primary, borderBottom: '1px solid #cbd5e1', paddingBottom: '0.2rem', marginBottom: '0.6rem' }}>{sec.title}</h3>
-            {sec.description && (
-              <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
-                {sec.description.split('\n').map((line, i) => (
-                  line.trim().length > 0 ? <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.3rem' }}><span style={{ color: primary }}>•</span> <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span></div> : null
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
+  const fontFamilyMap = {
+    'Inter': "'Inter', system-ui, -apple-system, sans-serif",
+    'Plus Jakarta Sans': "'Plus Jakarta Sans', system-ui, sans-serif",
+    'Outfit': "'Outfit', system-ui, sans-serif",
+    'Geist': "'Geist', monospace, sans-serif",
+    'Roboto': "'Roboto', sans-serif",
+    'Merriweather': "'Merriweather', Georgia, serif",
+    'Playfair Display': "'Playfair Display', Georgia, serif"
   };
 
-  // Render the template component with the merged data; templates
-  // should include `SupplementalSections` to display extras inside themselves.
-  return <TemplateComponent resumeData={mergedData} />;
+  const selectedFont = fontFamilyMap[activeSettings.fontFamily] || activeSettings.fontFamily || "'Inter', sans-serif";
+
+  const fontSizeMap = {
+    'Small': '13px',
+    'Medium': '15px',
+    'Large': '17px'
+  };
+  const selectedFontSize = fontSizeMap[activeSettings.fontSize] || '15px';
+
+  const selectedLineHeight = activeSettings.lineSpacing || '1.5';
+
+  return (
+    <div
+      className="customized-resume-wrapper"
+      style={{
+        fontFamily: selectedFont,
+        fontSize: selectedFontSize,
+        lineHeight: selectedLineHeight,
+        '--resume-font-family': selectedFont,
+        '--resume-line-spacing': selectedLineHeight,
+        '--primary-color': activeSettings.primaryColor || '#1e40af',
+        '--primary': activeSettings.primaryColor || '#1e40af',
+        '--secondary-color': activeSettings.secondaryColor || '#4f46e5'
+      }}
+    >
+      <TemplateComponent resumeData={mergedData} />
+    </div>
+  );
 };
 
 export default TemplateRenderer;

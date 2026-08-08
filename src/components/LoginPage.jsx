@@ -173,34 +173,19 @@ const LoginPage = ({ initialMode = 'login' }) => {
 
                 {/* Feature Bullet Stack */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#FFFFFF', border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', flexShrink: 0 }}>
-                      <ShieldCheck size={18} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>100% ATS Optimized</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Scannable by Workday, Greenhouse & Lever</div>
-                    </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>100% ATS Optimized</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Scannable by Workday, Greenhouse & Lever</div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#FFFFFF', border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', flexShrink: 0 }}>
-                      <Zap size={18} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>Executive Resume Writer</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Generate impact metrics & role descriptions</div>
-                    </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>Executive Resume Writer</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Generate impact metrics & role descriptions</div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#FFFFFF', border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', flexShrink: 0 }}>
-                      <BarChart3 size={18} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>Live Benchmark Score</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Audit content against 10,000+ top resumes</div>
-                    </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>Live Benchmark Score</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Audit content against 10,000+ top resumes</div>
                   </div>
                 </div>
               </div>
@@ -212,12 +197,8 @@ const LoginPage = ({ initialMode = 'login' }) => {
                 borderRadius: '14px',
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 border: '1px solid var(--primary-border)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.85rem'
+                backdropFilter: 'blur(8px)'
               }}>
-                <div style={{ fontSize: '1.4rem' }}>🌟</div>
                 <div>
                   <div style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-main)' }}>"Landed 4 interviews in 1 week"</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Verified Senior Software Engineer</div>

@@ -8,9 +8,9 @@ import { useAuth } from '../context/AuthContext';
 import AuraHeader from './AuraHeader';
 import { apiClient } from '../utils/apiClient';
 import { 
-  ArrowRight, Palette, CheckCircle, Zap, FileText, ChevronRight, 
-  Layout, ShieldCheck, Download, Award, Layers, Heart, Edit3, RotateCcw,
-  Database, Clock, HardDrive, History
+  ArrowRight, CheckCircle, Zap, FileText, ChevronRight, 
+  Layout, Download, Award, Layers, Heart, Edit3, RotateCcw,
+  Clock, History
 } from 'lucide-react';
 
 // ── Ultra-Clean Hero Interactive Sandbox ──
@@ -209,7 +209,6 @@ export default function LandingPage() {
               {/* Left Column */}
               <div>
                 <div className="aura-badge" style={{ marginBottom: '1.25rem' }}>
-                  <Zap size={15} />
                   <span>EXECUTIVE CAREER ENGINE</span>
                 </div>
 
@@ -292,51 +291,11 @@ export default function LandingPage() {
           <section style={{ padding: '4.5rem 0', backgroundColor: 'transparent', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative' }}>
             <div className="aura-container">
               
-              {/* Section Header with Theme & Database Status Pills */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
-                <div>
-                  <div className="aura-badge" style={{ marginBottom: '0.6rem' }}>
-                    <Database size={15} />
-                    <span>DATABASE SECURED & THEME SYNCED</span>
-                  </div>
-                  <h2 style={{ fontSize: '2.3rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.03em' }}>
-                    Career Assets & Activity Studio
-                  </h2>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                    padding: '0.45rem 0.9rem',
-                    borderRadius: '9999px',
-                    backgroundColor: 'var(--primary-light)',
-                    border: '1.5px solid var(--primary-border)',
-                    color: 'var(--primary)',
-                    fontSize: '0.825rem',
-                    fontWeight: 700
-                  }}>
-                    <Palette size={14} />
-                    <span>Active Theme Synced</span>
-                  </div>
-
-                  <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                    padding: '0.45rem 0.9rem',
-                    borderRadius: '9999px',
-                    backgroundColor: '#ECFDF5',
-                    border: '1px solid #A7F3D0',
-                    color: '#065F46',
-                    fontSize: '0.825rem',
-                    fontWeight: 700
-                  }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981' }} />
-                    <span>MongoDB Database Connected</span>
-                  </div>
-                </div>
+              {/* Section Header */}
+              <div style={{ marginBottom: '2.5rem' }}>
+                <h2 style={{ fontSize: '2.3rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.03em' }}>
+                  Career Assets & Activity Studio
+                </h2>
               </div>
 
               {/* Wide 2-Column Multi-Paper Grid */}
@@ -403,23 +362,12 @@ export default function LandingPage() {
                     }} />
 
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                        <span style={{
-                          fontSize: '0.775rem',
-                          fontWeight: 800,
-                          letterSpacing: '0.06em',
-                          color: 'var(--primary)',
-                          textTransform: 'uppercase',
-                          backgroundColor: 'var(--primary-light)',
-                          padding: '0.35rem 0.85rem',
-                          borderRadius: '9999px',
-                          border: '1px solid var(--primary-border)'
-                        }}>
-                          ACTIVE RESUME DRAFT
-                        </span>
-                        <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                          {user ? `User: ${user.email}` : 'Local Draft Synced'}
-                        </span>
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        {user && (
+                          <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                            {user.email}
+                          </span>
+                        )}
                       </div>
 
                       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: '1.75rem' }}>
@@ -448,12 +396,30 @@ export default function LandingPage() {
 
                         {/* Resume Metadata */}
                         <div style={{ flex: 1, minWidth: '180px' }}>
-                          <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.4rem 0' }}>
-                            {resumeData?.personalInfo?.fullName || 'Untitled Resume Draft'}
-                          </h3>
-                          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0 0 1rem 0', fontWeight: 600 }}>
-                            {resumeData?.personalInfo?.jobTitle || 'Executive Professional'}
-                          </p>
+                          {resumeData?.personalInfo?.fullName ? (
+                            <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.4rem 0' }}>
+                              {resumeData.personalInfo.fullName}
+                            </h3>
+                          ) : (
+                            <div style={{ marginBottom: '0.6rem' }}>
+                              <button
+                                onClick={() => navigate('/builder')}
+                                style={{
+                                  background: 'none', border: 'none', padding: 0,
+                                  fontSize: '0.9rem', fontWeight: 700,
+                                  color: 'var(--primary)', cursor: 'pointer',
+                                  textDecoration: 'underline', textUnderlineOffset: '3px'
+                                }}
+                              >
+                                + Add your name in the builder →
+                              </button>
+                            </div>
+                          )}
+                          {resumeData?.personalInfo?.jobTitle && (
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0 0 1rem 0', fontWeight: 600 }}>
+                              {resumeData.personalInfo.jobTitle}
+                            </p>
+                          )}
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', fontSize: '0.825rem', color: 'var(--text-muted)' }}>
                             <div>🎨 Active Template: <strong style={{ color: 'var(--primary)', textTransform: 'capitalize' }}>{selectedTemplate}</strong></div>
@@ -477,10 +443,8 @@ export default function LandingPage() {
 
                       <button
                         onClick={() => {
-                          if (window.confirm('Start a fresh blank resume? Your current progress will be reset.')) {
-                            resetResume();
-                            navigate('/choose');
-                          }
+                          resetResume();
+                          navigate('/choose');
                         }}
                         className="aura-btn-secondary"
                         style={{ padding: '0.8rem 1.1rem', fontSize: '0.925rem', borderRadius: '12px' }}
@@ -535,18 +499,13 @@ export default function LandingPage() {
                     boxShadow: 'var(--shadow-md)'
                   }}>
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                          <div style={{ width: '34px', height: '34px', borderRadius: '10px', backgroundColor: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <History size={18} />
-                          </div>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
-                            Download & Activity Vault
-                          </h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
+                        <div style={{ width: '34px', height: '34px', borderRadius: '10px', backgroundColor: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <History size={18} />
                         </div>
-                        <span style={{ fontSize: '0.775rem', fontWeight: 700, color: 'var(--primary)', backgroundColor: 'var(--primary-light)', border: '1px solid var(--primary-border)', padding: '0.25rem 0.75rem', borderRadius: '9999px' }}>
-                          DB Logged ({activities.length})
-                        </span>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                          Download & Activity Vault
+                        </h3>
                       </div>
 
                       {/* Timeline Log List */}
@@ -580,7 +539,7 @@ export default function LandingPage() {
                                 </div>
                                 <div>
                                   <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                                    {act.type === 'pdf_download' ? 'PDF Export Generated' : 'Resume Saved to Cloud'}
+                                    {act.type === 'pdf_download' ? 'PDF Export Generated' : 'Resume Draft Saved'}
                                   </div>
                                   <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
                                     {act.resumeName || 'Executive Resume'} • Template: {act.templateId || selectedTemplate}
@@ -602,21 +561,16 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    {/* Bottom Stats Footer Bar */}
+                    {/* Bottom Footer Bar */}
                     <div style={{
                       marginTop: '1.5rem',
                       paddingTop: '1rem',
                       borderTop: '1px solid var(--border-color)',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      fontSize: '0.825rem',
-                      color: 'var(--text-muted)'
+                      justifyContent: 'flex-end',
+                      fontSize: '0.825rem'
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <HardDrive size={15} color="var(--primary)" />
-                        <span>Saved to MongoDB Account</span>
-                      </div>
                       <button
                         onClick={() => navigate('/builder')}
                         style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', padding: 0 }}

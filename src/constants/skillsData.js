@@ -189,6 +189,11 @@ export const WORLDWIDE_JOB_ROLES = [
 // Mapping of job roles to recommended skills
 export const ROLE_SUGGESTIONS = [
   {
+    role: "Software Engineer",
+    keywords: ["software engineer", "software developer", "software", "engineer", "developer", "coder", "programmer", "tech lead", "technical lead", "engineering manager", "lead engineer"],
+    techs: ["JavaScript", "TypeScript", "Python", "Java", "React", "Node.js", "Docker", "REST API", "Git", "SQL", "PostgreSQL", "System Design"]
+  },
+  {
     role: "Frontend Engineer",
     keywords: ["front", "ui", "react", "angular", "vue", "frontend", "web developer", "website"],
     techs: ["React", "TypeScript", "JavaScript", "Next.js", "Tailwind CSS", "HTML5", "CSS3", "Redux", "Figma", "Vite"]
@@ -224,13 +229,23 @@ export const ROLE_SUGGESTIONS = [
     techs: ["Docker", "Kubernetes", "Amazon Web Services (AWS)", "Terraform", "GitHub Actions", "Linux", "Bash", "Jenkins", "Ansible", "Prometheus"]
   },
   {
+    role: "Cloud Architect",
+    keywords: ["cloud architect", "solution architect", "solutions architect", "architect", "aws architect", "azure architect"],
+    techs: ["Amazon Web Services (AWS)", "Google Cloud", "Microsoft Azure", "Terraform", "Docker", "Kubernetes", "Microservices", "System Design", "Security"]
+  },
+  {
+    role: "QA / Test Automation Engineer",
+    keywords: ["qa", "quality assurance", "test", "tester", "automation engineer", "qa engineer"],
+    techs: ["Selenium", "Cypress", "Playwright", "Postman", "JUnit", "Python", "JavaScript", "Jira", "CI/CD", "Git"]
+  },
+  {
     role: "Mobile App Developer",
     keywords: ["mobile", "ios", "android", "react native", "flutter", "swift", "kotlin"],
     techs: ["React Native", "Flutter", "Swift", "Kotlin", "TypeScript", "Dart", "Xcode", "Android Studio", "Firebase"]
   },
   {
     role: "UI/UX Designer",
-    keywords: ["design", "ui/ux", "ux", "designer", "product designer"],
+    keywords: ["design", "ui/ux", "ux", "designer", "product designer", "graphic designer"],
     techs: ["Figma", "Sketch", "Adobe XD", "Photoshop", "Illustrator", "UI/UX Design", "Wireframing", "Prototyping", "User Research"]
   },
   {
@@ -247,6 +262,11 @@ export const ROLE_SUGGESTIONS = [
     role: "Database Administrator (DBA)",
     keywords: ["dba", "database admin", "database administrator"],
     techs: ["PostgreSQL", "MySQL", "Oracle", "Microsoft SQL Server", "SQL", "Database Design", "Performance Tuning", "Linux"]
+  },
+  {
+    role: "Marketing / Sales / Business",
+    keywords: ["marketing", "sales", "business development", "hr", "recruiter", "content writer"],
+    techs: ["SEO", "Google Analytics", "CRM", "Salesforce", "Content Strategy", "Communication", "Leadership", "Social Media Marketing"]
   }
 ];
 
@@ -257,13 +277,31 @@ export const ROLE_SUGGESTIONS = [
  */
 export const getTechsForRole = (jobTitle) => {
   if (!jobTitle || typeof jobTitle !== 'string') return [];
-  const normalized = jobTitle.toLowerCase();
+  const normalized = jobTitle.trim().toLowerCase();
+  if (!normalized) return [];
+
   const matched = new Set();
   
+  // 1. Direct role & keyword matching
   for (const group of ROLE_SUGGESTIONS) {
     if (normalized.includes(group.role.toLowerCase()) || group.keywords.some(keyword => normalized.includes(keyword))) {
       group.techs.forEach(tech => matched.add(tech));
     }
+  }
+
+  // 2. Tokenized word matching for title words (e.g., "Senior Software Engineer")
+  if (matched.size === 0) {
+    const words = normalized.split(/\s+/);
+    for (const group of ROLE_SUGGESTIONS) {
+      if (group.keywords.some(kw => words.some(w => w.length > 2 && kw.includes(w)))) {
+        group.techs.forEach(tech => matched.add(tech));
+      }
+    }
+  }
+
+  // 3. General tech fallback if still empty
+  if (matched.size === 0) {
+    ["JavaScript", "TypeScript", "Python", "React", "Node.js", "Docker", "REST API", "SQL", "Git", "Agile Methodologies"].forEach(t => matched.add(t));
   }
   
   return Array.from(matched);

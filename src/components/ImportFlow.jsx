@@ -10,6 +10,7 @@ const ImportFlow = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const [errorMsg, setErrorMsg] = useState('');
   
   const handleFileChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -20,16 +21,17 @@ const ImportFlow = () => {
 
   const startProcessing = async (file) => {
     setIsProcessing(true);
+    setErrorMsg('');
     try {
       const success = await processRealFile(file);
       if (success) {
         navigate('/builder');
       } else {
-        alert("Extraction failed.");
+        setErrorMsg("Extraction failed. Please try a different file.");
         setIsProcessing(false);
       }
     } catch (err) {
-      alert("Error during extraction.");
+      setErrorMsg("Error during extraction. Please try again.");
       setIsProcessing(false);
     }
   };
@@ -57,9 +59,15 @@ const ImportFlow = () => {
               <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.5rem' }}>
                 Import Your Existing Resume
               </h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: 1.5 }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>
                 Upload your PDF or Word document (.pdf, .docx). Our smart parser will extract your experience, education, and skills instantly.
               </p>
+
+              {errorMsg && (
+                <div style={{ color: '#DC2626', fontSize: '0.875rem', fontWeight: 600, marginBottom: '1.25rem' }}>
+                  * {errorMsg}
+                </div>
+              )}
 
               <div 
                 onClick={triggerFileInput}

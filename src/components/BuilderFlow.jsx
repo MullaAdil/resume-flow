@@ -109,13 +109,8 @@ const ACCENT_COLOR_PRESETS = [
   { id: 'obsidian', name: 'Obsidian Slate', primary: '#0F172A', hover: '#020617', light: '#F8FAFC', border: '#CBD5E1', glow: 'rgba(15,23,42,0.25)' },
 ];
 
-const ACCENT_STYLE_PRESETS = [
-  { id: 'solid', name: 'Solid Minimal' },
-  { id: 'gradient', name: 'Modern Gradient' },
-  { id: 'soft', name: 'Soft Glass Tint' },
-  { id: 'outline', name: 'Clean Outline' },
-  { id: 'minimal', name: 'Architectural Slate' },
-];
+
+
 
 const BuilderFlow = () => {
   const navigate = useNavigate();
@@ -397,16 +392,23 @@ const BuilderFlow = () => {
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   const handleOpenDownloadModal = () => {
-    const defaultTitle = resumeData?.personalInfo?.fullName
-      ? `${resumeData.personalInfo.fullName.trim()}'s Resume`
-      : 'Executive Resume Draft';
+    const name = resumeData?.personalInfo?.fullName?.trim();
+    const jobTitle = resumeData?.personalInfo?.jobTitle?.trim();
+    let defaultTitle;
+    if (name && jobTitle) {
+      defaultTitle = `${name} - ${jobTitle} Resume`;
+    } else if (name) {
+      defaultTitle = `${name} - Resume`;
+    } else {
+      defaultTitle = 'My Resume';
+    }
     setDownloadDraftTitle(defaultTitle);
     setShowDownloadModal(true);
   };
 
   const handleConfirmDownloadPDF = async (e) => {
     if (e) e.preventDefault();
-    const finalTitle = downloadDraftTitle.trim() || 'My Resume Draft';
+    const finalTitle = downloadDraftTitle.trim() || 'My Resume';
     setIsDownloadingPDF(true);
 
     try {
@@ -952,25 +954,22 @@ const BuilderFlow = () => {
             <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {personalValidationError && (
                 <div style={{
-                  background: '#FEF2F2',
-                  border: '1.5px solid #FCA5A5',
-                  color: '#9F1239',
-                  padding: '0.85rem 1.15rem',
-                  borderRadius: '12px',
-                  fontSize: '0.9rem',
-                  fontWeight: 700,
+                  color: '#DC2626',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem'
+                  gap: '0.35rem',
+                  padding: '0.2rem 0'
                 }}>
-                  <span style={{ fontSize: '1.1rem' }}>⚠️</span>
+                  <span style={{ fontSize: '0.95rem' }}>*</span>
                   <span>{personalValidationError}</span>
                 </div>
               )}
 
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Full Name <span style={{ color: '#EF4444', fontWeight: 800 }}>* Mandatory</span></label>
+                  <label style={labelStyle}>Full Name <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
                   <div style={{ position: 'relative' }}>
                     <input 
                       style={{ 
@@ -991,7 +990,7 @@ const BuilderFlow = () => {
                   </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', position: 'relative' }} ref={jobRoleDropdownRef}>
-                  <label style={labelStyle}>Job Title <span style={{ color: '#EF4444', fontWeight: 800 }}>* Mandatory</span></label>
+                  <label style={labelStyle}>Job Title <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
                   <input 
                     style={{
                       ...inputStyle,
@@ -1004,11 +1003,6 @@ const BuilderFlow = () => {
                       const newRole = e.target.value;
                       updatePersonalInfo('jobTitle', newRole);
                       if (newRole) setPersonalValidationError('');
-                      const exactMatch = WORLDWIDE_JOB_ROLES.find(r => r.toLowerCase() === newRole.toLowerCase());
-                      if (exactMatch) {
-                        const suggested = getTechsForRole(exactMatch);
-                        suggested.forEach(tech => handleAddRoleSkill(tech));
-                      }
                     }} 
                   />
                   
@@ -1038,8 +1032,7 @@ const BuilderFlow = () => {
                           onClick={() => {
                             updatePersonalInfo('jobTitle', role);
                             setShowJobRoleDropdown(false);
-                            const suggested = getTechsForRole(role);
-                            suggested.forEach(tech => handleAddRoleSkill(tech));
+                            if (role) setPersonalValidationError('');
                           }}
                           style={{
                             padding: '0.65rem 1rem',
@@ -1071,42 +1064,61 @@ const BuilderFlow = () => {
                   {(() => {
                     const suggestedSkills = getTechsForRole(resumeData.personalInfo.jobTitle);
                     if (suggestedSkills.length === 0) return null;
+                    const unaddedSkills = suggestedSkills.filter(tech => {
+                      return !Object.values(resumeData.skills || {}).some(arr => 
+                        (arr || []).some(s => (typeof s === 'object' ? s.name : s).toLowerCase() === tech.toLowerCase())
+                      );
+                    });
+                    if (unaddedSkills.length === 0) return null;
                     return (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginTop: '0.25rem' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                          <CheckCircle size={12} style={{ color: '#059669' }} /> Recommend Skills:
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginTop: '0.35rem' }}>
+                        <span style={{ fontSize: '0.825rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}>
+                          <CheckCircle size={13} style={{ color: '#059669' }} /> Recommend Skills:
                         </span>
-                        {suggestedSkills.map(tech => {
-                          const isAlreadyAdded = Object.values(resumeData.skills || {}).some(arr => 
-                            (arr || []).some(s => (typeof s === 'object' ? s.name : s).toLowerCase() === tech.toLowerCase())
-                          );
-                          if (isAlreadyAdded) return null;
-                          return (
-                            <button
-                              key={tech}
-                              type="button"
-                              onClick={() => handleAddRoleSkill(tech)}
-                              style={{
-                                background: 'rgba(5, 150, 105, 0.05)',
-                                border: '1.5px solid rgba(5, 150, 105, 0.2)',
-                                borderRadius: '12px',
-                                padding: '2px 8px',
-                                fontSize: '0.8rem',
-                                color: '#059669',
-                                cursor: 'pointer',
-                                fontWeight: 600,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '3px',
-                                transition: 'all 0.15s ease'
-                              }}
-                              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.12)'; e.currentTarget.style.borderColor = '#059669'; }}
-                              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.05)'; e.currentTarget.style.borderColor = 'rgba(5, 150, 105, 0.2)'; }}
-                            >
-                              + {tech}
-                            </button>
-                          );
-                        })}
+                        {unaddedSkills.map(tech => (
+                          <button
+                            key={tech}
+                            type="button"
+                            onClick={() => handleAddRoleSkill(tech)}
+                            style={{
+                              background: 'rgba(5, 150, 105, 0.06)',
+                              border: '1.5px solid rgba(5, 150, 105, 0.25)',
+                              borderRadius: '12px',
+                              padding: '3px 10px',
+                              fontSize: '0.8rem',
+                              color: '#059669',
+                              cursor: 'pointer',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '3px',
+                              transition: 'all 0.15s ease'
+                            }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.15)'; e.currentTarget.style.borderColor = '#059669'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.06)'; e.currentTarget.style.borderColor = 'rgba(5, 150, 105, 0.25)'; }}
+                          >
+                            + {tech}
+                          </button>
+                        ))}
+                        {unaddedSkills.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => unaddedSkills.forEach(tech => handleAddRoleSkill(tech))}
+                            style={{
+                              background: '#059669',
+                              border: 'none',
+                              borderRadius: '12px',
+                              padding: '3px 10px',
+                              fontSize: '0.775rem',
+                              color: '#FFFFFF',
+                              cursor: 'pointer',
+                              fontWeight: 700,
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            + Add All ({unaddedSkills.length})
+                          </button>
+                        )}
                       </div>
                     );
                   })()}
@@ -1114,7 +1126,7 @@ const BuilderFlow = () => {
               </div>
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Email <span style={{ color: '#EF4444', fontWeight: 800 }}>* Mandatory</span></label>
+                  <label style={labelStyle}>Email <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
                   <div style={{ position: 'relative' }}>
                     <input 
                       style={{
@@ -1617,7 +1629,6 @@ const BuilderFlow = () => {
                             <button 
                               onClick={async () => {
                                 if (!proj.name || !proj.technologies) {
-                                  alert("Please enter a Project Name and Tools & Technologies first.");
                                   return;
                                 }
                                 setIsGeneratingAI(true);
@@ -1626,7 +1637,6 @@ const BuilderFlow = () => {
                                   updateItem('projects', proj.id, { description: desc });
                                 } catch (err) {
                                   console.error("Project AI Rewrite failed:", err);
-                                  alert("Failed to generate description.");
                                 } finally {
                                   setIsGeneratingAI(false);
                                 }
@@ -2015,42 +2025,6 @@ const BuilderFlow = () => {
           </div>
         </div>
 
-        {/* 2. Theme Accent Style */}
-        <div className="premium-card">
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: '0 0 0.25rem 0' }}>
-            ✨ Accent Style Variant
-          </h3>
-          <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 1rem 0' }}>
-            Choose header accent background treatment across template sections.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem' }}>
-            {ACCENT_STYLE_PRESETS.map((st) => {
-              const isSelected = (resumeData.settings?.accentStyle || 'solid') === st.id;
-              return (
-                <button
-                  key={st.id}
-                  type="button"
-                  onClick={() => updateSettings('accentStyle', st.id)}
-                  style={{
-                    padding: '0.65rem 0.85rem',
-                    borderRadius: '10px',
-                    border: isSelected ? '2px solid var(--primary)' : '1.5px solid #CBD5E1',
-                    background: isSelected ? 'var(--primary-light)' : '#FFFFFF',
-                    color: isSelected ? 'var(--primary)' : '#475569',
-                    fontWeight: isSelected ? 800 : 600,
-                    fontSize: '0.825rem',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  {st.name}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         {/* 3. Typography & Font Sizing */}
         <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
@@ -2384,11 +2358,7 @@ const BuilderFlow = () => {
 
           <button
             onClick={() => {
-              if (window.confirm("Start fresh with a clean resume? All current edits will be reset.")) {
-                resetResume();
-                setActiveStepIndex(0);
-                setPersonalValidationError('');
-              }
+              setShowExitConfirm(true);
             }}
             style={{
               background: 'transparent',
@@ -2500,21 +2470,6 @@ const BuilderFlow = () => {
               </div>
             )}
           </div>
-
-          <button 
-            onClick={() => {
-              setShowSyncModal(true);
-              setSyncMessage('');
-              setSyncError('');
-              if (syncUserKey) {
-                handleRetrieveResumes();
-              }
-            }}
-            className="aura-btn-subtle"
-            style={{ padding: '0.5rem 1.1rem', fontSize: '0.85rem' }}
-          >
-            <Cloud size={14} /> Cloud Sync
-          </button>
 
           <button 
             onClick={handleOpenDownloadModal}
@@ -2740,241 +2695,6 @@ const BuilderFlow = () => {
         )}
       </AnimatePresence>
 
-      {/* ── Supabase Cloud Sync Modal ── */}
-      <AnimatePresence>
-        {showSyncModal && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
-            style={{ 
-              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-              background: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(8px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-              padding: '1.5rem'
-            }}
-            onClick={() => setShowSyncModal(false)}
-          >
-            <motion.div 
-              initial={{ scale: 0.95, y: 15 }} 
-              animate={{ scale: 1, y: 0 }} 
-              exit={{ scale: 0.95, y: 15 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-              style={{ 
-                background: '#FFFFFF', borderRadius: '24px', 
-                border: '1.5px solid #E2E8F0', padding: '2rem', 
-                width: '100%', maxWidth: '520px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                position: 'relative'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setShowSyncModal(false)}
-                style={{ 
-                  position: 'absolute', top: '1.25rem', right: '1.25rem', 
-                  background: 'transparent', border: 'none', color: '#64748B', 
-                  cursor: 'pointer' 
-                }}
-              >
-                <X size={20} />
-              </button>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-                <Database size={24} style={{ color: '#059669' }} />
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                  Cloud Database Sync
-                </h2>
-              </div>
-              <p style={{ fontSize: '0.9rem', color: '#475569', margin: '0 0 1.5rem 0', fontWeight: 500 }}>
-                Save your progress or sync your resumes across multiple devices.
-              </p>
-
-              {/* Tabs */}
-              <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '12px', padding: '4px', marginBottom: '1.5rem' }}>
-                <button
-                  type="button"
-                  onClick={() => { setSyncTab('save'); setSyncError(''); setSyncMessage(''); }}
-                  style={{
-                    flex: 1, padding: '8px 16px', borderRadius: '8px', border: 'none',
-                    background: syncTab === 'save' ? '#059669' : 'transparent',
-                    color: syncTab === 'save' ? '#FFFFFF' : '#475569',
-                    fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  Save to Cloud
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setSyncTab('load'); setSyncError(''); setSyncMessage(''); if (syncUserKey) handleRetrieveResumes(); }}
-                  style={{
-                    flex: 1, padding: '8px 16px', borderRadius: '8px', border: 'none',
-                    background: syncTab === 'load' ? '#059669' : 'transparent',
-                    color: syncTab === 'load' ? '#FFFFFF' : '#475569',
-                    fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  Load from Cloud
-                </button>
-              </div>
-
-              {/* Error and Success Alerts */}
-              {syncError && (
-                <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 500 }}>
-                  ⚠️ {syncError}
-                </div>
-              )}
-              {syncMessage && (
-                <div style={{ background: '#ECFDF5', border: '1px solid #6EE7B7', color: '#047857', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
-                  ✨ {syncMessage}
-                </div>
-              )}
-
-              {/* Save Tab Content */}
-              {syncTab === 'save' && (
-                <form onSubmit={handleSaveToCloud} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Sync Key (Email / Username)
-                    </label>
-                    <input 
-                      type="text"
-                      required
-                      style={{ ...inputStyle, padding: '0.75rem 1rem', fontSize: '1rem' }}
-                      placeholder="e.g. adil@example.com"
-                      value={syncUserKey}
-                      onChange={(e) => setSyncUserKey(e.target.value)}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Resume Version / Name
-                    </label>
-                    <input 
-                      type="text"
-                      required
-                      style={{ ...inputStyle, padding: '0.75rem 1rem', fontSize: '1rem' }}
-                      placeholder="e.g. Software Engineer Resume"
-                      value={syncResumeName}
-                      onChange={(e) => setSyncResumeName(e.target.value)}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoadingSync}
-                    style={{
-                      background: '#059669', color: '#FFFFFF', border: 'none',
-                      padding: '0.85rem 1.5rem', borderRadius: '12px',
-                      fontWeight: 700, fontSize: '0.95rem', cursor: isLoadingSync ? 'not-allowed' : 'pointer',
-                      marginTop: '0.5rem', width: '100%',
-                      opacity: isLoadingSync ? 0.7 : 1
-                    }}
-                  >
-                    {isLoadingSync ? 'Saving to Database...' : 'Save Current Resume'}
-                  </button>
-                </form>
-              )}
-
-              {/* Load Tab Content */}
-              {syncTab === 'load' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Sync Key (Email / Username)
-                    </label>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <input 
-                        type="text"
-                        style={{ ...inputStyle, flex: 1, padding: '0.75rem 1rem', fontSize: '1rem' }}
-                        placeholder="e.g. adil@example.com"
-                        value={syncUserKey}
-                        onChange={(e) => setSyncUserKey(e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleRetrieveResumes}
-                        disabled={isLoadingSync}
-                        style={{
-                          background: '#1E293B', color: '#FFFFFF', border: 'none',
-                          padding: '0.75rem 1.25rem', borderRadius: '10px',
-                          fontWeight: 700, fontSize: '0.9rem', cursor: isLoadingSync ? 'not-allowed' : 'pointer'
-                        }}
-                      >
-                        Fetch
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Resumes List */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Your Saved Resumes
-                    </label>
-                    <div style={{ 
-                      maxHeight: '200px', overflowY: 'auto', 
-                      border: '1.5px solid #E2E8F0', borderRadius: '12px',
-                      background: '#F8FAFC'
-                    }}>
-                      {savedResumesList.length === 0 ? (
-                        <div style={{ padding: '2rem 1rem', textAlign: 'center', fontSize: '0.9rem', color: '#64748B', fontStyle: 'italic' }}>
-                          No resumes retrieved yet. Enter your Sync Key and click Fetch.
-                        </div>
-                      ) : (
-                        savedResumesList.map(res => (
-                          <div 
-                            key={res.id} 
-                            style={{ 
-                              display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                              padding: '0.85rem 1rem', borderBottom: '1px solid #E2E8F0' 
-                            }}
-                          >
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden', paddingRight: '0.5rem' }}>
-                              <strong style={{ fontSize: '0.95rem', color: '#0F172A', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                {res.name}
-                              </strong>
-                              <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                                Updated: {new Date(res.updated_at).toLocaleString()}
-                              </span>
-                            </div>
-                            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                              <button
-                                type="button"
-                                onClick={() => handleLoadResume(res.id)}
-                                style={{
-                                  background: 'var(--primary)', color: '#FFFFFF', border: 'none',
-                                  padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem',
-                                  fontWeight: 700, cursor: 'pointer'
-                                }}
-                              >
-                                Load
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteCloudResume(res.id)}
-                                style={{
-                                  background: 'transparent', border: 'none', color: '#EF4444',
-                                  cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center'
-                                }}
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Title Your PDF Draft Prompt Modal */}
       {showDownloadModal && (
         <div style={{
@@ -3017,10 +2737,10 @@ const BuilderFlow = () => {
                 </div>
                 <div>
                   <h3 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-                    Title Your PDF Draft
+                    Download PDF
                   </h3>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    Save title to your download history vault
+                    Name your PDF file before downloading
                   </span>
                 </div>
               </div>
@@ -3061,20 +2781,7 @@ const BuilderFlow = () => {
                 />
               </div>
 
-              <div style={{
-                padding: '0.85rem 1rem',
-                borderRadius: '12px',
-                backgroundColor: 'var(--primary-light)',
-                border: '1.5px solid var(--primary-border)',
-                fontSize: '0.825rem',
-                color: 'var(--text-main)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.35rem'
-              }}>
-                <div>🎨 <strong>Active Template:</strong> <span style={{ textTransform: 'capitalize', color: 'var(--primary)', fontWeight: 700 }}>{selectedTemplate || 'multicolor'}</span></div>
-                <div>📄 <strong>Vault Logging:</strong> Logs title to database history list</div>
-              </div>
+
 
               <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button
