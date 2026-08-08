@@ -396,36 +396,16 @@ export default function LandingPage() {
 
                         {/* Resume Metadata */}
                         <div style={{ flex: 1, minWidth: '180px' }}>
-                          {resumeData?.personalInfo?.fullName ? (
+                          {resumeData?.personalInfo?.fullName && (
                             <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.4rem 0' }}>
                               {resumeData.personalInfo.fullName}
                             </h3>
-                          ) : (
-                            <div style={{ marginBottom: '0.6rem' }}>
-                              <button
-                                onClick={() => navigate('/builder')}
-                                style={{
-                                  background: 'none', border: 'none', padding: 0,
-                                  fontSize: '0.9rem', fontWeight: 700,
-                                  color: 'var(--primary)', cursor: 'pointer',
-                                  textDecoration: 'underline', textUnderlineOffset: '3px'
-                                }}
-                              >
-                                + Add your name in the builder →
-                              </button>
-                            </div>
                           )}
                           {resumeData?.personalInfo?.jobTitle && (
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0 0 1rem 0', fontWeight: 600 }}>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0, fontWeight: 600 }}>
                               {resumeData.personalInfo.jobTitle}
                             </p>
                           )}
-
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', fontSize: '0.825rem', color: 'var(--text-muted)' }}>
-                            <div>🎨 Active Template: <strong style={{ color: 'var(--primary)', textTransform: 'capitalize' }}>{selectedTemplate}</strong></div>
-                            <div>📄 Experience Entries: <strong>{resumeData?.experience?.length || 0}</strong></div>
-                            <div>⚡ Skills Added: <strong>{Object.values(resumeData?.skills || {}).flat().length}</strong></div>
-                          </div>
                         </div>
                       </div>
                     </div>
