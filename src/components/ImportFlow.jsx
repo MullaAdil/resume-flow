@@ -58,7 +58,7 @@ const ImportFlow = () => {
                 Import Your Existing Resume
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: 1.5 }}>
-                Upload your PDF or Word document (.pdf, .docx). Our AI parser will extract your experience, education, and skills instantly.
+                Upload your PDF or Word document (.pdf, .docx). Our smart parser will extract your experience, education, and skills instantly.
               </p>
 
               <div 

@@ -276,9 +276,6 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
     }
   };  const generateSummaryAI = async (skillsArray, projectsArray, type, roughNotes) => {
     const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
-    if (!groqApiKey) {
-      throw new Error("Missing Groq API Key");
-    }
     const skillsList = skillsArray.map(s => typeof s === 'object' ? s.name : s).join(', ');
     const projectsList = (projectsArray || []).map(p => `${p.name}: ${p.technologies || ''}`).filter(Boolean).join('; ');
     
@@ -295,7 +292,6 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
     }
 
     try {
-      const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
       if (groqApiKey) {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',

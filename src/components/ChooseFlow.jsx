@@ -51,7 +51,7 @@ const ChooseFlow = () => {
               Create New Resume
             </h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.6, marginBottom: '1.75rem', flex: 1 }}>
-              Start from scratch with our step-by-step AI guided studio editor.
+              Start from scratch with our step-by-step studio editor.
             </p>
 
             <div className="aura-btn-subtle" style={{ width: '100%', justifyContent: 'center' }}>

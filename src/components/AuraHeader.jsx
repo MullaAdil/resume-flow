@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FileText, Palette, ArrowRight, Check, Sparkles, LogIn, LogOut, User } from 'lucide-react';
+import { FileText, Palette, ArrowRight, Check, LogIn, LogOut, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const THEMES = [

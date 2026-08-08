@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import AuraHeader from './AuraHeader';
 import { apiClient } from '../utils/apiClient';
 import { 
-  ArrowRight, Sparkles, CheckCircle, Zap, FileText, ChevronRight, 
+  ArrowRight, Palette, CheckCircle, Zap, FileText, ChevronRight, 
   Layout, ShieldCheck, Download, Award, Layers, Heart, Edit3, RotateCcw,
   Database, Clock, HardDrive, History
 } from 'lucide-react';
@@ -176,8 +176,8 @@ export default function LandingPage() {
       desc: "Single-column & multi-column layouts structured to pass corporate ATS screeners with ease."
     },
     {
-      icon: <Sparkles size={22} color="var(--primary)" />,
-      title: "AI Bullet Enhancer",
+      icon: <Zap size={22} color="var(--primary)" />,
+      title: "Achievement Bullet Enhancer",
       desc: "Transform basic task summaries into high-impact, data-driven achievement statements."
     },
     {
@@ -209,8 +209,8 @@ export default function LandingPage() {
               {/* Left Column */}
               <div>
                 <div className="aura-badge" style={{ marginBottom: '1.25rem' }}>
-                  <Sparkles size={15} />
-                  <span>AI-POWERED CAREER ENGINE</span>
+                  <Zap size={15} />
+                  <span>EXECUTIVE CAREER ENGINE</span>
                 </div>
 
                 <h1 style={{
@@ -230,7 +230,7 @@ export default function LandingPage() {
                   marginBottom: '2.25rem',
                   maxWidth: '560px'
                 }}>
-                  High-precision resume builder with AI bullet enhancement, real-time live preview, executive templates, and vector PDF export.
+                  High-precision resume builder with real-time live preview, executive templates, and vector PDF export.
                 </p>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -317,7 +317,7 @@ export default function LandingPage() {
                     fontSize: '0.825rem',
                     fontWeight: 700
                   }}>
-                    <Sparkles size={14} />
+                    <Palette size={14} />
                     <span>Active Theme Synced</span>
                   </div>
 

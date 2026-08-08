@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuraHeader from './AuraHeader';
-import { Sparkles, Mail, Lock, ArrowRight, CheckCircle, AlertCircle, ShieldCheck, Zap, BarChart3, Layers, Eye, EyeOff, Check, X } from 'lucide-react';
+import { Mail, Lock, ArrowRight, CheckCircle, AlertCircle, ShieldCheck, Zap, BarChart3, Layers, Eye, EyeOff, Check, X } from 'lucide-react';
 
 const LoginPage = ({ initialMode = 'login' }) => {
   const navigate = useNavigate();
@@ -144,19 +144,6 @@ const LoginPage = ({ initialMode = 'login' }) => {
               position: 'relative',
               overflow: 'hidden'
             }}>
-              {/* Subtle background glow circle */}
-              <div style={{
-                position: 'absolute',
-                top: '-40px',
-                right: '-40px',
-                width: '220px',
-                height: '220px',
-                borderRadius: '50%',
-                background: 'var(--primary-glow)',
-                filter: 'blur(40px)',
-                pointerEvents: 'none'
-              }} />
-
               <div>
                 {/* Brand Badge */}
                 <div style={{
@@ -178,7 +165,7 @@ const LoginPage = ({ initialMode = 'login' }) => {
                 </div>
 
                 <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.25, marginBottom: '1rem', letterSpacing: '-0.03em' }}>
-                  Craft Precision ATS Resumes Powered by AI.
+                  Craft Precision ATS-Ready Resumes.
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.975rem', lineHeight: 1.6, marginBottom: '2.25rem' }}>
                   Join thousands of top engineers, managers, and designers building job-winning resumes in minutes.
@@ -201,7 +188,7 @@ const LoginPage = ({ initialMode = 'login' }) => {
                       <Zap size={18} />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>AI Executive Writer</div>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>Executive Resume Writer</div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Generate impact metrics & role descriptions</div>
                     </div>
                   </div>
@@ -246,7 +233,7 @@ const LoginPage = ({ initialMode = 'login' }) => {
                   {isSignUp ? 'Create Studio Account' : 'Welcome Back'}
                 </h1>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                  {isSignUp ? 'Sign up to start building your ATS-ready resume.' : 'Sign in to access your saved resume drafts & AI tools.'}
+                  {isSignUp ? 'Sign up to start building your ATS-ready resume.' : 'Sign in to access your saved resume drafts & studio tools.'}
                 </p>
               </div>
 

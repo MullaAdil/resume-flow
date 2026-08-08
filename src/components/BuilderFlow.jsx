@@ -7,7 +7,7 @@ import { useResume, defaultState } from '../context/ResumeContext';
 import { useNavigate } from 'react-router-dom';
 import LivePreview from './LivePreview';
 import AuraHeader from './AuraHeader';
-import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Sparkles, Cloud, Database } from 'lucide-react';
+import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Zap, Cloud, Database, CheckCircle, FileText } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../context/AuthContext';
 
@@ -349,23 +349,47 @@ const BuilderFlow = () => {
     navigate('/');
   };
 
-  const handleDownloadPDF = async () => {
-    const filename = resumeData?.personalInfo?.fullName
-      ? `${resumeData.personalInfo.fullName.trim().replace(/\s+/g, '_')}_Resume.pdf`
-      : 'Resume.pdf';
-    await downloadPDF('resume-pdf-content', filename);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadDraftTitle, setDownloadDraftTitle] = useState('');
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+
+  const handleOpenDownloadModal = () => {
+    const defaultTitle = resumeData?.personalInfo?.fullName
+      ? `${resumeData.personalInfo.fullName.trim()}'s Resume`
+      : 'Executive Resume Draft';
+    setDownloadDraftTitle(defaultTitle);
+    setShowDownloadModal(true);
+  };
+
+  const handleConfirmDownloadPDF = async (e) => {
+    if (e) e.preventDefault();
+    const finalTitle = downloadDraftTitle.trim() || 'My Resume Draft';
+    setIsDownloadingPDF(true);
+
+    try {
+      if (syncUserKey) {
+        await apiClient.resumes.save(syncUserKey.trim().toLowerCase(), finalTitle, resumeData);
+      }
+    } catch (err) {
+      console.warn('Draft save during download failed:', err);
+    }
+
+    const safeFilename = `${finalTitle.replace(/[/\\?%*:|"<>]/g, '_')}.pdf`;
+    await downloadPDF('resume-pdf-content', safeFilename);
 
     try {
       await apiClient.activity.log({
+        user_id: syncUserKey || user?.email || 'anonymous',
         type: 'pdf_download',
-        resumeName: resumeData?.personalInfo?.fullName
-          ? `${resumeData.personalInfo.fullName}'s Resume`
-          : 'Executive Resume',
+        resumeName: finalTitle,
         templateId: selectedTemplate || 'multicolor'
       });
     } catch (err) {
       console.warn('Activity logging failed:', err);
     }
+
+    setIsDownloadingPDF(false);
+    setShowDownloadModal(false);
   };
 
   // Skill categories matching the screenshot order
@@ -652,7 +676,7 @@ const BuilderFlow = () => {
             <div style={{ position: 'relative', width: '80px', height: '80px' }}>
               <div style={{ position: 'absolute', width: '100%', height: '100%', borderRadius: '50%', border: '4px solid #E2E8F0', borderTopColor: '#059669', animation: 'spin 1s linear infinite' }} />
               <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#18181B' }}>
-                <Sparkles size={28} />
+                <CheckCircle size={28} />
               </div>
             </div>
             <style>{`
@@ -874,7 +898,7 @@ const BuilderFlow = () => {
               transition: 'none'
             }}
           >
-            <Sparkles size={12} /> Analyze Resume
+            <CheckCircle size={12} /> Audit Resume
           </button>
         </div>
         
@@ -973,7 +997,7 @@ const BuilderFlow = () => {
                     return (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginTop: '0.25rem' }}>
                         <span style={{ fontSize: '0.85rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                          <Sparkles size={12} style={{ color: '#059669' }} /> Recommend Skills:
+                          <CheckCircle size={12} style={{ color: '#059669' }} /> Recommend Skills:
                         </span>
                         {suggestedSkills.map(tech => {
                           const isAlreadyAdded = Object.values(resumeData.skills || {}).some(arr => 
@@ -1155,7 +1179,7 @@ const BuilderFlow = () => {
                 onMouseOver={(e) => { if (!isGeneratingAI) { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.15)'; e.currentTarget.style.borderColor = '#059669'; } }}
                 onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(5, 150, 105, 0.08)'; e.currentTarget.style.borderColor = 'rgba(5, 150, 105, 0.3)'; }}
               >
-                {isGeneratingAI ? '🪄 Generating...' : '🪄 Rewrite with AI'}
+                {isGeneratingAI ? 'Enhancing...' : 'Enhance Summary'}
               </button>
             </div>
           )}
@@ -1416,7 +1440,7 @@ const BuilderFlow = () => {
                         {suggestedTechs.length > 0 && (
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginBottom: '1rem', marginTop: '-0.25rem' }}>
                             <span style={{ fontSize: '0.9rem', color: '#4B5563', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                              <Sparkles size={12} style={{ color: '#059669' }} /> Suggested:
+                              <CheckCircle size={12} style={{ color: '#059669' }} /> Suggested:
                             </span>
                             {suggestedTechs.map(tech => {
                               const isAdded = (proj.technologies || '').split(',').map(t => t.trim()).includes(tech);
@@ -1490,7 +1514,7 @@ const BuilderFlow = () => {
 
                         {/* Project Details input for AI context */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
-                          <label style={labelStyle}>Project Details / Key Features (helps AI generate points)</label>
+                          <label style={labelStyle}>Project Details / Key Features (helps generate bullet points)</label>
                           <textarea
                             style={{ ...inputStyle, minHeight: '70px', resize: 'vertical' }}
                             placeholder="e.g. Developed a chatbot using OpenAI API, optimized search with vector database Pinecone, handled 1000+ users..."
@@ -1525,7 +1549,7 @@ const BuilderFlow = () => {
                                 fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: isGeneratingAI ? 'wait' : 'pointer' 
                               }}
                             >
-                              <Sparkles size={14} /> Generate Bullet Points with AI
+                              <Zap size={14} /> Generate Impact Bullets
                             </button>
                           </div>
                           <textarea style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} value={proj.description || ''} onChange={(e) => updateItem('projects', proj.id, { description: e.target.value })} />
@@ -2203,7 +2227,7 @@ const BuilderFlow = () => {
           </button>
 
           <button 
-            onClick={handleDownloadPDF}
+            onClick={handleOpenDownloadModal}
             style={{
               padding: '0.5rem 1.25rem',
               borderRadius: '8px',
@@ -2722,6 +2746,137 @@ const BuilderFlow = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Title Your PDF Draft Prompt Modal */}
+      {showDownloadModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1.5rem'
+        }}>
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '520px',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '24px',
+            border: '1.5px solid var(--primary-border)',
+            boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+            padding: '2.25rem 2rem',
+            overflow: 'hidden'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  backgroundColor: 'var(--primary-light)',
+                  border: '1.5px solid var(--primary-border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--primary)'
+                }}>
+                  <Download size={22} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+                    Title Your PDF Draft
+                  </h3>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Save title to your download history vault
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowDownloadModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: '6px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmDownloadPDF} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div>
+                <label className="aura-label" style={{ fontWeight: 700, marginBottom: '0.45rem', display: 'block' }}>
+                  Draft Title
+                </label>
+                <input
+                  type="text"
+                  className="aura-input"
+                  value={downloadDraftTitle}
+                  onChange={(e) => setDownloadDraftTitle(e.target.value)}
+                  placeholder="e.g. Senior Developer Resume - Aug 2026"
+                  required
+                  autoFocus
+                  style={{ height: '48px', fontSize: '0.95rem' }}
+                />
+              </div>
+
+              <div style={{
+                padding: '0.85rem 1rem',
+                borderRadius: '12px',
+                backgroundColor: 'var(--primary-light)',
+                border: '1.5px solid var(--primary-border)',
+                fontSize: '0.825rem',
+                color: 'var(--text-main)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.35rem'
+              }}>
+                <div>🎨 <strong>Active Template:</strong> <span style={{ textTransform: 'capitalize', color: 'var(--primary)', fontWeight: 700 }}>{selectedTemplate || 'multicolor'}</span></div>
+                <div>📄 <strong>Vault Logging:</strong> Logs title to database history list</div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowDownloadModal(false)}
+                  className="aura-btn-secondary"
+                  style={{ flex: 1, height: '46px', borderRadius: '12px', justifyContent: 'center' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isDownloadingPDF}
+                  className="aura-btn-primary"
+                  style={{ flex: 1.5, height: '46px', borderRadius: '12px', justifyContent: 'center' }}
+                >
+                  {isDownloadingPDF ? (
+                    <span>Generating PDF...</span>
+                  ) : (
+                    <>
+                      <Download size={18} />
+                      <span>Save & Download PDF</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </motion.div>
   );
