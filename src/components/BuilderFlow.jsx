@@ -7,7 +7,7 @@ import { useResume, defaultState } from '../context/ResumeContext';
 import { useNavigate } from 'react-router-dom';
 import LivePreview from './LivePreview';
 import AuraHeader from './AuraHeader';
-import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Zap, Cloud, Database, CheckCircle, FileText } from 'lucide-react';
+import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Zap, Cloud, Database, CheckCircle, FileText, Palette, RotateCcw, Sliders, Layout } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../context/AuthContext';
 
@@ -98,6 +98,25 @@ const ScoreCircularProgress = ({ targetScore }) => {
   );
 };
 
+const ACCENT_COLOR_PRESETS = [
+  { id: 'indigo', name: 'Quantum Indigo', primary: '#6366F1', hover: '#4F46E5', light: '#EEF2FF', border: '#C7D2FE', glow: 'rgba(99,102,241,0.25)' },
+  { id: 'emerald', name: 'Emerald', primary: '#059669', hover: '#047857', light: '#ECFDF5', border: '#A7F3D0', glow: 'rgba(5,150,105,0.25)' },
+  { id: 'sapphire', name: 'Sapphire Blue', primary: '#2563EB', hover: '#1D4ED8', light: '#EFF6FF', border: '#BFDBFE', glow: 'rgba(37,99,235,0.25)' },
+  { id: 'crimson', name: 'Crimson Red', primary: '#EF4444', hover: '#DC2626', light: '#FEF2F2', border: '#FCA5A5', glow: 'rgba(239,68,68,0.25)' },
+  { id: 'amber', name: 'Amber Warmth', primary: '#F59E0B', hover: '#D97706', light: '#FFFBEB', border: '#FDE68A', glow: 'rgba(245,158,11,0.25)' },
+  { id: 'violet', name: 'Royal Violet', primary: '#8B5CF6', hover: '#7C3AED', light: '#F5F3FF', border: '#DDD6FE', glow: 'rgba(139,92,246,0.25)' },
+  { id: 'cyan', name: 'Teal Cyan', primary: '#06B6D4', hover: '#0891B2', light: '#ECFEFF', border: '#A5F3FC', glow: 'rgba(6,182,212,0.25)' },
+  { id: 'obsidian', name: 'Obsidian Slate', primary: '#0F172A', hover: '#020617', light: '#F8FAFC', border: '#CBD5E1', glow: 'rgba(15,23,42,0.25)' },
+];
+
+const ACCENT_STYLE_PRESETS = [
+  { id: 'solid', name: 'Solid Minimal' },
+  { id: 'gradient', name: 'Modern Gradient' },
+  { id: 'soft', name: 'Soft Glass Tint' },
+  { id: 'outline', name: 'Clean Outline' },
+  { id: 'minimal', name: 'Architectural Slate' },
+];
+
 const BuilderFlow = () => {
   const navigate = useNavigate();
   const { 
@@ -117,6 +136,18 @@ const BuilderFlow = () => {
   const { user } = useAuth();
 
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [personalValidationError, setPersonalValidationError] = useState('');
+  const [showAccentPicker, setShowAccentPicker] = useState(false);
+
+  const applyAccentColorPreset = (preset) => {
+    updateSettings('primaryColor', preset.primary);
+    updateSettings('secondaryColor', preset.hover);
+    document.documentElement.style.setProperty('--primary', preset.primary);
+    document.documentElement.style.setProperty('--primary-hover', preset.hover);
+    document.documentElement.style.setProperty('--primary-light', preset.light);
+    document.documentElement.style.setProperty('--primary-border', preset.border);
+    document.documentElement.style.setProperty('--primary-glow', preset.glow);
+  };
   
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [activeExpIndex, setActiveExpIndex] = useState(0);
@@ -335,10 +366,22 @@ const BuilderFlow = () => {
   }, [mobileTab]);
 
   const handleNext = () => {
+    if (steps[activeStepIndex]?.id === 'personal') {
+      const fullName = (resumeData.personalInfo?.fullName || '').trim();
+      const email = (resumeData.personalInfo?.email || '').trim();
+      const jobTitle = (resumeData.personalInfo?.jobTitle || '').trim();
+
+      if (!fullName || !email || !jobTitle) {
+        setPersonalValidationError('Please fill in mandatory fields (* Full Name, * Job Title, * Email) before proceeding.');
+        return;
+      }
+    }
+    setPersonalValidationError('');
     if (activeStepIndex < steps.length - 1) setActiveStepIndex(prev => prev + 1);
   };
   
   const handleBack = () => {
+    setPersonalValidationError('');
     if (activeStepIndex > 0) setActiveStepIndex(prev => prev - 1);
     else setShowExitConfirm(true);
   };
@@ -907,26 +950,60 @@ const BuilderFlow = () => {
           {/* ── Personal ── */}
           {activeStep.id === 'personal' && (
             <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {personalValidationError && (
+                <div style={{
+                  background: '#FEF2F2',
+                  border: '1.5px solid #FCA5A5',
+                  color: '#9F1239',
+                  padding: '0.85rem 1.15rem',
+                  borderRadius: '12px',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span style={{ fontSize: '1.1rem' }}>⚠️</span>
+                  <span>{personalValidationError}</span>
+                </div>
+              )}
+
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Full Name</label>
+                  <label style={labelStyle}>Full Name <span style={{ color: '#EF4444', fontWeight: 800 }}>* Mandatory</span></label>
                   <div style={{ position: 'relative' }}>
-                    <input style={{ ...inputStyle, width: '100%', borderBottom: '2px solid #18181B' }} value={resumeData.personalInfo.fullName || ''} onChange={(e) => updatePersonalInfo('fullName', e.target.value)} />
+                    <input 
+                      style={{ 
+                        ...inputStyle, 
+                        width: '100%', 
+                        borderBottom: '2px solid #18181B',
+                        borderColor: (!resumeData.personalInfo.fullName && personalValidationError) ? '#EF4444' : 'var(--border-color)'
+                      }} 
+                      value={resumeData.personalInfo.fullName || ''} 
+                      onChange={(e) => {
+                        updatePersonalInfo('fullName', e.target.value);
+                        if (e.target.value) setPersonalValidationError('');
+                      }} 
+                    />
                     {isValidName(resumeData.personalInfo.fullName) && (
                       <Check size={16} color="#10B981" style={{ position: 'absolute', right: '12px', top: '14px' }} />
                     )}
                   </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', position: 'relative' }} ref={jobRoleDropdownRef}>
-                  <label style={labelStyle}>Job Title</label>
+                  <label style={labelStyle}>Job Title <span style={{ color: '#EF4444', fontWeight: 800 }}>* Mandatory</span></label>
                   <input 
-                    style={inputStyle} 
+                    style={{
+                      ...inputStyle,
+                      borderColor: (!resumeData.personalInfo.jobTitle && personalValidationError) ? '#EF4444' : 'var(--border-color)'
+                    }} 
                     value={resumeData.personalInfo.jobTitle || ''} 
                     placeholder="e.g. Frontend Engineer"
                     onFocus={() => setShowJobRoleDropdown(true)}
                     onChange={(e) => {
                       const newRole = e.target.value;
                       updatePersonalInfo('jobTitle', newRole);
+                      if (newRole) setPersonalValidationError('');
                       const exactMatch = WORLDWIDE_JOB_ROLES.find(r => r.toLowerCase() === newRole.toLowerCase());
                       if (exactMatch) {
                         const suggested = getTechsForRole(exactMatch);
@@ -1037,9 +1114,20 @@ const BuilderFlow = () => {
               </div>
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Email</label>
+                  <label style={labelStyle}>Email <span style={{ color: '#EF4444', fontWeight: 800 }}>* Mandatory</span></label>
                   <div style={{ position: 'relative' }}>
-                    <input style={{ ...inputStyle, width: '100%' }} value={resumeData.personalInfo.email || ''} onChange={(e) => updatePersonalInfo('email', e.target.value)} />
+                    <input 
+                      style={{
+                        ...inputStyle,
+                        width: '100%',
+                        borderColor: (!resumeData.personalInfo.email && personalValidationError) ? '#EF4444' : 'var(--border-color)'
+                      }} 
+                      value={resumeData.personalInfo.email || ''} 
+                      onChange={(e) => {
+                        updatePersonalInfo('email', e.target.value);
+                        if (e.target.value) setPersonalValidationError('');
+                      }} 
+                    />
                     {isValidEmail(resumeData.personalInfo.email) && (
                       <Check size={16} color="#10B981" style={{ position: 'absolute', right: '12px', top: '14px' }} />
                     )}
@@ -1769,65 +1857,70 @@ const BuilderFlow = () => {
     </AnimatePresence>
   );
 
-  // ── Render the customize panel ──
-  const renderCustomizePanel = () => (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-        
-        {/* Templates Grid — properly fitted mini-previews */}
+  // ── Render dedicated templates gallery ──
+  const renderTemplatesPanel = () => (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827', marginBottom: '0.25rem' }}>Resume Template</h2>
-          <p style={{ color: '#6B7280', fontSize: '0.9rem', marginBottom: '1rem' }}>Select a template to instantly apply it to your preview.</p>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#111827', margin: '0 0 0.35rem 0', letterSpacing: '-0.02em' }}>
+            Choose Resume Template
+          </h2>
+          <p style={{ color: '#64748B', fontSize: '0.95rem', margin: 0 }}>
+            Select a professional layout below. Your resume content will immediately adapt.
+          </p>
+        </div>
 
-          {/* Filter Pills */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-            {['All', 'ATS', 'Professional', 'Modern', 'Creative', 'Simple'].map(tag => (
-              <button
-                key={tag}
-                onClick={() => setCustomizeFilterTag(tag)}
-                style={{
-                  padding: '0.35rem 0.85rem',
-                  borderRadius: '20px',
-                  border: customizeFilterTag === tag ? '2px solid #059669' : '1.5px solid #CBD5E1',
-                  background: customizeFilterTag === tag ? '#059669' : '#FFFFFF',
-                  color: customizeFilterTag === tag ? '#FFFFFF' : '#475569',
-                  fontWeight: 600,
-                  fontSize: '0.78rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-              >{tag}</button>
-            ))}
-          </div>
-          {/* Filtered template grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.25rem' }}>
-            {templates
-              .filter(tpl => customizeFilterTag === 'All' || tpl.tags.includes(customizeFilterTag))
-              .map((tpl) => {
-              // Each card column is roughly (editorWidth/2 - gap). 
-              // We define a fixed card preview height to keep all cards uniform.
-              const CARD_PREVIEW_WIDTH = 180; // px — the rendered card content width
-              const CARD_PREVIEW_HEIGHT = 255; // px — matches A4 ratio: 180 * (1131/800) ≈ 255
+        {/* Filter Pills */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {['All', 'ATS', 'Professional', 'Modern', 'Creative', 'Simple'].map(tag => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => setCustomizeFilterTag(tag)}
+              style={{
+                padding: '0.45rem 1rem',
+                borderRadius: '20px',
+                border: customizeFilterTag === tag ? '2px solid var(--primary)' : '1.5px solid #CBD5E1',
+                background: customizeFilterTag === tag ? 'var(--primary)' : '#FFFFFF',
+                color: customizeFilterTag === tag ? '#FFFFFF' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.825rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtered Template Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.25rem', marginTop: '0.5rem' }}>
+          {templates
+            .filter(tpl => customizeFilterTag === 'All' || tpl.tags.includes(customizeFilterTag))
+            .map((tpl) => {
+              const CARD_PREVIEW_WIDTH = 180;
+              const CARD_PREVIEW_HEIGHT = 255;
               const scaleX = CARD_PREVIEW_WIDTH / 800;
+              const isSelected = selectedTemplate === tpl.id;
 
               return (
                 <div
                   key={tpl.id}
                   onClick={() => setSelectedTemplate(tpl.id)}
                   style={{
-                    border: selectedTemplate === tpl.id ? '3px solid #059669' : '1.5px solid #CBD5E1',
-                    borderRadius: '10px',
+                    border: isSelected ? '3px solid var(--primary)' : '1.5px solid #CBD5E1',
+                    borderRadius: '14px',
                     cursor: 'pointer',
                     background: '#FFFFFF',
                     transition: 'all 0.2s ease',
                     overflow: 'hidden',
                     position: 'relative',
-                    boxShadow: selectedTemplate === tpl.id
-                      ? '0 0 0 3px rgba(5, 150, 105, 0.15), 0 8px 20px -8px rgba(0,0,0,0.15)'
+                    boxShadow: isSelected
+                      ? '0 0 0 4px var(--primary-glow), 0 10px 25px -5px rgba(15,23,42,0.15)'
                       : '0 4px 12px -4px rgba(15, 23, 42, 0.06)',
                   }}
                 >
-                  {/* Fixed-height preview container — clips the scaled template */}
                   <div style={{
                     width: '100%',
                     height: `${CARD_PREVIEW_HEIGHT}px`,
@@ -1849,106 +1942,230 @@ const BuilderFlow = () => {
                     </div>
                   </div>
 
-                  {/* Label bar */}
                   <div style={{
-                    padding: '0.55rem 0.75rem',
-                    background: selectedTemplate === tpl.id ? '#059669' : '#F8FAFC',
-                    borderTop: `1px solid ${selectedTemplate === tpl.id ? '#059669' : '#E2E8F0'}`,
+                    padding: '0.65rem 0.85rem',
+                    background: isSelected ? 'var(--primary)' : '#FFFFFF',
+                    borderTop: `1px solid ${isSelected ? 'var(--primary)' : '#E2E8F0'}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}>
-                    <span style={{ fontWeight: 700, color: selectedTemplate === tpl.id ? '#FFFFFF' : '#1E293B', fontSize: '0.8rem' }}>
+                    <span style={{ fontWeight: 700, color: isSelected ? '#FFFFFF' : '#1E293B', fontSize: '0.85rem' }}>
                       {tpl.name}
                     </span>
-                    {selectedTemplate === tpl.id && <Check size={14} color="#FFFFFF" />}
+                    {isSelected && <Check size={16} color="#FFFFFF" />}
                   </div>
                 </div>
               );
             })}
-          </div>
         </div>
-        
-        <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0' }} />
-        
-        {/* Settings */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          
-          {/* Colors */}
-          <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem', color: '#1E293B' }}>Primary Color</h3>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              {['#059669', '#0F172A', '#2563EB', '#DC2626', '#7C3AED', '#D97706', '#0891B2', '#BE185D'].map(color => (
-                <div 
-                  key={color}
-                  onClick={() => updateSettings('primaryColor', color)}
-                  style={{ width: '32px', height: '32px', borderRadius: '50%', background: color, cursor: 'pointer', border: resumeData.settings?.primaryColor === color ? '3px solid #FFF' : 'none', outline: resumeData.settings?.primaryColor === color ? `2px solid ${color}` : 'none' }}
-                />
-              ))}
-            </div>
-          </div>
+      </div>
+    </motion.div>
+  );
 
-          {/* Font */}
-          <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem', color: '#1E293B' }}>Typography</h3>
-            <select 
-              value={resumeData.settings?.fontFamily || 'Inter'}
-              onChange={(e) => updateSettings('fontFamily', e.target.value)}
-              style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '4px', border: '1px solid #CBD5E1', background: '#FFFFFF', outline: 'none', fontSize: '1rem', color: '#1E293B' }}
-            >
-              <option value="Inter">Inter (Clean & Modern)</option>
-              <option value="Geist">Geist (Minimalist)</option>
-              <option value="SF Pro Display">SF Pro (Apple Style)</option>
-              <option value="Merriweather">Merriweather (Classic)</option>
-            </select>
-          </div>
+  // ── Render the customize panel (Pure Customization controls) ──
+  const renderCustomizePanel = () => (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#111827', margin: '0 0 0.35rem 0', letterSpacing: '-0.02em' }}>
+            Customize Studio Design
+          </h2>
+          <p style={{ color: '#64748B', fontSize: '0.95rem', margin: 0 }}>
+            Tune typography, accent color palettes, margins, font sizing, and section visibility.
+          </p>
+        </div>
 
-          {/* Margins */}
-          <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem', color: '#1E293B' }}>Margins</h3>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              {['Compact', 'Standard', 'Spacious'].map(margin => (
+        {/* 1. Primary Accent Palette */}
+        <div className="premium-card">
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: '0 0 0.25rem 0' }}>
+            🎨 Primary Accent Color
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 1rem 0' }}>
+            Select an accent color palette. Updates studio headers, buttons, badges, and template accents.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+            {ACCENT_COLOR_PRESETS.map((preset) => {
+              const isSelected = (resumeData.settings?.primaryColor || '#6366F1').toLowerCase() === preset.primary.toLowerCase();
+              return (
                 <button
-                  key={margin}
-                  onClick={() => updateSettings('margins', margin)}
-                  style={{ flex: 1, padding: '0.5rem', borderRadius: '4px', border: resumeData.settings?.margins === margin ? '2px solid #059669' : '1px solid #CBD5E1', background: resumeData.settings?.margins === margin ? '#ECFDF5' : '#FFFFFF', color: resumeData.settings?.margins === margin ? '#059669' : '#64748B', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}
+                  key={preset.id}
+                  type="button"
+                  onClick={() => applyAccentColorPreset(preset)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.6rem 0.75rem',
+                    borderRadius: '10px',
+                    border: isSelected ? `2.5px solid ${preset.primary}` : '1.5px solid #E2E8F0',
+                    background: isSelected ? preset.light : '#FFFFFF',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    boxShadow: isSelected ? `0 4px 14px ${preset.glow}` : 'none'
+                  }}
                 >
-                  {margin}
+                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: preset.primary, flexShrink: 0, boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }} />
+                  <span style={{ fontSize: '0.8rem', fontWeight: isSelected ? 800 : 600, color: isSelected ? preset.primary : '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {preset.name}
+                  </span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
-
-          {/* Show/Hide Sections */}
-          <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem', color: '#1E293B' }}>Include Sections</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {[
-                { key: 'showSummary', label: 'Professional Summary' },
-                { key: 'showExperience', label: 'Professional Experience' },
-                { key: 'showEducation', label: 'Education' },
-                { key: 'showProjects', label: 'Projects' },
-                { key: 'showSkills', label: 'Skills' },
-                { key: 'showCertifications', label: 'Certifications' },
-                { key: 'showLanguages', label: 'Languages' },
-              ].map(sec => {
-                const isChecked = resumeData.settings?.[sec.key] !== false;
-                return (
-                  <label key={sec.key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.95rem', color: '#334155' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={isChecked} 
-                      onChange={(e) => updateSettings(sec.key, e.target.checked)}
-                      style={{ accentColor: '#059669', width: '16px', height: '16px' }}
-                    />
-                    {sec.label}
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
         </div>
+
+        {/* 2. Theme Accent Style */}
+        <div className="premium-card">
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: '0 0 0.25rem 0' }}>
+            ✨ Accent Style Variant
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 1rem 0' }}>
+            Choose header accent background treatment across template sections.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem' }}>
+            {ACCENT_STYLE_PRESETS.map((st) => {
+              const isSelected = (resumeData.settings?.accentStyle || 'solid') === st.id;
+              return (
+                <button
+                  key={st.id}
+                  type="button"
+                  onClick={() => updateSettings('accentStyle', st.id)}
+                  style={{
+                    padding: '0.65rem 0.85rem',
+                    borderRadius: '10px',
+                    border: isSelected ? '2px solid var(--primary)' : '1.5px solid #CBD5E1',
+                    background: isSelected ? 'var(--primary-light)' : '#FFFFFF',
+                    color: isSelected ? 'var(--primary)' : '#475569',
+                    fontWeight: isSelected ? 800 : 600,
+                    fontSize: '0.825rem',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {st.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 3. Typography & Font Sizing */}
+        <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+            🔤 Typography & Font Sizing
+          </h3>
+
+          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Font Family</label>
+              <select 
+                value={resumeData.settings?.fontFamily || 'Inter'}
+                onChange={(e) => updateSettings('fontFamily', e.target.value)}
+                style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1.5px solid #CBD5E1', background: '#FFFFFF', outline: 'none', fontSize: '0.95rem', color: '#1E293B', fontWeight: 500 }}
+              >
+                <option value="Inter">Inter (Modern Clean)</option>
+                <option value="Plus Jakarta Sans">Plus Jakarta Sans (Architectural)</option>
+                <option value="Outfit">Outfit (Executive Tech)</option>
+                <option value="Geist">Geist (Minimalist Monospace)</option>
+                <option value="Roboto">Roboto (Corporate standard)</option>
+                <option value="Merriweather">Merriweather (Classic Serif)</option>
+                <option value="Playfair Display">Playfair Display (Luxury)</option>
+              </select>
+            </div>
+
+            <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Text Size</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {['Small', 'Medium', 'Large'].map(sz => (
+                  <button
+                    key={sz}
+                    type="button"
+                    onClick={() => updateSettings('fontSize', sz)}
+                    style={{ flex: 1, padding: '0.65rem 0.5rem', borderRadius: '8px', border: (resumeData.settings?.fontSize || 'Medium') === sz ? '2px solid var(--primary)' : '1px solid #CBD5E1', background: (resumeData.settings?.fontSize || 'Medium') === sz ? 'var(--primary-light)' : '#FFFFFF', color: (resumeData.settings?.fontSize || 'Medium') === sz ? 'var(--primary)' : '#64748B', fontWeight: 700, fontSize: '0.825rem', cursor: 'pointer' }}
+                  >
+                    {sz}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Line Height Spacing</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {[
+                  { label: 'Tight', val: '1.3' },
+                  { label: 'Normal', val: '1.5' },
+                  { label: 'Relaxed', val: '1.7' }
+                ].map(ls => (
+                  <button
+                    key={ls.label}
+                    type="button"
+                    onClick={() => updateSettings('lineSpacing', ls.val)}
+                    style={{ flex: 1, padding: '0.65rem 0.5rem', borderRadius: '8px', border: (resumeData.settings?.lineSpacing || '1.5') === ls.val ? '2px solid var(--primary)' : '1px solid #CBD5E1', background: (resumeData.settings?.lineSpacing || '1.5') === ls.val ? 'var(--primary-light)' : '#FFFFFF', color: (resumeData.settings?.lineSpacing || '1.5') === ls.val ? 'var(--primary)' : '#64748B', fontWeight: 700, fontSize: '0.825rem', cursor: 'pointer' }}
+                  >
+                    {ls.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Page Margins</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {['Compact', 'Standard', 'Spacious'].map(margin => (
+                  <button
+                    key={margin}
+                    type="button"
+                    onClick={() => updateSettings('margins', margin)}
+                    style={{ flex: 1, padding: '0.65rem 0.5rem', borderRadius: '8px', border: (resumeData.settings?.margins || 'Standard') === margin ? '2px solid var(--primary)' : '1px solid #CBD5E1', background: (resumeData.settings?.margins || 'Standard') === margin ? 'var(--primary-light)' : '#FFFFFF', color: (resumeData.settings?.margins || 'Standard') === margin ? 'var(--primary)' : '#64748B', fontWeight: 700, fontSize: '0.825rem', cursor: 'pointer' }}
+                  >
+                    {margin}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Section Toggles */}
+        <div className="premium-card">
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: '0 0 0.25rem 0' }}>
+            👁️ Section Visibility Toggles
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 1rem 0' }}>
+            Toggle sections on or off to customize your document layout.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+            {[
+              { key: 'showSummary', label: 'Professional Summary' },
+              { key: 'showExperience', label: 'Professional Experience' },
+              { key: 'showEducation', label: 'Education History' },
+              { key: 'showProjects', label: 'Projects & Work' },
+              { key: 'showSkills', label: 'Areas of Expertise' },
+              { key: 'showCertifications', label: 'Certifications & Licenses' },
+              { key: 'showLanguages', label: 'Languages' },
+              { key: 'showCustomSections', label: 'Custom Sections' },
+            ].map(sec => {
+              const isChecked = resumeData.settings?.[sec.key] !== false;
+              return (
+                <label key={sec.key} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.5rem 0.75rem', borderRadius: '8px', background: '#F8FAFC', border: '1px solid #E2E8F0', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={isChecked} 
+                    onChange={(e) => updateSettings(sec.key, e.target.checked)}
+                    style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
+                  />
+                  {sec.label}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
     </motion.div>
   );
@@ -2155,19 +2372,46 @@ const BuilderFlow = () => {
           z-index: -2;
         }
       `}</style>
-      
-      {/* Top Header */}
       <header style={{ height: '64px', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', position: 'relative', zIndex: 20 }}>
-        {/* Left: Quick Back to Templates */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* Left: Home & Start Fresh */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button 
-            onClick={() => navigate('/templates')}
+            onClick={() => setShowExitConfirm(true)}
             className="studio-back-btn"
           >
-            <ChevronLeft size={16} /> Change Template
+            <ChevronLeft size={16} /> Home
+          </button>
+
+          <button
+            onClick={() => {
+              if (window.confirm("Start fresh with a clean resume? All current edits will be reset.")) {
+                resetResume();
+                setActiveStepIndex(0);
+                setPersonalValidationError('');
+              }
+            }}
+            style={{
+              background: 'transparent',
+              border: '1px solid #CBD5E1',
+              borderRadius: '8px',
+              padding: '5px 11px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              color: '#475569',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = '#FEF2F2'; e.currentTarget.style.borderColor = '#FCA5A5'; e.currentTarget.style.color = '#EF4444'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.color = '#475569'; }}
+          >
+            <RotateCcw size={13} /> Start Fresh
           </button>
         </div>
 
+        {/* Center: 3-Way Mode Switcher (Content / Customize / Templates) */}
         <div style={{ 
           position: 'absolute', 
           left: '50%', 
@@ -2179,38 +2423,84 @@ const BuilderFlow = () => {
         }}>
           <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <button 
-              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
               onClick={() => setLeftPaneMode('edit')}
             >
-              Edit
+              Content
             </button>
             <button 
-              style={{ padding: '6px 20px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
               onClick={() => setLeftPaneMode('customize')}
             >
               Customize
             </button>
-          </div>
-
-          {/* Mobile View Switcher (Edit vs Preview) */}
-          <div className="mobile-view-toggle" style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px' }}>
             <button 
-              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'edit' ? 'var(--text-main)' : 'transparent', color: mobileTab === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
-              onClick={() => setMobileTab('edit')}
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'templates' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'templates' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+              onClick={() => setLeftPaneMode('templates')}
             >
-              ✏️ Form
-            </button>
-            <button 
-              style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', background: mobileTab === 'preview' ? 'var(--text-main)' : 'transparent', color: mobileTab === 'preview' ? '#FFFFFF' : '#64748B', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }} 
-              onClick={() => setMobileTab('preview')}
-            >
-              👁️ Preview
+              Templates
             </button>
           </div>
         </div>
 
         {/* Right: Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {/* Quick Accent Color Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowAccentPicker(!showAccentPicker)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                height: '36px',
+                padding: '0 0.85rem',
+                borderRadius: '8px',
+                border: '1.5px solid var(--primary-border)',
+                background: 'var(--primary-light)',
+                color: 'var(--primary)',
+                fontWeight: 700,
+                fontSize: '0.825rem',
+                cursor: 'pointer'
+              }}
+            >
+              <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary)', display: 'inline-block' }} />
+              <span>Accent</span>
+            </button>
+
+            {showAccentPicker && (
+              <div style={{
+                position: 'absolute', right: 0, top: '125%',
+                background: '#FFFFFF', border: '1px solid #CBD5E1',
+                borderRadius: '14px', boxShadow: '0 15px 35px rgba(15,23,42,0.15)',
+                padding: '0.75rem', minWidth: '220px', zIndex: 250
+              }}>
+                <div style={{ fontSize: '0.725rem', fontWeight: 800, color: '#64748B', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  QUICK ACCENT PALETTE
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                  {ACCENT_COLOR_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => {
+                        applyAccentColorPreset(preset);
+                        setShowAccentPicker(false);
+                      }}
+                      title={preset.name}
+                      style={{
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        background: preset.primary, border: (resumeData.settings?.primaryColor || '').toLowerCase() === preset.primary.toLowerCase() ? '3px solid #FFF' : 'none',
+                        outline: (resumeData.settings?.primaryColor || '').toLowerCase() === preset.primary.toLowerCase() ? '2px solid ' + preset.primary : 'none',
+                        cursor: 'pointer'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <button 
             onClick={() => {
               setShowSyncModal(true);
@@ -2241,7 +2531,7 @@ const BuilderFlow = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              transition: 'all 0.1s ease'
+              transition: 'all 0.15s ease'
             }}
             onMouseOver={(e) => { e.currentTarget.style.background = '#FAF9F6'; }}
             onMouseOut={(e) => { e.currentTarget.style.background = '#FFFFFF'; }}
@@ -2252,7 +2542,7 @@ const BuilderFlow = () => {
       </header>
 
       {/* Main Split Layout: Editor takes ~62% space for maximum clarity */}
-      <div className={`builder-layout mobile-tab-${mobileTab}`} style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className={'builder-layout mobile-tab-' + mobileTab} style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         
         {/* Left Pane — Editing Form (Expanded Width ~62%) */}
         <div className="editor-container builder-sidebar" style={{ 
@@ -2276,7 +2566,11 @@ const BuilderFlow = () => {
           <div style={{ position: 'absolute', top: '30%', left: '-10%', width: '350px', height: '350px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.06) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
           
           <div style={{ flex: 1, overflowY: 'auto', padding: '2rem 2.5rem 100px 2.5rem', position: 'relative', zIndex: 10 }}>
-            {leftPaneMode === 'edit' ? (showAIAudit ? renderAIAuditPanel() : renderEditForm()) : renderCustomizePanel()}
+            {leftPaneMode === 'edit' 
+              ? (showAIAudit ? renderAIAuditPanel() : renderEditForm()) 
+              : leftPaneMode === 'templates' 
+                ? renderTemplatesPanel() 
+                : renderCustomizePanel()}
           </div>
 
           {/* Footer — only in edit mode and when not showing AI Audit */}
@@ -2351,81 +2645,15 @@ const BuilderFlow = () => {
               style={{ 
                 width: '800px', 
                 height: '1131px', 
-                transform: `scale(${previewScale})`,
+                transform: 'scale(' + previewScale + ')',
                 transformOrigin: 'top center', 
                 background: '#FFFFFF',
                 boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
                 position: 'relative',
-                marginBottom: `-${(1 - previewScale) * 1131}px`
+                marginBottom: '-' + ((1 - previewScale) * 1131) + 'px'
               }}
             >
-              {leftPaneMode === 'customize' ? (
-                <div
-                  id="resume-pdf-content"
-                  style={{
-                    width: '800px', minHeight: '1131px', position: 'relative',
-                    '--resume-primary': resumeData.settings?.primaryColor || '#059669',
-                    '--resume-font': resumeData.settings?.fontFamily || 'Inter',
-                    '--resume-padding': resumeData.settings?.margins === 'Compact' ? '24px' : resumeData.settings?.margins === 'Spacious' ? '56px' : '40px',
-                    fontFamily: `var(--resume-font), sans-serif`
-                  }}
-                >
-                  <style>{`
-                    #resume-pdf-content * { font-family: var(--resume-font), sans-serif !important; }
-                    #resume-pdf-content [style*="color: #059669"],
-                    #resume-pdf-content [style*="color:#059669"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #059669"],
-                    #resume-pdf-content [style*="background:#059669"],
-                    #resume-pdf-content [style*="background-color: #059669"],
-                    #resume-pdf-content [style*="background-color:#059669"] { background-color: var(--resume-primary) !important; background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="border-color: #059669"],
-                    #resume-pdf-content [style*="borderColor: #059669"] { border-color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #4361EE"],
-                    #resume-pdf-content [style*="color:#4361EE"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #4361EE"],
-                    #resume-pdf-content [style*="background:#4361EE"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #2563EB"],
-                    #resume-pdf-content [style*="color:#2563EB"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #2563EB"],
-                    #resume-pdf-content [style*="background:#2563EB"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #007E6F"],
-                    #resume-pdf-content [style*="color:#007E6F"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #007E6F"],
-                    #resume-pdf-content [style*="background:#007E6F"] { background: var(--resume-primary) !important; background-color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #9D4EDD"],
-                    #resume-pdf-content [style*="color:#9D4EDD"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #9D4EDD"],
-                    #resume-pdf-content [style*="background:#9D4EDD"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #14213D"],
-                    #resume-pdf-content [style*="color:#14213D"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #14213D"],
-                    #resume-pdf-content [style*="background:#14213D"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #F72585"],
-                    #resume-pdf-content [style*="color:#F72585"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #F72585"],
-                    #resume-pdf-content [style*="background:#F72585"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #E11D48"],
-                    #resume-pdf-content [style*="color:#E11D48"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #E11D48"],
-                    #resume-pdf-content [style*="background:#E11D48"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #1E3A8A"],
-                    #resume-pdf-content [style*="color:#1E3A8A"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #1E3A8A"],
-                    #resume-pdf-content [style*="background:#1E3A8A"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #FF9F1C"],
-                    #resume-pdf-content [style*="color:#FF9F1C"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #FF9F1C"],
-                    #resume-pdf-content [style*="background:#FF9F1C"] { background: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="color: #FCA311"],
-                    #resume-pdf-content [style*="color:#FCA311"] { color: var(--resume-primary) !important; }
-                    #resume-pdf-content [style*="background: #FCA311"],
-                    #resume-pdf-content [style*="background:#FCA311"] { background: var(--resume-primary) !important; }
-                  `}</style>
-                  <TemplateRenderer templateId={selectedTemplate} resumeData={resumeData} />
-                </div>
-              ) : (
-                <LivePreview disableScaling={true} />
-              )}
+              <LivePreview disableScaling={true} />
             </div>
           </div>
           
