@@ -22,88 +22,95 @@ export const dummyData = {
     fullName: 'John Doe',
     firstName: 'John',
     lastName: 'Doe',
-    jobTitle: 'Senior Software Engineer',
+    jobTitle: 'Full Stack Software Engineer',
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
     location: 'San Francisco, CA',
     linkedin: 'linkedin.com/in/johndoe',
     github: 'github.com/johndoe',
     website: 'johndoe.com',
-    portfolio: 'portfolio.johndoe.com',
-    summary: 'Highly motivated and detail-oriented Software Engineer with over 8 years of experience building scalable web applications. Proven track record of leading teams, optimizing performance, and delivering high-quality software solutions on time.',
+    portfolio: 'github.com/johndoe',
+    summary: 'Full Stack Software Engineer focused on building scalable web applications and clean user experiences. Skilled in React, Node.js, API development, and cloud deployment.',
   },
   experience: [
     {
       id: 'exp1',
       title: 'Senior Software Engineer',
       jobTitle: 'Senior Software Engineer',
-      company: 'Tech Innovators Inc.',
-      startDate: 'Jan 2020',
+      company: 'Tech Solutions Inc.',
+      startDate: 'Jun 2024',
       endDate: 'Present',
       location: 'San Francisco, CA',
-      description: '• Led the development of a microservices architecture that improved system scalability by 40%.\n• Mentored junior engineers and conducted code reviews to ensure best practices.\n• Reduced page load times by 30% through advanced caching strategies.',
+      description: '• Developed modern web applications using React and Node.js.\n• Built reusable components, optimized performance, and integrated REST APIs for data-driven features.',
     },
     {
       id: 'exp2',
       title: 'Software Engineer',
       jobTitle: 'Software Engineer',
-      company: 'Creative Solutions',
-      startDate: 'Mar 2016',
-      endDate: 'Dec 2019',
-      location: 'New York, NY',
-      description: '• Developed and maintained RESTful APIs used by over 100,000 active users.\n• Collaborated with product managers and designers to launch 3 major product features.\n• Integrated third-party payment gateways, processing over $1M in transactions.',
+      company: 'Innovatech Labs',
+      startDate: 'Jan 2022',
+      endDate: 'May 2024',
+      location: 'San Jose, CA',
+      description: '• Worked on full stack product development with JavaScript, Express, and PostgreSQL.\n• Collaborated in agile teams to deliver customer-focused solutions and automation tools.',
     }
   ],
   education: [
     {
       id: 'edu1',
-      school: 'University of California, Berkeley',
-      institution: 'University of California, Berkeley',
-      degree: 'Master of Science in Computer Science',
-      startDate: 'Aug 2014',
-      endDate: 'May 2016',
+      school: 'University of California',
+      institution: 'University of California',
+      degree: 'B.S. in Computer Science',
+      startDate: '',
+      endDate: 'Jun 2020',
       location: 'Berkeley, CA',
-      cgpa: '3.9/4.0',
-    },
-    {
-      id: 'edu2',
-      school: 'University of Washington',
-      institution: 'University of Washington',
-      degree: 'Bachelor of Science in Software Engineering',
-      startDate: 'Sep 2010',
-      endDate: 'Jun 2014',
-      location: 'Seattle, WA',
-      cgpa: '3.8/4.0',
     }
   ],
   projects: [
     {
       id: 'proj1',
-      name: 'E-commerce Platform Migration',
-      duration: 'Jan 2022 - Jun 2022',
-      description: 'Successfully migrated a legacy monolithic e-commerce platform to a modern React and Node.js stack, resulting in a 50% increase in mobile conversions and zero downtime.',
+      name: 'E-Commerce Platform - Full Stack Web Application',
+      technologies: 'React | Node.js | MongoDB | Docker',
+      duration: '',
+      description: '• Designed and developed a full-stack e-commerce application from scratch with secure user authentication (login, register, session management)\n• Built backend architecture following MVC pattern with REST API endpoints for create, read, update, and delete operations\n• Implemented database with normalized schema for efficient data storage and retrieval across multiple user accounts\n• Wrote automated end-to-end test suite using Selenium WebDriver to simulate real user interactions including form submissions, navigation, and authentication flows\n• Containerized the entire application using Docker ensuring consistent deployment across different environments with zero configuration issues\n• Identified and resolved a hardcoded credential vulnerability during development — applied OWASP Top 10 security principles to harden the application',
     },
     {
       id: 'proj2',
-      name: 'Real-time Analytics Dashboard',
-      duration: 'Mar 2021 - Sep 2021',
-      description: 'Built a real-time analytics dashboard using WebSockets and D3.js, allowing business stakeholders to monitor key performance indicators instantly.',
+      name: 'Smart Home Dashboard - Capstone Project',
+      technologies: 'Python | React | IoT Sensors | WebSockets',
+      duration: '',
+      description: '• Designed and built a real-time smart home monitoring system as final year capstone project, integrating hardware and software components end to end\n• Assembled hardware circuit with temperature sensors connected to microcontroller for detecting environmental changes simultaneously\n• Developed Python backend to receive and process live sensor data via WebSockets, updating dashboard status in real time\n• Documented full system architecture including circuit diagrams, data flow, and test results for academic submission',
+    },
+    {
+      id: 'proj3',
+      name: 'Customer Churn Predictor - Machine Learning',
+      technologies: 'Python | Scikit-learn | Pandas | Flask',
+      duration: '',
+      description: '• Built a binary classification model using Random Forest and XGBoost algorithms, achieving 92%+ accuracy on held-out test data\n• Engineered full data preprocessing pipeline — missing value imputation, feature scaling, one-hot encoding — to convert raw data into model-ready features\n• Deployed real-time prediction interface using Flask for live customer risk assessment',
+    },
+    {
+      id: 'proj4',
+      name: 'Sales Data Analysis - Enterprise Database',
+      technologies: 'PostgreSQL | Advanced SQL | PowerBI',
+      duration: '',
+      description: '• Conducted end-to-end business data analysis on enterprise sample database simulating a real retail company dataset\n• Analysed revenue performance, customer lifetime value, product profitability, store efficiency, and time-based sales trends across the full dataset\n• Wrote advanced SQL queries using multi-table joins, correlated subqueries, CTEs, and window functions for ranking, cumulative totals, and segmentation\n• Derived actionable insights including top revenue-generating products, high-value customer segments, underperforming regions, and peak sales periods',
     }
   ],
   skills: {
-    programming: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'GraphQL', 'AWS', 'Docker']
+    programming: ['React', 'Node.js', 'JavaScript', 'TypeScript', 'REST APIs', 'SQL', 'AWS', 'Docker']
   },
   certifications: [
-    { id: 'cert1', name: 'AWS Certified Solutions Architect', issuer: 'Amazon Web Services', date: '2021' },
-    { id: 'cert2', name: 'Certified Scrum Master (CSM)', issuer: 'Scrum Alliance', date: '2019' }
+    { id: 'cert1', name: 'AWS Certified Solutions Architect - Associate', issuer: 'AWS', date: '' },
+    { id: 'cert2', name: 'Google Cloud Professional Cloud Developer', issuer: 'Google Cloud', date: '' },
+    { id: 'cert3', name: 'Cisco - Networking & Python Essentials', issuer: 'Cisco Networking Academy', date: '' },
+    { id: 'cert4', name: 'Microsoft Fundamentals', issuer: 'Coursera', date: '' }
   ],
   languages: [
-    { id: 'lang1', name: 'English', proficiency: 'Native' },
-    { id: 'lang2', name: 'Spanish', proficiency: 'Conversational' }
+    { id: 'lang1', name: 'English', proficiency: 'Native' }
   ]
 };
 
-const TemplateRenderer = ({ templateId, resumeData, isPreview = false }) => {
+const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propData, isPreview = false }) => {
+  const resumeData = rawResumeData || propData;
   const isAslam = templateId === 'aslam';
   const currentDummy = isAslam ? aslamDummyData : dummyData;
 
@@ -112,8 +119,8 @@ const TemplateRenderer = ({ templateId, resumeData, isPreview = false }) => {
 
   const getSkillsArray = (s) => {
     if (!s) return [];
-    if (Array.isArray(s)) return s.filter(Boolean);
-    return Object.values(s).flat().filter(Boolean);
+    if (Array.isArray(s)) return s.map(item => typeof item === 'object' ? item?.name || '' : item).filter(Boolean);
+    return Object.values(s).flat().map(item => typeof item === 'object' ? item?.name || '' : item).filter(Boolean);
   };
 
   const renderSupplementalSections = (data) => {
@@ -201,11 +208,11 @@ const TemplateRenderer = ({ templateId, resumeData, isPreview = false }) => {
   const hasUserCertifications = resumeData?.certifications && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c.name);
   const hasUserLanguages = resumeData?.languages && resumeData.languages.length > 0 && resumeData.languages.some(l => l.name);
 
-  const fallbackExperience = isPreview ? [] : (isAslam ? (aslamDummyData.experience || []) : dummyData.experience);
-  const fallbackEducation = isPreview ? [] : (isAslam ? (aslamDummyData.education || []) : dummyData.education);
-  const fallbackProjects = isPreview ? [] : (isAslam ? (aslamDummyData.projects || []) : dummyData.projects);
-  const fallbackCertifications = isPreview ? [] : (isAslam ? (aslamDummyData.certifications || []) : dummyData.certifications);
-  const fallbackLanguages = isPreview ? [] : (isAslam ? (aslamDummyData.languages || []) : dummyData.languages);
+  const fallbackExperience = isAslam ? (aslamDummyData.experience || []) : dummyData.experience;
+  const fallbackEducation = isAslam ? (aslamDummyData.education || []) : dummyData.education;
+  const fallbackProjects = isAslam ? (aslamDummyData.projects || []) : dummyData.projects;
+  const fallbackCertifications = isAslam ? (aslamDummyData.certifications || []) : dummyData.certifications;
+  const fallbackLanguages = isAslam ? (aslamDummyData.languages || []) : dummyData.languages;
 
   const activeSettings = {
     showSummary: true,

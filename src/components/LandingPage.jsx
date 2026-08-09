@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { templates } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
-import { mockResumeData } from '../utils/mockResumeData';
+import { mockResumeData, templateMockData } from '../utils/mockResumeData';
 import { useResume } from '../context/ResumeContext';
 import { useAuth } from '../context/AuthContext';
 import AuraHeader from './AuraHeader';
@@ -15,13 +15,32 @@ import {
 
 // ── Ultra-Clean Hero Interactive Sandbox ──
 const HeroSandbox = () => {
-  const [selectedId, setSelectedId] = useState('multicolor');
+  const { resumeData, selectedTemplate, setSelectedTemplate } = useResume();
+  const [selectedId, setSelectedId] = useState(selectedTemplate || 'multicolor');
+
+  const hasSavedDraft = Boolean(
+    resumeData?.personalInfo?.fullName ||
+    resumeData?.personalInfo?.email ||
+    (resumeData?.experience && resumeData.experience.length > 0) ||
+    (resumeData?.projects && resumeData.projects.length > 0) ||
+    (resumeData?.skills && (Array.isArray(resumeData.skills) ? resumeData.skills.length > 0 : Object.values(resumeData.skills).flat().filter(Boolean).length > 0))
+  );
+
   const showcaseOptions = [
     { id: 'multicolor', label: 'Multi Color' },
     { id: 'visionary', label: 'Visionary' },
     { id: 'minimalclassic', label: 'Classic' },
     { id: 'aslam', label: 'Elite IT' }
   ];
+
+  const handleSelect = (id) => {
+    setSelectedId(id);
+    if (setSelectedTemplate) setSelectedTemplate(id);
+  };
+
+  const previewDataToRender = hasSavedDraft
+    ? resumeData
+    : (templateMockData[selectedId] || mockResumeData);
 
   return (
     <div style={{
@@ -56,7 +75,7 @@ const HeroSandbox = () => {
           {showcaseOptions.map((opt) => (
             <button
               key={opt.id}
-              onClick={() => setSelectedId(opt.id)}
+              onClick={() => handleSelect(opt.id)}
               style={{
                 padding: '0.3rem 0.65rem',
                 borderRadius: '9999px',
@@ -78,8 +97,8 @@ const HeroSandbox = () => {
 
       {/* Rendered Template View */}
       <div style={{
-        height: '520px',
-        overflow: 'hidden',
+        height: '540px',
+        overflowY: 'auto',
         position: 'relative',
         backgroundColor: '#F1F5F9',
         display: 'flex',
@@ -90,10 +109,12 @@ const HeroSandbox = () => {
           transform: 'scale(0.53)',
           transformOrigin: 'top center',
           width: '794px',
-          height: '1123px',
+          height: 'auto',
+          minHeight: '1123px',
+          marginBottom: '20px',
           boxShadow: '0 12px 32px rgba(0,0,0,0.08)'
         }}>
-          <TemplateRenderer templateId={selectedId} data={mockResumeData} />
+          <TemplateRenderer templateId={selectedId} resumeData={previewDataToRender} />
         </div>
       </div>
 
@@ -127,12 +148,16 @@ export default function LandingPage() {
   const hasSavedDraft = Boolean(
     resumeData?.personalInfo?.fullName ||
     resumeData?.personalInfo?.email ||
-    resumeData?.experience?.length > 0 ||
-    resumeData?.projects?.length > 0 ||
-    resumeData?.skills?.programming?.length > 0
+    (resumeData?.experience && resumeData.experience.length > 0) ||
+    (resumeData?.projects && resumeData.projects.length > 0) ||
+    (resumeData?.skills && (Array.isArray(resumeData.skills) ? resumeData.skills.length > 0 : Object.values(resumeData.skills).flat().filter(Boolean).length > 0))
   );
 
   const [activities, setActivities] = useState([]);
+  const [savedResumeName, setSavedResumeName] = useState(() => {
+    // Try to read from localStorage as a quick fallback
+    return localStorage.getItem('lumen_last_pdf_title') || '';
+  });
 
   React.useEffect(() => {
     const fetchActivities = async () => {
@@ -146,6 +171,26 @@ export default function LandingPage() {
       }
     };
     fetchActivities();
+  }, [user?.email]);
+
+  React.useEffect(() => {
+    const fetchLatestResumeName = async () => {
+      if (!user?.email) return;
+      try {
+        const list = await apiClient.resumes.list(user.email);
+        if (Array.isArray(list) && list.length > 0) {
+          // Sort by most recent and grab the name
+          const latest = list.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))[0];
+          if (latest?.name) {
+            setSavedResumeName(latest.name);
+            localStorage.setItem('lumen_last_pdf_title', latest.name);
+          }
+        }
+      } catch (e) {
+        console.warn('Could not fetch resume list:', e);
+      }
+    };
+    fetchLatestResumeName();
   }, [user?.email]);
 
   const [wishlist, setWishlist] = useState(() => {
@@ -208,8 +253,8 @@ export default function LandingPage() {
             }}>
               {/* Left Column */}
               <div>
-                <div className="aura-badge" style={{ marginBottom: '1.25rem' }}>
-                  <span>EXECUTIVE CAREER ENGINE</span>
+                <div style={{ marginBottom: '1.25rem', fontSize: '0.875rem', fontWeight: 700, color: 'var(--primary)', letterSpacing: '0.02em' }}>
+                  {'{ Resume Builder }'}
                 </div>
 
                 <h1 style={{
@@ -294,274 +339,251 @@ export default function LandingPage() {
               {/* Section Header */}
               <div style={{ marginBottom: '2.5rem' }}>
                 <h2 style={{ fontSize: '2.3rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, letterSpacing: '-0.03em' }}>
-                  Career Assets & Activity Studio
+                  LED — Career Assets & Activity
                 </h2>
               </div>
 
-              {/* Wide 2-Column Multi-Paper Grid */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-                gap: '2.5rem',
-                alignItems: 'stretch'
-              }}>
+              {/* Single Unified Multi-Paper Stacked Card */}
+              <div style={{ position: 'relative', width: '100%' }}>
+                {/* Paper Sheet 3: Cool Slate */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '24px',
+                  background: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  transform: 'translate(10px, 11px) rotate(1.2deg)',
+                  zIndex: 0,
+                  boxShadow: '0 4px 14px rgba(15,23,42,0.03)'
+                }} />
 
-                {/* Left Column: Multi-Paper Stacked Card - Active Resume Draft */}
-                <div style={{ position: 'relative' }}>
-                  {/* Paper Sheet 3: Cool Slate */}
+                {/* Paper Sheet 2: Soft Warm Linen */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '24px',
+                  background: 'var(--primary-light, #FAF9F5)',
+                  border: '1.5px solid var(--primary-border, #E7E5E0)',
+                  transform: 'translate(5px, 6px) rotate(0.6deg)',
+                  zIndex: 1,
+                  boxShadow: '0 4px 14px rgba(15,23,42,0.04)'
+                }} />
+
+                {/* Main Single Card Content */}
+                <div style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '24px',
+                  border: '1.5px solid var(--primary-border)',
+                  padding: '2.5rem',
+                  boxShadow: 'var(--shadow-md)',
+                  overflow: 'hidden'
+                }}>
+                  {/* Background Glow */}
                   <div style={{
                     position: 'absolute',
-                    inset: 0,
-                    borderRadius: '24px',
-                    background: '#F1F5F9',
-                    border: '1px solid #CBD5E1',
-                    transform: 'translate(10px, 11px) rotate(1.4deg)',
-                    zIndex: 0,
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.03)'
+                    top: '-60px',
+                    right: '-60px',
+                    width: '240px',
+                    height: '240px',
+                    borderRadius: '50%',
+                    background: 'var(--primary-glow)',
+                    filter: 'blur(50px)',
+                    pointerEvents: 'none'
                   }} />
 
-                  {/* Paper Sheet 2: Soft Warm Linen / Theme Tint */}
                   <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    borderRadius: '24px',
-                    background: 'var(--primary-light, #FAF9F5)',
-                    border: '1.5px solid var(--primary-border, #E7E5E0)',
-                    transform: 'translate(5px, 6px) rotate(0.7deg)',
-                    zIndex: 1,
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.04)'
-                  }} />
-
-                  {/* Paper Sheet 1: Main Top Card */}
-                  <div style={{
-                    position: 'relative',
-                    zIndex: 2,
-                    height: '100%',
-                    boxSizing: 'border-box',
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '24px',
-                    border: '1.5px solid var(--primary-border)',
-                    padding: '2.25rem 2rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    boxShadow: 'var(--shadow-md)',
-                    overflow: 'hidden'
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                    gap: '2.5rem',
+                    alignItems: 'center'
                   }}>
-                    {/* Background Radial Glow */}
-                    <div style={{
-                      position: 'absolute',
-                      top: '-60px',
-                      right: '-60px',
-                      width: '220px',
-                      height: '220px',
-                      borderRadius: '50%',
-                      background: 'var(--primary-glow)',
-                      filter: 'blur(45px)',
-                      pointerEvents: 'none'
-                    }} />
-
-                    <div>
-                      <div style={{ marginBottom: '1.5rem' }}>
-                        {user && (
-                          <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                            {user.email}
-                          </span>
-                        )}
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: '1.75rem' }}>
-                        {/* Mini Live Preview */}
-                        <div style={{
+                    {/* Left: Active Draft Info & Mini Preview */}
+                    <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      {/* Mini Live Preview Thumbnail (Clickable to open builder) */}
+                      <div 
+                        onClick={() => navigate('/builder')}
+                        style={{
                           width: '140px',
-                          height: '190px',
+                          height: '195px',
                           borderRadius: '14px',
                           backgroundColor: '#FFFFFF',
                           border: '1.5px solid var(--primary-border)',
                           overflow: 'hidden',
-                          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.1)',
+                          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
                           position: 'relative',
-                          flexShrink: 0
-                        }}>
-                          <div style={{
-                            transform: 'scale(0.18)',
-                            transformOrigin: 'top left',
-                            width: '794px',
-                            height: '1123px',
-                            pointerEvents: 'none'
-                          }}>
-                            <TemplateRenderer templateId={selectedTemplate || 'multicolor'} data={resumeData} />
-                          </div>
-                        </div>
-
-                        {/* Resume Metadata */}
-                        <div style={{ flex: 1, minWidth: '180px' }}>
-                          {resumeData?.personalInfo?.fullName && (
-                            <h3 style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.4rem 0' }}>
-                              {resumeData.personalInfo.fullName}
-                            </h3>
-                          )}
-                          {resumeData?.personalInfo?.jobTitle && (
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0, fontWeight: 600 }}>
-                              {resumeData.personalInfo.jobTitle}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action CTA Buttons */}
-                    <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
-                      <button
-                        onClick={() => navigate('/builder')}
-                        className="aura-btn-primary"
-                        style={{ flex: 1, minWidth: '180px', padding: '0.8rem 1.25rem', fontSize: '0.925rem', borderRadius: '12px', justifyContent: 'center' }}
-                      >
-                        <Edit3 size={17} />
-                        <span>Rebuild & Edit Resume</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          resetResume();
-                          navigate('/choose');
+                          flexShrink: 0,
+                          cursor: 'pointer',
+                          transition: 'transform 0.15s, box-shadow 0.15s'
                         }}
-                        className="aura-btn-secondary"
-                        style={{ padding: '0.8rem 1.1rem', fontSize: '0.925rem', borderRadius: '12px' }}
-                        title="Start Fresh"
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 12px 28px rgba(15, 23, 42, 0.14)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(15, 23, 42, 0.08)';
+                        }}
+                        title="Click to open resume in Builder Studio"
                       >
-                        <RotateCcw size={17} />
-                        <span>Start Fresh</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column: Multi-Paper Stacked Card - Activity History Log */}
-                <div style={{ position: 'relative' }}>
-                  {/* Paper Sheet 3: Warm Linen */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    borderRadius: '24px',
-                    background: '#FAF9F5',
-                    border: '1px solid #E7E5E0',
-                    transform: 'translate(10px, 11px) rotate(-1.2deg)',
-                    zIndex: 0,
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.03)'
-                  }} />
-
-                  {/* Paper Sheet 2: Cool Slate */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    borderRadius: '24px',
-                    background: '#F1F5F9',
-                    border: '1px solid #CBD5E1',
-                    transform: 'translate(5px, 6px) rotate(-0.6deg)',
-                    zIndex: 1,
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.04)'
-                  }} />
-
-                  {/* Paper Sheet 1: Main Card */}
-                  <div style={{
-                    position: 'relative',
-                    zIndex: 2,
-                    height: '100%',
-                    boxSizing: 'border-box',
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '24px',
-                    border: '1.5px solid var(--primary-border)',
-                    padding: '2.25rem 2rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    boxShadow: 'var(--shadow-md)'
-                  }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
-                        <div style={{ width: '34px', height: '34px', borderRadius: '10px', backgroundColor: 'var(--primary-light)', color: 'var(--primary)', border: '1px solid var(--primary-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <History size={18} />
+                        <div style={{
+                          transform: 'scale(' + (140 / 794) + ')',
+                          transformOrigin: 'top left',
+                          width: '794px',
+                          height: '1123px',
+                          pointerEvents: 'none'
+                        }}>
+                          <TemplateRenderer templateId={selectedTemplate || 'multicolor'} resumeData={resumeData} />
                         </div>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
-                          Download & Activity Vault
-                        </h3>
                       </div>
 
-                      {/* Timeline Log List */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', maxHeight: '250px', overflowY: 'auto', paddingRight: '0.25rem' }}>
-                        {activities.length > 0 ? (
-                          activities.slice(0, 5).map((act, index) => (
-                            <div key={act.id || act._id || index} style={{
-                              padding: '0.85rem 1rem',
-                              borderRadius: '14px',
-                              backgroundColor: 'var(--primary-light)',
-                              border: '1px solid var(--primary-border)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              gap: '0.75rem'
+                      {/* Resume Details & Metadata */}
+                      <div style={{ flex: 1, minWidth: '180px' }}>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.35rem' }}>
+                          {user?.email || 'Active Local Resume'}
+                        </div>
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0', letterSpacing: '-0.02em' }}>
+                          {savedResumeName || resumeData?.personalInfo?.fullName || 'Active Resume'}
+                        </h3>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', margin: 0, fontWeight: 600 }}>
+                          {resumeData?.personalInfo?.jobTitle || 'Executive Professional'}
+                        </p>
+
+                        {/* PDF Title / Save tag */}
+                        {savedResumeName && (
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            marginTop: '0.75rem',
+                            paddingLeft: '0.6rem',
+                            borderLeft: '2.5px solid var(--primary)',
+                          }}>
+                            <FileText size={13} color="var(--primary)" style={{ flexShrink: 0 }} />
+                            <span style={{
+                              fontSize: '0.825rem',
+                              fontWeight: 600,
+                              color: 'var(--text-main)',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              maxWidth: '220px',
                             }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <div style={{
-                                  width: '34px',
-                                  height: '34px',
-                                  borderRadius: '8px',
-                                  backgroundColor: '#FFFFFF',
-                                  color: 'var(--primary)',
-                                  border: '1px solid var(--primary-border)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
-                                }}>
-                                  {act.type === 'pdf_download' ? <Download size={16} /> : <FileText size={16} />}
-                                </div>
-                                <div>
-                                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                                    {act.type === 'pdf_download' ? 'PDF Export Generated' : 'Resume Draft Saved'}
-                                  </div>
-                                  <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
-                                    {act.resumeName || 'Executive Resume'} • Template: {act.templateId || selectedTemplate}
-                                  </div>
-                                </div>
-                              </div>
-                              <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: 600, flexShrink: 0 }}>
-                                {act.created_at ? new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Saved'}
-                              </span>
-                            </div>
-                          ))
-                        ) : (
-                          <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
-                            <Clock size={32} color="var(--primary)" style={{ marginBottom: '0.5rem' }} />
-                            <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)' }}>No PDF Downloads Logged Yet</div>
-                            <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>Click "Rebuild & Edit Resume" to export your first PDF!</div>
+                              {savedResumeName}
+                            </span>
                           </div>
                         )}
+
+                        {/* CTAs */}
+                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+                          <button
+                            onClick={() => navigate('/builder')}
+                            className="aura-btn-primary"
+                            style={{ padding: '0.75rem 1.4rem', fontSize: '0.9rem' }}
+                          >
+                            <Edit3 size={16} />
+                            <span>Rebuild & Edit Resume</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              resetResume();
+                              navigate('/choose');
+                            }}
+                            className="aura-btn-secondary"
+                            style={{ padding: '0.75rem 1.25rem', fontSize: '0.9rem' }}
+                            title="Start Fresh"
+                          >
+                            <RotateCcw size={16} />
+                            <span>Start Fresh</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Bottom Footer Bar */}
+                    {/* Right: Embedded Recent Activity & Downloads Log */}
                     <div style={{
-                      marginTop: '1.5rem',
-                      paddingTop: '1rem',
-                      borderTop: '1px solid var(--border-color)',
+                      borderLeft: '1px solid var(--border-color)',
+                      paddingLeft: '2rem',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      fontSize: '0.825rem'
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '220px'
                     }}>
-                      <button
-                        onClick={() => navigate('/builder')}
-                        style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', padding: 0 }}
-                      >
-                        Open Builder Studio →
-                      </button>
+                      <div>
+                        <div 
+                          onClick={() => navigate('/activity')}
+                          style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '1.1rem', cursor: 'pointer' }}
+                          title="Open LED Activity & Export Vault page"
+                        >
+                          <History size={18} color="var(--primary)" />
+                          <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                            Recent Activity & Downloads
+                          </h4>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxHeight: '180px', overflowY: 'auto', paddingRight: '0.25rem' }}>
+                          {activities.length > 0 ? (
+                            activities.slice(0, 4).map((act, index) => (
+                              <div key={act.id || act._id || index} style={{
+                                padding: '0.6rem 0',
+                                borderBottom: '1px solid var(--border-color)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: '0.75rem'
+                              }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                                  <div style={{
+                                    width: '30px',
+                                    height: '30px',
+                                    borderRadius: '8px',
+                                    backgroundColor: 'var(--primary-light)',
+                                    color: 'var(--primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0
+                                  }}>
+                                    {act.type === 'pdf_download' ? <Download size={14} /> : <FileText size={14} />}
+                                  </div>
+                                  <div>
+                                    <div style={{ fontSize: '0.855rem', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.2 }}>
+                                      {act.resumeName || 'Executive Resume'}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                      {act.type === 'pdf_download' ? 'PDF Exported' : 'Draft Saved'} · {act.templateId || selectedTemplate}
+                                    </div>
+                                  </div>
+                                </div>
+                                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 500, flexShrink: 0 }}>
+                                  {act.created_at ? new Date(act.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Saved'}
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <div style={{ textAlign: 'center', padding: '1.5rem 1rem', color: 'var(--text-muted)' }}>
+                              <Clock size={28} color="var(--primary)" style={{ marginBottom: '0.4rem' }} />
+                              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>No Downloads Logged Yet</div>
+                              <div style={{ fontSize: '0.775rem', marginTop: '3px' }}>Click "Rebuild & Edit Resume" to export your first PDF!</div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                        <button
+                          onClick={() => navigate('/activity')}
+                          style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', padding: 0 }}
+                        >
+                          View Full Activity Vault →
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-              </div>{/* End 2-Column Grid */}
+              </div>
             </div>
           </section>
         )}
@@ -631,7 +653,7 @@ export default function LandingPage() {
                       height: '1123px',
                       pointerEvents: 'none'
                     }}>
-                      <TemplateRenderer templateId={tmpl.id} data={mockResumeData} />
+                      <TemplateRenderer templateId={tmpl.id} resumeData={templateMockData[tmpl.id] || mockResumeData} />
                     </div>
 
                     {/* Top Heart Wishlist Overlay Button */}
@@ -707,12 +729,12 @@ export default function LandingPage() {
           gap: '1rem'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--text-main)' }}>
-            <FileText size={18} color="var(--primary)" />
-            <span>LUMEN Studio</span>
+            <span>LED</span>
+            <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Learning Experience Delivery</span>
           </div>
 
           <div>
-            © {new Date().getFullYear()} LUMEN Career Intelligence. All rights reserved.
+            © {new Date().getFullYear()} LED — Learning Experience Delivery. All rights reserved.
           </div>
         </div>
       </footer>

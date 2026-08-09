@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap');
 
 .customized-resume-wrapper,
 .customized-resume-wrapper * {
@@ -6,16 +6,16 @@
 }
 
 :root {
-  /* Deep Indigo Quantum Theme */
-  --primary: #6366F1;
-  --primary-hover: #4F46E5;
-  --primary-light: #EEF2FF;
-  --primary-border: #C7D2FE;
-  --primary-glow: rgba(99, 102, 241, 0.20);
+  /* Midnight Black — Default Theme */
+  --primary: #0F172A;
+  --primary-hover: #1E293B;
+  --primary-light: #F1F5F9;
+  --primary-border: #CBD5E1;
+  --primary-glow: rgba(15, 23, 42, 0.14);
   
-  --bg-color: #F8FAFF;
+  --bg-color: #F8FAFC;
   --card-bg: #FFFFFF;
-  --panel-bg: #F1F5FF;
+  --panel-bg: #F1F5F9;
   
   --text-main: #0F172A;
   --text-muted: #475569;
@@ -85,9 +85,9 @@ body {
   font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-color);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(238, 242, 255, 0.6) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(15, 23, 42, 0.04) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(30, 41, 59, 0.03) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(241, 245, 249, 0.6) 0px, transparent 50%);
   background-attachment: fixed;
   color: var(--text-main);
   line-height: 1.6;
@@ -96,10 +96,11 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 800;
-  letter-spacing: -0.035em;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   color: var(--text-main);
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 a {
@@ -137,80 +138,114 @@ button {
   transform: translateY(-2px);
 }
 
-/* Buttons */
+/* ── Button System ── */
 .aura-btn-primary {
   background-color: var(--primary);
   color: #FFFFFF;
-  border: 1px solid transparent;
-  padding: 0.725rem 1.6rem;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 16px var(--primary-glow);
+  border: none;
+  padding: 0.65rem 1.4rem;
+  border-radius: 12px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 12px var(--primary-glow);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
+  gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .aura-btn-primary:hover {
   background-color: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--primary-glow);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--primary-glow);
 }
 
 .aura-btn-secondary {
   background-color: #FFFFFF;
   color: var(--text-main);
-  border: 1px solid var(--border-color);
-  padding: 0.725rem 1.6rem;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  font-size: 0.95rem;
+  border: 1.5px solid var(--border-color);
+  padding: 0.65rem 1.4rem;
+  border-radius: 12px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
   transition: all 0.2s ease;
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 1px 4px rgba(15,23,42,0.05);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
+  gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .aura-btn-secondary:hover {
-  background-color: #F8FAFC;
-  border-color: #CBD5E1;
-  transform: translateY(-2px);
+  background-color: var(--primary-light);
+  border-color: var(--primary-border);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .aura-btn-subtle {
   background-color: var(--primary-light);
   color: var(--primary);
-  border: 1px solid var(--primary-border);
-  padding: 0.65rem 1.35rem;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
+  border: 1.5px solid var(--primary-border);
+  padding: 0.6rem 1.3rem;
+  border-radius: 12px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .aura-btn-subtle:hover {
-  background-color: var(--primary-border);
-  color: var(--primary-hover);
+  background-color: var(--primary);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.aura-btn-danger {
+  background-color: #FFFFFF;
+  color: var(--text-main);
+  border: 1.5px solid var(--border-color);
+  padding: 0.65rem 1.4rem;
+  border-radius: 12px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.aura-btn-danger:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-border);
+  color: var(--primary);
 }
 
 /* Badge Pills */
 .aura-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.45rem 1rem;
-  border-radius: var(--radius-pill);
-  font-size: 0.825rem;
-  font-weight: 700;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
   background-color: var(--primary-light);
   border: 1px solid var(--primary-border);
   color: var(--primary);

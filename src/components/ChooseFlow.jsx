@@ -10,91 +10,168 @@ const ChooseFlow = () => {
     <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuraHeader />
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3.5rem 1.5rem' }}>
-        <div style={{ textAlign: 'center', maxWidth: '580px', marginBottom: '3rem' }}>
-          <div className="aura-badge" style={{ marginBottom: '0.75rem' }}>
-            <span>Career Path Selection</span>
-          </div>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.75rem' }}>
-            How would you like to start?
-          </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
-            Select an option below to begin crafting your high-precision ATS resume.
-          </p>
-        </div>
+      <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3.5rem 1.5rem' }}>
+        {/* Multi-Paper Stacked Card Container — 1000px Wide Horizontal Layout */}
+        <div style={{ position: 'relative', width: '100%', maxWidth: '1000px' }}>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 380px))', gap: '2rem', width: '100%', justifyContent: 'center' }}>
-          
-          {/* Create New Card */}
-          <div 
-            onClick={() => navigate('/builder')}
-            className="aura-card"
-            style={{ 
-              backgroundColor: '#FFFFFF',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              padding: '2.5rem 2rem'
-            }}
-          >
-            <div style={{ 
-              width: '52px', height: '52px', borderRadius: '12px', 
-              backgroundColor: 'var(--primary-light)', border: '1px solid var(--primary-border)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: '1.5rem', color: 'var(--primary)'
+          {/* Paper backing layer 2 — Soft Cool Slate */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '24px',
+            background: '#F1F5F9',
+            border: '1px solid #CBD5E1',
+            transform: 'translate(10px, 12px) rotate(0.8deg)',
+            zIndex: -2,
+            boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)'
+          }} />
+
+          {/* Paper backing layer 1 — Soft Warm Linen */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '24px',
+            background: '#FAF9F5',
+            border: '1px solid #E7E5E0',
+            transform: 'translate(5px, 6px) rotate(0.4deg)',
+            zIndex: -1,
+            boxShadow: '0 6px 20px rgba(15, 23, 42, 0.05)'
+          }} />
+
+          {/* Main Top Studio Card */}
+          <div style={{
+            width: '100%',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '24px',
+            border: '1.5px solid var(--primary-border)',
+            padding: '3rem 2.75rem',
+            boxShadow: 'var(--shadow-md)',
+            position: 'relative',
+            zIndex: 1,
+            boxSizing: 'border-box'
+          }}>
+
+            {/* Header Area — Minimal Text */}
+            <div style={{ marginBottom: '2.25rem', textAlign: 'center' }}>
+              <h1 style={{ fontSize: '2.1rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.5rem 0', letterSpacing: '-0.03em' }}>
+                How would you like to start?
+              </h1>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: 0 }}>
+                Select an option to begin crafting your ATS-ready resume.
+              </p>
+            </div>
+
+            {/* Horizontal 2-Column Option Cards */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '1.5rem',
+              alignItems: 'stretch'
             }}>
-              <FilePlus size={26} />
+              
+              {/* Option 1: Create New */}
+              <div
+                onClick={() => navigate('/builder')}
+                style={{
+                  padding: '2rem 1.75rem',
+                  borderRadius: '18px',
+                  border: '1.5px solid var(--border-color)',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '1.25rem',
+                  transition: 'all 0.15s ease',
+                  boxShadow: 'var(--shadow-sm)'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = 'var(--primary)';
+                  e.currentTarget.style.boxShadow = '0 6px 22px var(--primary-glow)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div>
+                  <div style={{
+                    width: '48px', height: '48px', borderRadius: '12px',
+                    backgroundColor: 'var(--primary-light)', color: 'var(--primary)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '1.25rem'
+                  }}>
+                    <FilePlus size={24} />
+                  </div>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                    Create New Resume
+                  </h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
+                    Start blank with our step-by-step guided editor.
+                  </p>
+                </div>
+
+                <div className="aura-btn-primary" style={{ width: '100%', padding: '0.7rem 1rem', fontSize: '0.875rem' }}>
+                  <span>Start from Scratch</span>
+                  <ArrowRight size={16} />
+                </div>
+              </div>
+
+              {/* Option 2: Import PDF / Word */}
+              <div
+                onClick={() => navigate('/import')}
+                style={{
+                  padding: '2rem 1.75rem',
+                  borderRadius: '18px',
+                  border: '1.5px solid var(--border-color)',
+                  backgroundColor: '#FFFFFF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '1.25rem',
+                  transition: 'all 0.15s ease',
+                  boxShadow: 'var(--shadow-sm)'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = 'var(--primary)';
+                  e.currentTarget.style.boxShadow = '0 6px 22px var(--primary-glow)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div>
+                  <div style={{
+                    width: '48px', height: '48px', borderRadius: '12px',
+                    backgroundColor: 'var(--primary-light)', color: 'var(--primary)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '1.25rem'
+                  }}>
+                    <FileUp size={24} />
+                  </div>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                    Import Existing Resume
+                  </h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
+                    Upload PDF or Word file — auto-extract sections into builder.
+                  </p>
+                </div>
+
+                <div className="aura-btn-secondary" style={{ width: '100%', padding: '0.7rem 1rem', fontSize: '0.875rem' }}>
+                  <span>Upload Document</span>
+                  <ArrowRight size={16} />
+                </div>
+              </div>
+
             </div>
 
-            <h3 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-              Create New Resume
-            </h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.6, marginBottom: '1.75rem', flex: 1 }}>
-              Start from scratch with our step-by-step studio editor.
-            </p>
-
-            <div className="aura-btn-subtle" style={{ width: '100%', justifyContent: 'center' }}>
-              <span>Start Blank Studio</span>
-              <ArrowRight size={16} />
-            </div>
           </div>
-
-          {/* Import Resume Card */}
-          <div 
-            onClick={() => navigate('/import')}
-            className="aura-card"
-            style={{ 
-              backgroundColor: '#FFFFFF',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              padding: '2.5rem 2rem'
-            }}
-          >
-            <div style={{ 
-              width: '52px', height: '52px', borderRadius: '12px', 
-              backgroundColor: 'var(--primary-light)', border: '1px solid var(--primary-border)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: '1.5rem', color: 'var(--primary)'
-            }}>
-              <FileUp size={26} />
-            </div>
-
-            <h3 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-              Import Existing Resume
-            </h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.6, marginBottom: '1.75rem', flex: 1 }}>
-              Upload your existing PDF or Word file and let our parser extract all section details automatically.
-            </p>
-
-            <div className="aura-btn-subtle" style={{ width: '100%', justifyContent: 'center' }}>
-              <span>Upload PDF / Word</span>
-              <ArrowRight size={16} />
-            </div>
-          </div>
-
         </div>
       </main>
     </div>

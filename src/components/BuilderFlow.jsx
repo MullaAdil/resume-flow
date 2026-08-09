@@ -24,18 +24,20 @@ const JellyButton = ({ onClick, style, children, className, onMouseOver, onMouse
         alignItems: 'center',
         justifyContent: 'center',
         gap: '8px',
-        border: '1px solid #CBD5E1',
+        border: '1.5px solid var(--border-color)',
         background: '#FFFFFF',
-        color: '#1F2937',
-        fontWeight: 700,
+        color: 'var(--text-main)',
+        fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+        fontWeight: 600,
+        fontSize: '0.9rem',
         cursor: disabled ? 'not-allowed' : 'pointer',
         position: 'relative',
         outline: 'none',
         userSelect: 'none',
-        padding: '0.65rem 1.5rem',
-        borderRadius: '8px', // standard clean rounded corners
-        fontSize: '1.1rem', // enlarged text size
-        transition: 'all 0.1s ease',
+        padding: '0.65rem 1.4rem',
+        borderRadius: '9999px',
+        transition: 'all 0.15s ease',
+        opacity: disabled ? 0.5 : 1,
         ...style
       }}
       onMouseOver={onMouseOver}
@@ -334,15 +336,36 @@ const BuilderFlow = () => {
   const steps = allSteps.filter(s => !(s.id === 'experience' && resumeData.profileType === 'student'));
 
   const previewContainerRef = useRef(null);
+  const previewContentRef = useRef(null);
+  const [contentHeight, setContentHeight] = useState(1131);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      if (previewContentRef.current) {
+        const el = previewContentRef.current.querySelector('#resume-pdf-content') || previewContentRef.current;
+        const h = Math.max(el.scrollHeight || 0, el.offsetHeight || 0, 1131);
+        if (h > 0 && Math.abs(h - contentHeight) > 2) setContentHeight(h);
+      }
+    };
+    updateHeight();
+    const timer = setTimeout(updateHeight, 250);
+    let observer;
+    if (previewContentRef.current && typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(updateHeight);
+      observer.observe(previewContentRef.current);
+    }
+    return () => {
+      clearTimeout(timer);
+      if (observer) observer.disconnect();
+    };
+  }, [resumeData, selectedTemplate, leftPaneMode]);
 
   useEffect(() => {
     const handleResize = () => {
       const el = previewContainerRef.current;
       const paneWidth = el ? el.offsetWidth : (window.innerWidth * 0.38);
-      const paneHeight = el ? el.offsetHeight : (window.innerHeight - 64);
-      const scaleW = (paneWidth - 32) / 800;
-      const scaleH = (paneHeight - 32) / 1131;
-      const newScale = Math.max(0.3, Math.min(scaleW, scaleH, 1));
+      const scaleW = (paneWidth - 36) / 800;
+      const newScale = Math.max(0.35, Math.min(scaleW, 0.95));
       setPreviewScale(newScale);
     };
     handleResize();
@@ -410,6 +433,8 @@ const BuilderFlow = () => {
     if (e) e.preventDefault();
     const finalTitle = downloadDraftTitle.trim() || 'My Resume';
     setIsDownloadingPDF(true);
+    // Persist the PDF title so the landing page card can display it
+    localStorage.setItem('lumen_last_pdf_title', finalTitle);
 
     try {
       if (syncUserKey) {
@@ -527,6 +552,17 @@ const BuilderFlow = () => {
     updatePersonalInfo('summary', newSummary);
   };
 
+  const getFlatSkillsList = (skills) => {
+    if (!skills) return [];
+    if (Array.isArray(skills)) {
+      return skills.map(s => typeof s === 'object' ? s?.name || '' : s).filter(Boolean);
+    }
+    return Object.values(skills)
+      .flat()
+      .map(s => typeof s === 'object' ? s?.name || '' : s)
+      .filter(Boolean);
+  };
+
   const generateAuditReport = () => {
     const jobTitle = resumeData.personalInfo?.jobTitle || resumeData.experience?.[0]?.title || '';
     const titleLower = jobTitle.toLowerCase();
@@ -545,8 +581,8 @@ const BuilderFlow = () => {
       targetSkills = ["Figma", "User Research", "Wireframing", "Prototyping", "Design Systems", "Usability Testing", "Adobe Suite"];
     }
     
-    // User skills list
-    const userSkillsArr = (resumeData.skills?.programming || []).map(s => (typeof s === 'object' ? s.name : s).toLowerCase());
+    // User skills list across all categories
+    const userSkillsArr = getFlatSkillsList(resumeData.skills).map(s => s.toLowerCase());
     
     const matchedSkills = targetSkills.filter(ts => userSkillsArr.some(us => us.includes(ts.toLowerCase())));
     const missingSkills = targetSkills.filter(ts => !userSkillsArr.some(us => us.includes(ts.toLowerCase())));
@@ -620,7 +656,7 @@ const BuilderFlow = () => {
     if (resumeData.personalInfo?.summary) score += 20;
     if (resumeData.experience?.length > 0) score += 15;
     if (resumeData.education?.length > 0) score += 10;
-    if (resumeData.skills?.programming?.length > 0) score += 5;
+    if (getFlatSkillsList(resumeData.skills).length > 0) score += 5;
     return Math.min(score, 100);
   };
 
@@ -635,7 +671,7 @@ const BuilderFlow = () => {
     } else if (!resumeData.experience || resumeData.experience.length === 0) {
       text = '+15% Add work experience';
       nextStepId = 'experience';
-    } else if (!resumeData.skills?.programming || resumeData.skills.programming.length === 0) {
+    } else if (getFlatSkillsList(resumeData.skills).length === 0) {
       text = '+10% Add areas of expertise';
       nextStepId = 'skills';
     } else {
@@ -1064,11 +1100,8 @@ const BuilderFlow = () => {
                   {(() => {
                     const suggestedSkills = getTechsForRole(resumeData.personalInfo.jobTitle);
                     if (suggestedSkills.length === 0) return null;
-                    const unaddedSkills = suggestedSkills.filter(tech => {
-                      return !Object.values(resumeData.skills || {}).some(arr => 
-                        (arr || []).some(s => (typeof s === 'object' ? s.name : s).toLowerCase() === tech.toLowerCase())
-                      );
-                    });
+                    const userSkillsLower = getFlatSkillsList(resumeData.skills).map(s => s.toLowerCase());
+                    const unaddedSkills = suggestedSkills.filter(tech => !userSkillsLower.includes(tech.toLowerCase()));
                     if (unaddedSkills.length === 0) return null;
                     return (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center', marginTop: '0.35rem' }}>
@@ -2528,92 +2561,93 @@ const BuilderFlow = () => {
                 : renderCustomizePanel()}
           </div>
 
-          {/* Footer — only in edit mode and when not showing AI Audit */}
+          {/* Footer — Back / Step counter / Next */}
           {leftPaneMode === 'edit' && !showAIAudit && (
-            <div style={{ padding: '1.25rem 2.5rem', background: '#FFFFFF', borderTop: '1.5px solid #18181B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <JellyButton 
-                onClick={handleBack} 
-                style={{ width: '110px', borderRadius: '12px 24px 12px 24px' }}
+            <div style={{ padding: '1rem 2.5rem', background: '#FFFFFF', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {/* Back Button */}
+              <JellyButton
+                onClick={handleBack}
+                style={{ minWidth: '100px' }}
               >
-                Back
+                ← Back
               </JellyButton>
-              
-              <div style={{ 
-                display: 'flex', alignItems: 'center', gap: '10px', 
-                background: '#FFFFFF', border: '1px solid #E2E8F0', 
-                padding: '8px 16px', borderRadius: '24px', 
-                fontSize: '0.85rem', fontWeight: 600,
-                position: 'relative',
-                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+
+              {/* Step indicator */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
               }}>
-                <span style={{ color: '#059669' }}>{(activeStepIndex + 1).toString()}</span>
-                <span style={{ color: '#94A3B8' }}>/</span>
-                <span style={{ color: '#1E293B' }}>{steps.length.toString()}</span>
-                
-                <div style={{ display: 'flex', gap: '8px', marginLeft: '6px', position: 'relative', alignItems: 'center', height: '14px' }}>
-                  {steps.map((s, i) => {
-                    const isActive = i === activeStepIndex;
-                    return (
-                      <div 
-                        key={s.id} 
-                        onClick={() => setActiveStepIndex(i)} 
-                        style={{ 
-                          width: '8px', 
-                          height: '8px', 
-                          borderRadius: '50%', 
-                          background: '#E2E8F0',
-                          cursor: 'pointer', 
-                          position: 'relative'
-                        }} 
-                      >
-                        {isActive && (
-                          <div
-                            style={{
-                              position: 'absolute',
-                              inset: 0,
-                              borderRadius: '50%',
-                              background: '#059669',
-                              zIndex: 5
-                            }}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
+                <span style={{ color: 'var(--primary)', fontWeight: 700 }}>{activeStepIndex + 1}</span>
+                <span>/</span>
+                <span>{steps.length}</span>
+                <div style={{ display: 'flex', gap: '5px', marginLeft: '4px' }}>
+                  {steps.map((s, i) => (
+                    <div
+                      key={s.id}
+                      onClick={() => setActiveStepIndex(i)}
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        backgroundColor: i === activeStepIndex ? 'var(--primary)' : '#E2E8F0',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s',
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
 
-              <JellyButton 
-                onClick={handleNext} 
-                style={{ background: '#059669', color: '#FFFFFF', minWidth: '150px', border: 'none', borderRadius: '24px 12px 24px 12px' }}
+              {/* Next / Finish Button */}
+              <JellyButton
+                onClick={handleNext}
+                style={{
+                  minWidth: '150px',
+                  background: 'var(--primary)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  boxShadow: '0 2px 10px var(--primary-glow)',
+                }}
               >
-                {activeStepIndex === steps.length - 1 ? 'Finish' : 'Next: ' + steps[activeStepIndex + 1]?.title}
+                {activeStepIndex === steps.length - 1 ? 'Finish' : 'Next: ' + steps[activeStepIndex + 1]?.title} →
               </JellyButton>
             </div>
           )}
         </div>
 
         {/* Right Pane — Compact Live Preview (~38% Width) */}
-        <div ref={previewContainerRef} className="builder-preview-area" style={{ flex: '0.85 1 0%', minWidth: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', minHeight: '100%', padding: '2rem 1rem' }}>
-            <div 
-              style={{ 
-                width: '800px', 
-                height: '1131px', 
-                transform: 'scale(' + previewScale + ')',
-                transformOrigin: 'top center', 
-                background: '#FFFFFF',
-                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
-                position: 'relative',
-                marginBottom: '-' + ((1 - previewScale) * 1131) + 'px'
-              }}
-            >
-              <LivePreview disableScaling={true} />
+        <div ref={previewContainerRef} className="builder-preview-area" style={{ flex: '0.85 1 0%', minWidth: 0, background: '#F8FAFC', display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto', position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '100%', minHeight: '100%', padding: '2rem 1rem 7rem 1rem' }}>
+            <div style={{
+              width: `${Math.round(800 * previewScale)}px`,
+              height: `${Math.round(Math.max(1131, contentHeight) * previewScale)}px`,
+              position: 'relative',
+              flexShrink: 0
+            }}>
+              <div 
+                ref={previewContentRef}
+                style={{ 
+                  width: '800px', 
+                  minHeight: '1131px',
+                  height: 'auto',
+                  transform: `scale(${previewScale})`,
+                  transformOrigin: 'top left', 
+                  background: '#FFFFFF',
+                  boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.1)',
+                  position: 'relative'
+                }}
+              >
+                <LivePreview disableScaling={true} />
+              </div>
             </div>
           </div>
           
-          {/* Zoom Indicator */}
-          <div style={{ position: 'absolute', bottom: '2rem', background: '#1E293B', color: '#FFF', padding: '6px 16px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+          {/* Page Counter Indicator */}
+          <div style={{ position: 'absolute', bottom: '1.5rem', background: '#0F172A', color: '#FFF', padding: '6px 16px', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(15,23,42,0.15)' }}>
             <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronLeft size={16} /></span> 
             1 / 1 
             <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronRight size={16} /></span>
@@ -2632,7 +2666,7 @@ const BuilderFlow = () => {
             transition={{ duration: 0.2 }}
             style={{
               position: 'fixed', inset: 0, zIndex: 9999,
-              background: 'rgba(15, 23, 42, 0.3)', backdropFilter: 'blur(8px)',
+              background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}
@@ -2646,46 +2680,34 @@ const BuilderFlow = () => {
               onClick={(e) => e.stopPropagation()}
               style={{
                 background: '#FFFFFF', 
-                border: '1px solid #E2E8F0',
-                borderRadius: '24px 12px 24px 12px', // organic curved modal
+                border: '1px solid var(--border-color)',
+                borderRadius: '24px',
                 padding: '2.5rem',
-                maxWidth: '440px', width: '90%', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.1)',
+                maxWidth: '440px', width: '90%', boxShadow: 'var(--shadow-lg)',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1.25rem'
               }}
             >
               <div>
-                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.4rem', fontWeight: 800, color: '#1E293B' }}>
+                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>
                   Leave Editor?
                 </h3>
-                <p style={{ margin: 0, fontSize: '1rem', color: '#475569', lineHeight: 1.6 }}>
-                  If you go back, all your changes will be lost and you'll start fresh from the home page.
+                <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                  If you go back, all your unsaved changes will be reset.
                 </p>
               </div>
 
               <div style={{ display: 'flex', gap: '0.75rem', width: '100%', marginTop: '0.5rem' }}>
                 <button
                   onClick={() => setShowExitConfirm(false)}
-                  style={{
-                    flex: 1, padding: '0.75rem 1.5rem', borderRadius: '24px 12px 24px 12px', // organic shape
-                    border: 'none', background: '#059669', // formal emerald green
-                    color: '#FFFFFF', fontWeight: 700, fontSize: '0.95rem',
-                    cursor: 'pointer', transition: 'none'
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.background = '#047857'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.background = '#059669'; }}
+                  className="aura-btn-primary"
+                  style={{ flex: 1, padding: '0.75rem 1.25rem' }}
                 >
                   Continue Editing
                 </button>
                 <button
                   onClick={handleConfirmExit}
-                  style={{
-                    flex: 1, padding: '0.75rem 1.5rem', borderRadius: '12px 24px 12px 24px', // organic shape
-                    border: '1px solid #CBD5E1', background: '#FFFFFF', // formal slate/white
-                    color: '#475569', fontWeight: 700, fontSize: '0.95rem',
-                    cursor: 'pointer', transition: 'none'
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.borderColor = '#94A3B8'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = '#CBD5E1'; }}
+                  className="aura-btn-secondary"
+                  style={{ flex: 1, padding: '0.75rem 1.25rem' }}
                 >
                   Discard Changes
                 </button>

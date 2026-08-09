@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuraHeader from './AuraHeader';
-import { Mail, Lock, ArrowRight, CheckCircle, AlertCircle, ShieldCheck, Zap, BarChart3, Layers, Eye, EyeOff, Check, X } from 'lucide-react';
+import { Mail, Lock, ArrowRight, CheckCircle, AlertCircle, Zap, BarChart3, Layers, Eye, EyeOff, Check, X } from 'lucide-react';
 
 const LoginPage = ({ initialMode = 'login' }) => {
   const navigate = useNavigate();
@@ -145,23 +145,27 @@ const LoginPage = ({ initialMode = 'login' }) => {
               overflow: 'hidden'
             }}>
               <div>
-                {/* Brand Badge */}
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.45rem 1rem',
-                  borderRadius: '9999px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid var(--primary-border)',
-                  color: 'var(--primary)',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  marginBottom: '2rem',
-                  boxShadow: '0 2px 10px var(--primary-glow)'
-                }}>
-                  <ShieldCheck size={16} />
-                  <span>LUMEN CAREER STUDIO</span>
+                {/* Brand Wordmark */}
+                <div style={{ marginBottom: '2rem' }}>
+                  <div style={{
+                    fontWeight: 900,
+                    fontSize: '2.4rem',
+                    color: '#0F172A',
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1,
+                  }}>
+                    LED
+                  </div>
+                  <div style={{
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    color: '#64748B',
+                    letterSpacing: '0.02em',
+                    marginTop: '5px',
+                    lineHeight: 1,
+                  }}>
+                    Learning Experience Delivery
+                  </div>
                 </div>
 
                 <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.25, marginBottom: '1rem', letterSpacing: '-0.03em' }}>

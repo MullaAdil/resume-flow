@@ -5,6 +5,7 @@ import LoginPage from './components/LoginPage';
 import ChooseFlow from './components/ChooseFlow';
 import ImportFlow from './components/ImportFlow';
 import BuilderFlow from './components/BuilderFlow';
+import ActivityPage from './components/ActivityPage';
 import TemplateShowcase from './components/TemplateShowcase';
 import EmbeddedThemeBackground from './components/EmbeddedThemeBackground';
 import { AnimatePresence } from 'framer-motion';
@@ -22,6 +23,7 @@ const AnimatedRoutes = () => {
         <Route path="/choose" element={<ChooseFlow />} />
         <Route path="/import" element={<ImportFlow />} />
         <Route path="/builder" element={<BuilderFlow />} />
+        <Route path="/activity" element={<ActivityPage />} />
       </Routes>
     </AnimatePresence>
   );

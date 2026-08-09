@@ -372,7 +372,7 @@ const TemplateShowcase = () => {
               </button>
               
               {/* Full size render */}
-              <div style={{ transform: 'scale(1)', transformOrigin: 'top center', background: '#fff' }}>
+              <div style={{ transform: 'scale(1)', transformOrigin: 'top center', background: '#fff', paddingBottom: '6rem' }}>
                  {
                    (() => {
                      const baseData = templateMockData[previewTemplate] || mockResumeData;

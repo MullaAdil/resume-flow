@@ -102,7 +102,7 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
     // Set PDF document metadata so it doesn't show as "Untitled" in PDF readers
     pdf.setProperties({
       title: filename.replace(/\.pdf$/i, ''),
-      creator: 'LUMEN Resume Builder',
+      creator: 'LED — Learning Experience Delivery',
       subject: 'Resume'
     });
 
