@@ -151,7 +151,7 @@ const HeroSandbox = () => {
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { resumeData, resetResume, selectedTemplate } = useResume();
+  const { resumeData, resetResume, selectedTemplate, setSelectedTemplate } = useResume();
   const { user } = useAuth();
 
   const hasSavedDraft = Boolean(
