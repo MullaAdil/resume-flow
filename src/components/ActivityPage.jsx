@@ -55,16 +55,16 @@ const ActivityPage = () => {
 
   const mostRecentActivity = activities.length > 0 ? activities[0] : null;
 
-  const activeTemplateId = mostRecentActivity?.templateId || recentDownloadStored?.templateId || selectedTemplate || 'multicolor';
+  const activeTemplateId = selectedTemplate || recentDownloadStored?.templateId || mostRecentActivity?.templateId || 'multicolor';
 
-  const activeResumeName = mostRecentActivity?.resumeName || recentDownloadStored?.resumeName || (resumeData?.personalInfo?.fullName ? `${resumeData.personalInfo.fullName}'s Resume` : 'Untitled Resume Draft');
+  const activeResumeName = recentDownloadStored?.resumeName || (resumeData?.personalInfo?.fullName ? `${resumeData.personalInfo.fullName}'s Resume` : null) || mostRecentActivity?.resumeName || 'Untitled Resume Draft';
 
   const currentTemplateObj = templates.find(t => t.id === activeTemplateId) || {
     id: activeTemplateId,
     name: (activeTemplateId || 'multicolor').replace(/^[a-z]/, c => c.toUpperCase())
   };
 
-  const currentJobTitle = resumeData?.personalInfo?.jobTitle || 'Executive Professional';
+  const currentJobTitle = resumeData?.personalInfo?.jobTitle || 'Professional Resume';
 
   return (
     <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

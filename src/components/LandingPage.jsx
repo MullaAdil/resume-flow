@@ -447,7 +447,7 @@ export default function LandingPage() {
                           {savedResumeName || resumeData?.personalInfo?.fullName || 'Active Resume'}
                         </h3>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', margin: 0, fontWeight: 600 }}>
-                          {resumeData?.personalInfo?.jobTitle || 'Executive Professional'}
+                          {resumeData?.personalInfo?.jobTitle || 'Active Professional Resume'}
                         </p>
 
                         {/* PDF Title / Save tag */}
@@ -550,7 +550,7 @@ export default function LandingPage() {
                                   </div>
                                   <div>
                                     <div style={{ fontSize: '0.855rem', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.2 }}>
-                                      {act.resumeName || 'Executive Resume'}
+                                      {act.resumeName || resumeData?.personalInfo?.fullName || 'Resume Draft'}
                                     </div>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                                       {act.type === 'pdf_download' ? 'PDF Exported' : 'Draft Saved'} · {act.templateId || selectedTemplate}
