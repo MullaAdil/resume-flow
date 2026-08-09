@@ -162,10 +162,16 @@ export default function LandingPage() {
     (resumeData?.skills && (Array.isArray(resumeData.skills) ? resumeData.skills.length > 0 : Object.values(resumeData.skills).flat().filter(Boolean).length > 0))
   );
 
-  const [activities, setActivities] = useState([]);
+  const recentDownloadStored = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('lumen_recent_download') || 'null');
+    } catch {
+      return null;
+    }
+  })();
+
   const [savedResumeName, setSavedResumeName] = useState(() => {
-    // Try to read from localStorage as a quick fallback
-    return localStorage.getItem('lumen_last_pdf_title') || '';
+    return recentDownloadStored?.resumeName || localStorage.getItem('lumen_last_pdf_title') || '';
   });
 
   React.useEffect(() => {
@@ -443,7 +449,7 @@ export default function LandingPage() {
                           height: '1123px',
                           pointerEvents: 'none'
                         }}>
-                          <TemplateRenderer templateId={selectedTemplate || 'multicolor'} resumeData={resumeData} />
+                          <TemplateRenderer templateId={recentDownloadStored?.templateId || selectedTemplate || 'multicolor'} resumeData={resumeData} />
                         </div>
                       </div>
 
@@ -453,11 +459,13 @@ export default function LandingPage() {
                           {user?.email || 'Active Local Resume'}
                         </div>
                         <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0', letterSpacing: '-0.02em' }}>
-                          {savedResumeName || resumeData?.personalInfo?.fullName || 'Active Resume'}
+                          {savedResumeName || (resumeData?.personalInfo?.fullName ? `${resumeData.personalInfo.fullName}'s Resume` : 'Active Resume')}
                         </h3>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', margin: 0, fontWeight: 600 }}>
-                          {resumeData?.personalInfo?.jobTitle || 'Active Professional Resume'}
-                        </p>
+                        {resumeData?.personalInfo?.jobTitle && (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', margin: 0, fontWeight: 600 }}>
+                            {resumeData.personalInfo.jobTitle}
+                          </p>
+                        )}
 
                         {/* PDF Title / Save tag */}
                         {savedResumeName && (

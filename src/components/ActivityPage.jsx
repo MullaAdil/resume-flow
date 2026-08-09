@@ -55,16 +55,14 @@ const ActivityPage = () => {
 
   const mostRecentActivity = activities.length > 0 ? activities[0] : null;
 
-  const activeTemplateId = selectedTemplate || recentDownloadStored?.templateId || mostRecentActivity?.templateId || 'multicolor';
+  const activeTemplateId = recentDownloadStored?.templateId || selectedTemplate || mostRecentActivity?.templateId || 'multicolor';
 
-  const activeResumeName = recentDownloadStored?.resumeName || (resumeData?.personalInfo?.fullName ? `${resumeData.personalInfo.fullName}'s Resume` : null) || mostRecentActivity?.resumeName || 'Untitled Resume Draft';
+  const activeResumeName = recentDownloadStored?.resumeName || (resumeData?.personalInfo?.fullName ? `${resumeData.personalInfo.fullName}'s Resume` : null) || mostRecentActivity?.resumeName || 'Downloaded Resume';
 
   const currentTemplateObj = templates.find(t => t.id === activeTemplateId) || {
     id: activeTemplateId,
     name: (activeTemplateId || 'multicolor').replace(/^[a-z]/, c => c.toUpperCase())
   };
-
-  const currentJobTitle = resumeData?.personalInfo?.jobTitle || 'Professional Resume';
 
   return (
     <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -178,9 +176,15 @@ const ActivityPage = () => {
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {activeResumeName}
                   </div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)' }}>
-                    {currentJobTitle}
-                  </div>
+                  {resumeData?.personalInfo?.jobTitle ? (
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)' }}>
+                      {resumeData.personalInfo.jobTitle}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--primary)' }}>
+                      {currentTemplateObj.name} Template
+                    </div>
+                  )}
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed #CBD5E1' }}>
                     <span>Recent Template: <strong>{currentTemplateObj.name}</strong></span>
                     <span>Status: <strong>Recent Task</strong></span>
