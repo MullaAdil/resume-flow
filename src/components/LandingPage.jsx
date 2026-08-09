@@ -13,10 +13,15 @@ import {
   Clock, History
 } from 'lucide-react';
 
-// ── Ultra-Clean Hero Interactive Sandbox ──
 const HeroSandbox = () => {
   const { resumeData, selectedTemplate, setSelectedTemplate } = useResume();
   const [selectedId, setSelectedId] = useState(selectedTemplate || 'multicolor');
+
+  useEffect(() => {
+    if (selectedTemplate) {
+      setSelectedId(selectedTemplate);
+    }
+  }, [selectedTemplate]);
 
   const hasSavedDraft = Boolean(
     resumeData?.personalInfo?.fullName ||
@@ -26,12 +31,16 @@ const HeroSandbox = () => {
     (resumeData?.skills && (Array.isArray(resumeData.skills) ? resumeData.skills.length > 0 : Object.values(resumeData.skills).flat().filter(Boolean).length > 0))
   );
 
+  const activeTplName = templates.find(t => t.id === selectedId)?.name || selectedId;
   const showcaseOptions = [
     { id: 'multicolor', label: 'Multi Color' },
     { id: 'visionary', label: 'Visionary' },
     { id: 'minimalclassic', label: 'Classic' },
     { id: 'aslam', label: 'Elite IT' }
   ];
+  if (selectedId && !showcaseOptions.some(opt => opt.id === selectedId)) {
+    showcaseOptions.push({ id: selectedId, label: activeTplName });
+  }
 
   const handleSelect = (id) => {
     setSelectedId(id);
@@ -604,7 +613,7 @@ export default function LandingPage() {
                   <Layout size={15} />
                   <span>Curated Designs</span>
                 </div>
-                <h2 style={{ fontSize: '2.1rem' }}>Executive Templates</h2>
+                <h2 style={{ fontSize: '2.1rem' }}>Featured Resume Templates</h2>
               </div>
 
               <button
@@ -632,7 +641,10 @@ export default function LandingPage() {
                     display: 'flex',
                     flexDirection: 'column'
                   }}
-                  onClick={() => navigate('/choose')}
+                  onClick={() => {
+                    if (setSelectedTemplate) setSelectedTemplate(tmpl.id);
+                    navigate('/builder');
+                  }}
                 >
                   <div style={{
                     height: '240px',
