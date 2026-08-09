@@ -214,7 +214,7 @@ const PhotoModernTemplate = ({ resumeData }) => {
         background: "#ffffff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
         padding: "3rem 3.5rem",
-        fontFamily: "'Times New Roman', Times, serif",
+        fontFamily: "var(--resume-font-family, inherit)",
         color: "#000000",
         lineHeight: "1.4",
         fontSize: "13px",

@@ -136,14 +136,19 @@ const BuilderFlow = () => {
   const [personalValidationError, setPersonalValidationError] = useState('');
   const [showAccentPicker, setShowAccentPicker] = useState(false);
 
-  const applyAccentColorPreset = (preset) => {
-    updateSettings('primaryColor', preset.primary);
-    updateSettings('secondaryColor', preset.hover);
+  // Studio UI Accent Theme Switcher (Only updates App UI theme, NOT the resume template)
+  const applyStudioUiAccentTheme = (preset) => {
     document.documentElement.style.setProperty('--primary', preset.primary);
     document.documentElement.style.setProperty('--primary-hover', preset.hover);
     document.documentElement.style.setProperty('--primary-light', preset.light);
     document.documentElement.style.setProperty('--primary-border', preset.border);
     document.documentElement.style.setProperty('--primary-glow', preset.glow);
+  };
+
+  // Resume Template Accent Color Switcher (Only updates resume template settings in Customize panel)
+  const applyTemplateAccentColor = (preset) => {
+    updateSettings('primaryColor', preset.primary);
+    updateSettings('secondaryColor', preset.hover);
   };
   
   const [activeStepIndex, setActiveStepIndex] = useState(0);
@@ -2025,7 +2030,7 @@ const BuilderFlow = () => {
             🎨 Primary Accent Color
           </h3>
           <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 1rem 0' }}>
-            Select an accent color palette. Updates studio headers, buttons, badges, and template accents.
+            Select an accent color palette for your resume template.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
             {ACCENT_COLOR_PRESETS.map((preset) => {
@@ -2034,7 +2039,7 @@ const BuilderFlow = () => {
                 <button
                   key={preset.id}
                   type="button"
-                  onClick={() => applyAccentColorPreset(preset)}
+                  onClick={() => applyTemplateAccentColor(preset)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -2055,6 +2060,30 @@ const BuilderFlow = () => {
                 </button>
               );
             })}
+          </div>
+
+          {/* Custom Accent Color Picker */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid #E2E8F0' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Custom Accent Hex Color:</span>
+            <input 
+              type="color" 
+              value={resumeData.settings?.primaryColor || '#6366F1'} 
+              onChange={(e) => {
+                updateSettings('primaryColor', e.target.value);
+                updateSettings('secondaryColor', e.target.value);
+              }}
+              style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid #CBD5E1', cursor: 'pointer', padding: 0, backgroundColor: 'transparent' }}
+            />
+            <input
+              type="text"
+              value={resumeData.settings?.primaryColor || '#6366F1'}
+              onChange={(e) => {
+                updateSettings('primaryColor', e.target.value);
+                updateSettings('secondaryColor', e.target.value);
+              }}
+              placeholder="#6366F1"
+              style={{ width: '90px', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', fontWeight: 600, color: '#1E293B' }}
+            />
           </div>
         </div>
 
@@ -2487,14 +2516,13 @@ const BuilderFlow = () => {
                       key={preset.id}
                       type="button"
                       onClick={() => {
-                        applyAccentColorPreset(preset);
+                        applyStudioUiAccentTheme(preset);
                         setShowAccentPicker(false);
                       }}
                       title={preset.name}
                       style={{
                         width: '36px', height: '36px', borderRadius: '50%',
-                        background: preset.primary, border: (resumeData.settings?.primaryColor || '').toLowerCase() === preset.primary.toLowerCase() ? '3px solid #FFF' : 'none',
-                        outline: (resumeData.settings?.primaryColor || '').toLowerCase() === preset.primary.toLowerCase() ? '2px solid ' + preset.primary : 'none',
+                        background: preset.primary,
                         cursor: 'pointer'
                       }}
                     />

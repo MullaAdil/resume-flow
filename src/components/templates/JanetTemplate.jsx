@@ -113,7 +113,7 @@ const JanetTemplate = ({ resumeData }) => {
         background: "#ffffff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
         padding: marginPadding,
-        fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        fontFamily: "var(--resume-font-family, inherit)",
         color: primaryColor,
         lineHeight: "1.5",
         fontSize: "13px",

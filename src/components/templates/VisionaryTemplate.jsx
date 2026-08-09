@@ -13,7 +13,7 @@ const VisionaryTemplate = ({ resumeData }) => {
   } = resumeData;
 
   const primaryColor = settings.primaryColor || "#059669";
-  const fontFamily = settings.fontFamily || "Inter, -apple-system, sans-serif";
+  const fontFamily = "var(--resume-font-family, inherit)";
 
   const getSkillsList = (s) => {
     if (!s) return [];

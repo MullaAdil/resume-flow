@@ -27,7 +27,7 @@ const ExecutiveTemplate = ({ resumeData }) => {
         background: "#fff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
         padding: marginPadding,
-        fontFamily: "Arial, Helvetica, sans-serif",
+        fontFamily: "var(--resume-font-family, inherit)",
         color: "#333",
       }}
     >

@@ -44,7 +44,7 @@ const MaverickTemplate = ({ resumeData }) => {
         minHeight: "1131px",
         background: "#fff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
-        fontFamily: "Arial, Helvetica, sans-serif",
+        fontFamily: "var(--resume-font-family, inherit)",
         display: "flex",
       }}
     >
