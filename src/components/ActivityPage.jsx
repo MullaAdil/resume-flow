@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, FileText, Clock, ArrowLeft, Search, Sparkles, CheckCircle, Eye, Edit3 } from 'lucide-react';
+import { Download, FileText, Clock, ArrowLeft, Search, Sparkles, Edit3 } from 'lucide-react';
 import AuraHeader from './AuraHeader';
 import { useAuth } from '../context/AuthContext';
 import { useResume } from '../context/ResumeContext';
@@ -11,7 +11,7 @@ import { templates } from './templatesList';
 const ActivityPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { selectedTemplate, resumeData } = useResume();
+  const { selectedTemplate, setSelectedTemplate, resumeData } = useResume();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('all');
@@ -45,14 +45,24 @@ const ActivityPage = () => {
 
   const pdfExportsCount = activities.filter(a => a.type === 'pdf_download').length;
 
-  const currentTemplateObj = templates.find(t => t.id === selectedTemplate) || {
-    id: selectedTemplate || 'multicolor',
-    name: (selectedTemplate || 'multicolor').replace(/^[a-z]/, c => c.toUpperCase())
-  };
+  const recentDownloadStored = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('lumen_recent_download') || 'null');
+    } catch {
+      return null;
+    }
+  })();
 
-  const currentResumeName = resumeData?.personalInfo?.fullName
-    ? `${resumeData.personalInfo.fullName}'s Resume`
-    : (activities[0]?.resumeName || 'Untitled Resume Draft');
+  const mostRecentActivity = activities.length > 0 ? activities[0] : null;
+
+  const activeTemplateId = mostRecentActivity?.templateId || recentDownloadStored?.templateId || selectedTemplate || 'multicolor';
+
+  const activeResumeName = mostRecentActivity?.resumeName || recentDownloadStored?.resumeName || (resumeData?.personalInfo?.fullName ? `${resumeData.personalInfo.fullName}'s Resume` : 'Untitled Resume Draft');
+
+  const currentTemplateObj = templates.find(t => t.id === activeTemplateId) || {
+    id: activeTemplateId,
+    name: (activeTemplateId || 'multicolor').replace(/^[a-z]/, c => c.toUpperCase())
+  };
 
   const currentJobTitle = resumeData?.personalInfo?.jobTitle || 'Executive Professional';
 
@@ -80,7 +90,7 @@ const ActivityPage = () => {
             LED — Career Activity & Assets Vault
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0 }}>
-            Live preview of your recently edited resume template alongside database-logged activity history.
+            Live preview of your recently exported/edited resume template alongside database-logged activity history.
           </p>
         </div>
 
@@ -117,7 +127,7 @@ const ActivityPage = () => {
                   </span>
                 </div>
 
-                {/* Live Scaled Resume Preview Container */}
+                {/* Live Scaled Resume Preview Container using Recent Template */}
                 <div style={{
                   width: '100%',
                   height: '360px',
@@ -136,12 +146,15 @@ const ActivityPage = () => {
                     backgroundColor: '#FFFFFF',
                     pointerEvents: 'none'
                   }}>
-                    <TemplateRenderer templateId={selectedTemplate || 'multicolor'} resumeData={resumeData} />
+                    <TemplateRenderer templateId={activeTemplateId} resumeData={resumeData} />
                   </div>
 
                   {/* Hover Overlay */}
                   <div 
-                    onClick={() => navigate('/builder')}
+                    onClick={() => {
+                      setSelectedTemplate(activeTemplateId);
+                      navigate('/builder');
+                    }}
                     style={{
                       position: 'absolute', inset: 0,
                       backgroundColor: 'rgba(15, 23, 42, 0.15)',
@@ -163,20 +176,23 @@ const ActivityPage = () => {
                 {/* Metadata Summary */}
                 <div style={{ backgroundColor: '#F8FAFC', borderRadius: '12px', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                   <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {currentResumeName}
+                    {activeResumeName}
                   </div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)' }}>
                     {currentJobTitle}
                   </div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed #CBD5E1' }}>
-                    <span>Active Template: <strong>{currentTemplateObj.name}</strong></span>
-                    <span>Saved: <strong>Local Draft</strong></span>
+                    <span>Recent Template: <strong>{currentTemplateObj.name}</strong></span>
+                    <span>Status: <strong>Recent Task</strong></span>
                   </div>
                 </div>
 
                 {/* Primary CTA */}
                 <button
-                  onClick={() => navigate('/builder')}
+                  onClick={() => {
+                    setSelectedTemplate(activeTemplateId);
+                    navigate('/builder');
+                  }}
                   className="aura-btn-primary"
                   style={{ width: '100%', padding: '0.8rem', fontSize: '0.9rem', borderRadius: '10px' }}
                 >
@@ -313,7 +329,7 @@ const ActivityPage = () => {
 
                             <div>
                               <div style={{ fontSize: '0.925rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                                {act.resumeName || currentResumeName}
+                                {act.resumeName || activeResumeName}
                               </div>
                               <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                                 {act.type === 'pdf_download' ? 'PDF Exported' : 'Draft Checkpoint'} • Template: <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{actTemplateObj.name}</span> • User: {act.user_id || user?.email || 'Anonymous'}
@@ -326,7 +342,10 @@ const ActivityPage = () => {
                               {act.created_at ? new Date(act.created_at).toLocaleString() : 'Recent'}
                             </span>
                             <button
-                              onClick={() => navigate('/builder')}
+                              onClick={() => {
+                                setSelectedTemplate(act.templateId || activeTemplateId);
+                                navigate('/builder');
+                              }}
                               className="aura-btn-subtle"
                               style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
                             >

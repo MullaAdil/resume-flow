@@ -272,6 +272,9 @@ const BuilderFlow = () => {
       const data = await apiClient.resumes.get(resumeId);
       if (data && data.data) {
         setResumeData(data.data);
+        if (data.data.selectedTemplate || data.data.templateId) {
+          setSelectedTemplate(data.data.selectedTemplate || data.data.templateId);
+        }
         setSyncResumeName(data.name);
         setSyncMessage(`Successfully loaded "${data.name}"!`);
         setShowSyncModal(false);
@@ -453,6 +456,12 @@ const BuilderFlow = () => {
     await downloadPDF('resume-pdf-content', safeFilename);
 
     try {
+      localStorage.setItem('lumen_recent_download', JSON.stringify({
+        resumeName: finalTitle,
+        templateId: selectedTemplate || 'multicolor',
+        timestamp: new Date().toISOString()
+      }));
+
       await apiClient.activity.log({
         user_id: syncUserKey || user?.email || 'anonymous',
         type: 'pdf_download',
