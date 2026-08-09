@@ -333,6 +333,7 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     'Large': 1.12
   };
   const fontScale = fontScaleMap[activeSettings.fontSize] || 1.0;
+  const selectedLineHeight = activeSettings.lineSpacing || '1.5';
 
   return (
     <div
