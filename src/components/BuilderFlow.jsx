@@ -445,8 +445,15 @@ const BuilderFlow = () => {
     localStorage.setItem('lumen_last_pdf_title', finalTitle);
 
     try {
+      const dataToSave = {
+        ...resumeData,
+        settings: {
+          ...(resumeData?.settings || {}),
+          selectedTemplate: selectedTemplate || 'multicolor'
+        }
+      };
       if (syncUserKey) {
-        await apiClient.resumes.save(syncUserKey.trim().toLowerCase(), finalTitle, resumeData);
+        await apiClient.resumes.save(syncUserKey.trim().toLowerCase(), finalTitle, dataToSave);
       }
     } catch (err) {
       console.warn('Draft save during download failed:', err);

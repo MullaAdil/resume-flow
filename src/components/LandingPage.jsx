@@ -419,7 +419,11 @@ export default function LandingPage() {
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                       {/* Mini Live Preview Thumbnail (Clickable to open builder) */}
                       <div 
-                        onClick={() => navigate('/builder')}
+                        onClick={() => {
+                          const targetTpl = recentDownloadStored?.templateId || selectedTemplate;
+                          if (targetTpl) setSelectedTemplate(targetTpl);
+                          navigate('/builder');
+                        }}
                         style={{
                           width: '140px',
                           height: '195px',
@@ -496,7 +500,11 @@ export default function LandingPage() {
                         {/* CTAs */}
                         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
                           <button
-                            onClick={() => navigate('/builder')}
+                            onClick={() => {
+                              const targetTpl = recentDownloadStored?.templateId || selectedTemplate;
+                              if (targetTpl) setSelectedTemplate(targetTpl);
+                              navigate('/builder');
+                            }}
                             className="aura-btn-primary"
                             style={{ padding: '0.75rem 1.4rem', fontSize: '0.9rem' }}
                           >

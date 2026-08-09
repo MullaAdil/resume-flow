@@ -64,6 +64,25 @@ const ActivityPage = () => {
     name: (activeTemplateId || 'multicolor').replace(/^[a-z]/, c => c.toUpperCase())
   };
 
+  const handleOpenStudioWithTemplate = (targetTemplate, targetName) => {
+    const tpl = targetTemplate || activeTemplateId;
+    if (tpl) {
+      setSelectedTemplate(tpl);
+      try {
+        const stored = JSON.parse(localStorage.getItem('lumen_recent_download') || '{}');
+        localStorage.setItem('lumen_recent_download', JSON.stringify({
+          ...stored,
+          templateId: tpl,
+          resumeName: targetName || stored.resumeName || activeResumeName,
+          timestamp: new Date().toISOString()
+        }));
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    navigate('/builder');
+  };
+
   return (
     <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuraHeader />
@@ -149,10 +168,7 @@ const ActivityPage = () => {
 
                   {/* Hover Overlay */}
                   <div 
-                    onClick={() => {
-                      setSelectedTemplate(activeTemplateId);
-                      navigate('/builder');
-                    }}
+                    onClick={() => handleOpenStudioWithTemplate(activeTemplateId, activeResumeName)}
                     style={{
                       position: 'absolute', inset: 0,
                       backgroundColor: 'rgba(15, 23, 42, 0.15)',
@@ -193,10 +209,7 @@ const ActivityPage = () => {
 
                 {/* Primary CTA */}
                 <button
-                  onClick={() => {
-                    setSelectedTemplate(activeTemplateId);
-                    navigate('/builder');
-                  }}
+                  onClick={() => handleOpenStudioWithTemplate(activeTemplateId, activeResumeName)}
                   className="aura-btn-primary"
                   style={{ width: '100%', padding: '0.8rem', fontSize: '0.9rem', borderRadius: '10px' }}
                 >
@@ -346,10 +359,7 @@ const ActivityPage = () => {
                               {act.created_at ? new Date(act.created_at).toLocaleString() : 'Recent'}
                             </span>
                             <button
-                              onClick={() => {
-                                setSelectedTemplate(act.templateId || activeTemplateId);
-                                navigate('/builder');
-                              }}
+                              onClick={() => handleOpenStudioWithTemplate(act.templateId || activeTemplateId, act.resumeName || activeResumeName)}
                               className="aura-btn-subtle"
                               style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
                             >
