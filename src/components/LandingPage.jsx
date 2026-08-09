@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { templates } from './templatesList';
 import TemplateRenderer from './TemplateRenderer';
