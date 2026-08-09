@@ -168,48 +168,36 @@ const ActivityPage = () => {
                 }} />
 
                 {/* Main Studio Card */}
-                <div style={{
-                  position: 'relative', zIndex: 2, backgroundColor: '#FFFFFF',
-                  borderRadius: '24px', border: '1.5px solid var(--primary-border)',
-                  padding: '1.5rem', boxShadow: 'var(--shadow-md)',
-                  display: 'flex', flexDirection: 'column', gap: '1.15rem'
-                }}>
+                <div 
+                  onClick={() => handleOpenStudioWithTemplate(item.templateId, item.resumeName)}
+                  style={{
+                    position: 'relative', zIndex: 2, backgroundColor: '#FFFFFF',
+                    borderRadius: '24px', border: '1.5px solid var(--primary-border)',
+                    padding: '1.5rem', boxShadow: 'var(--shadow-md)',
+                    display: 'flex', flexDirection: 'column', gap: '1.15rem',
+                    cursor: 'pointer', transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
 
-                  {/* Scaled Template Preview Thumbnail */}
+                  {/* Scaled Template Preview Thumbnail - Fixed into Block */}
                   <div style={{
-                    width: '100%', height: '270px', borderRadius: '14px',
+                    width: '100%', height: '280px', borderRadius: '14px',
                     border: '1px solid var(--border-color)', backgroundColor: '#F8FAFC',
                     overflow: 'hidden', position: 'relative',
-                    boxShadow: 'inset 0 2px 6px rgba(15,23,42,0.04)'
+                    display: 'flex', justifyContent: 'center', paddingTop: '6px',
+                    boxShadow: 'inset 0 2px 6px rgba(15,23,42,0.03)'
                   }}>
                     <div style={{
-                      width: '800px', height: '1131px',
-                      transform: 'scale(0.35)',
-                      transformOrigin: 'top left',
+                      width: '794px', height: '1123px',
+                      transform: 'scale(0.33)',
+                      transformOrigin: 'top center',
                       backgroundColor: '#FFFFFF',
-                      pointerEvents: 'none'
+                      pointerEvents: 'none',
+                      boxShadow: '0 4px 14px rgba(15, 23, 42, 0.08)'
                     }}>
                       <TemplateRenderer templateId={item.templateId} resumeData={resumeData} />
-                    </div>
-
-                    {/* Hover overlay button */}
-                    <div 
-                      onClick={() => handleOpenStudioWithTemplate(item.templateId, item.resumeName)}
-                      style={{
-                        position: 'absolute', inset: 0,
-                        backgroundColor: 'rgba(15, 23, 42, 0.15)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', opacity: 0.9, transition: 'opacity 0.2s ease'
-                      }}
-                    >
-                      <div style={{
-                        backgroundColor: '#FFFFFF', padding: '0.45rem 0.9rem', borderRadius: '9999px',
-                        display: 'flex', alignItems: 'center', gap: '0.35rem', boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-                        fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)'
-                      }}>
-                        <Edit3 size={14} color="var(--primary)" />
-                        <span>Open in Studio</span>
-                      </div>
                     </div>
                   </div>
 
