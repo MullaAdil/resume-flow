@@ -442,7 +442,7 @@ const AuraHeader = () => {
 
             {/* ── Launch CTA ── */}
             <button
-              onClick={() => navigate('/builder')}
+              onClick={() => navigate('/choose')}
               className="aura-btn-primary"
               style={{ height: '34px', padding: '0 0.95rem', fontSize: '0.85rem', borderRadius: '8px', flexShrink: 0 }}
             >

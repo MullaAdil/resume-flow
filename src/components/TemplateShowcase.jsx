@@ -48,7 +48,7 @@ const TemplateShowcase = () => {
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
-    navigate('/builder');
+    navigate('/choose');
   };
 
   // Update scale dynamically based on grid column width, so it's fully visible and large

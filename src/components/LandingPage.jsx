@@ -295,7 +295,7 @@ export default function LandingPage() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                   <button
-                    onClick={() => navigate('/templates')}
+                    onClick={() => navigate('/choose')}
                     className="aura-btn-primary"
                     style={{ padding: '0.85rem 1.8rem', fontSize: '1rem' }}
                   >
@@ -660,7 +660,7 @@ export default function LandingPage() {
                   }}
                   onClick={() => {
                     if (setSelectedTemplate) setSelectedTemplate(tmpl.id);
-                    navigate('/builder');
+                    navigate('/choose');
                   }}
                 >
                   <div style={{

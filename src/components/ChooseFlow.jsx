@@ -1,10 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FilePlus, FileUp, ArrowRight } from 'lucide-react';
+import { FilePlus, FileUp, ArrowRight, Layout } from 'lucide-react';
 import AuraHeader from './AuraHeader';
+import { useResume } from '../context/ResumeContext';
+import { templates } from './templatesList';
 
 const ChooseFlow = () => {
   const navigate = useNavigate();
+  const { selectedTemplate } = useResume();
+  const activeTemplate = templates.find(t => t.id === selectedTemplate);
 
   return (
     <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -59,6 +63,30 @@ const ChooseFlow = () => {
               <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: 0 }}>
                 Select an option to begin crafting your ATS-ready resume.
               </p>
+              {activeTemplate && (
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  marginTop: '0.85rem',
+                  padding: '0.35rem 0.85rem',
+                  borderRadius: '999px',
+                  backgroundColor: 'var(--primary-light)',
+                  border: '1px solid var(--primary-border)',
+                  fontSize: '0.825rem',
+                  fontWeight: 600,
+                  color: 'var(--primary)'
+                }}>
+                  <Layout size={14} />
+                  <span>Selected Template: <strong>{activeTemplate.name}</strong></span>
+                  <span
+                    onClick={(e) => { e.stopPropagation(); navigate('/templates'); }}
+                    style={{ textDecoration: 'underline', cursor: 'pointer', marginLeft: '0.35rem', opacity: 0.85 }}
+                  >
+                    Change
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Horizontal 2-Column Option Cards */}
