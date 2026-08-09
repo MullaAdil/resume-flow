@@ -39,15 +39,57 @@ const ActivityPage = () => {
   })();
 
   const mostRecentActivity = activities.length > 0 ? activities[0] : null;
-
   const activeTemplateId = recentDownloadStored?.templateId || selectedTemplate || mostRecentActivity?.templateId || 'multicolor';
-
   const activeResumeName = recentDownloadStored?.resumeName || (resumeData?.personalInfo?.fullName ? `${resumeData.personalInfo.fullName}'s Resume` : null) || mostRecentActivity?.resumeName || 'Downloaded Resume';
 
-  const currentTemplateObj = templates.find(t => t.id === activeTemplateId) || {
-    id: activeTemplateId,
-    name: (activeTemplateId || 'multicolor').replace(/^[a-z]/, c => c.toUpperCase())
-  };
+  // Construct up to 3 side-by-side last used items
+  const recentItems = (() => {
+    const list = [];
+    const seen = new Set();
+
+    // 1. Add recent items from DB activity logs
+    if (Array.isArray(activities)) {
+      for (const act of activities) {
+        const key = `${act.templateId || 'default'}_${act.resumeName || 'draft'}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          list.push({
+            id: act.id || act._id || Math.random(),
+            templateId: act.templateId || selectedTemplate || 'multicolor',
+            resumeName: act.resumeName || activeResumeName,
+            type: act.type || 'pdf_download',
+            created_at: act.created_at
+          });
+        }
+        if (list.length >= 3) break;
+      }
+    }
+
+    // 2. Supplement with current active session & popular templates if fewer than 3 items
+    const defaultFallbacks = [
+      { templateId: activeTemplateId, resumeName: activeResumeName },
+      { templateId: 'visionary', resumeName: `${resumeData?.personalInfo?.fullName || 'Active Resume'} - Visionary` },
+      { templateId: 'aslam', resumeName: `${resumeData?.personalInfo?.fullName || 'Active Resume'} - Elite IT` },
+      { templateId: 'multicolor', resumeName: `${resumeData?.personalInfo?.fullName || 'Active Resume'} - MultiColor` }
+    ];
+
+    for (const fb of defaultFallbacks) {
+      const key = `${fb.templateId}_${fb.resumeName}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        list.push({
+          id: `fb_${fb.templateId}`,
+          templateId: fb.templateId,
+          resumeName: fb.resumeName,
+          type: 'recent_session',
+          created_at: null
+        });
+      }
+      if (list.length >= 3) break;
+    }
+
+    return list.slice(0, 3);
+  })();
 
   const handleOpenStudioWithTemplate = (targetTemplate, targetName) => {
     const tpl = targetTemplate || activeTemplateId;
@@ -72,7 +114,7 @@ const ActivityPage = () => {
     <div style={{ backgroundColor: 'transparent', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AuraHeader />
 
-      <main style={{ flex: 1, padding: '2.5rem 1.5rem 4rem', maxWidth: '1000px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+      <main style={{ flex: 1, padding: '2.5rem 2rem 4rem', maxWidth: '1320px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         
         {/* Navigation back bar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
@@ -87,120 +129,119 @@ const ActivityPage = () => {
         </div>
 
         {/* Section Title */}
-        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '2.1rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.4rem 0', letterSpacing: '-0.03em' }}>
-            LED — Career Activity & Recent Asset
+        <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.4rem 0', letterSpacing: '-0.03em' }}>
+            LED — Career Activity & Last Used Assets
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: 0 }}>
-            Live preview of your active resume draft and recently selected template layout.
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.975rem', margin: 0 }}>
+            Side-by-side view of your 3 most recently used resume templates & saved drafts.
           </p>
         </div>
 
-        {/* Small Horizontal Scaled Asset Preview Card */}
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: '100%', maxWidth: '720px' }}>
-            
-            <div style={{ position: 'relative', width: '100%' }}>
-              {/* Sheet 3: Slate bottom layer */}
-              <div style={{
-                position: 'absolute', inset: 0, borderRadius: '24px',
-                background: '#F1F5F9', border: '1px solid #CBD5E1',
-                transform: 'translate(6px, 7px) rotate(0.8deg)', zIndex: 0
-              }} />
+        {/* 3 Side-by-Side Horizontal Cards Grid (End-to-End Span) */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '1.75rem',
+          width: '100%'
+        }}>
+          {recentItems.map((item, index) => {
+            const itemTplObj = templates.find(t => t.id === item.templateId) || {
+              id: item.templateId,
+              name: (item.templateId || 'multicolor').replace(/^[a-z]/, c => c.toUpperCase())
+            };
 
-              {/* Sheet 2: Linen middle layer */}
-              <div style={{
-                position: 'absolute', inset: 0, borderRadius: '24px',
-                background: 'var(--primary-light, #FAF9F5)', border: '1.5px solid var(--primary-border, #E7E5E0)',
-                transform: 'translate(3px, 4px) rotate(0.4deg)', zIndex: 1
-              }} />
-
-              {/* Main Top Studio Card (Horizontal Split) */}
-              <div style={{
-                position: 'relative', zIndex: 2, backgroundColor: '#FFFFFF',
-                borderRadius: '24px', border: '1.5px solid var(--primary-border)',
-                padding: '1.5rem 1.75rem', boxShadow: 'var(--shadow-md)',
-                display: 'flex', gap: '1.75rem', alignItems: 'center', flexWrap: 'wrap'
-              }}>
-
-                {/* Left: Compact Scaled Preview Thumbnail */}
+            return (
+              <div key={item.id || index} style={{ position: 'relative', width: '100%' }}>
+                {/* Sheet 3: Slate bottom layer */}
                 <div style={{
-                  width: '190px', height: '260px', borderRadius: '14px',
-                  border: '1px solid var(--border-color)', backgroundColor: '#F8FAFC',
-                  overflow: 'hidden', position: 'relative', flexShrink: 0,
-                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.06)'
-                }}>
-                  <div style={{
-                    width: '800px', height: '1131px',
-                    transform: 'scale(' + (190 / 800) + ')',
-                    transformOrigin: 'top left',
-                    backgroundColor: '#FFFFFF',
-                    pointerEvents: 'none'
-                  }}>
-                    <TemplateRenderer templateId={activeTemplateId} resumeData={resumeData} />
-                  </div>
+                  position: 'absolute', inset: 0, borderRadius: '24px',
+                  background: '#F1F5F9', border: '1px solid #CBD5E1',
+                  transform: `translate(${5 + index * 2}px, ${6 + index * 2}px) rotate(${0.6 * (index + 1)}deg)`, zIndex: 0
+                }} />
 
-                  {/* Hover Overlay */}
-                  <div 
-                    onClick={() => handleOpenStudioWithTemplate(activeTemplateId, activeResumeName)}
-                    style={{
-                      position: 'absolute', inset: 0,
-                      backgroundColor: 'rgba(15, 23, 42, 0.15)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: 'pointer', opacity: 0.9, transition: 'opacity 0.2s ease'
-                    }}
-                  >
+                {/* Sheet 2: Linen middle layer */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '24px',
+                  background: 'var(--primary-light, #FAF9F5)', border: '1.5px solid var(--primary-border, #E7E5E0)',
+                  transform: `translate(${2 + index}px, ${3 + index}px) rotate(${0.3 * (index + 1)}deg)`, zIndex: 1
+                }} />
+
+                {/* Main Studio Card */}
+                <div style={{
+                  position: 'relative', zIndex: 2, backgroundColor: '#FFFFFF',
+                  borderRadius: '24px', border: '1.5px solid var(--primary-border)',
+                  padding: '1.5rem', boxShadow: 'var(--shadow-md)',
+                  display: 'flex', flexDirection: 'column', gap: '1.15rem'
+                }}>
+
+                  {/* Scaled Template Preview Thumbnail */}
+                  <div style={{
+                    width: '100%', height: '270px', borderRadius: '14px',
+                    border: '1px solid var(--border-color)', backgroundColor: '#F8FAFC',
+                    overflow: 'hidden', position: 'relative',
+                    boxShadow: 'inset 0 2px 6px rgba(15,23,42,0.04)'
+                  }}>
                     <div style={{
-                      backgroundColor: '#FFFFFF', padding: '0.45rem 0.85rem', borderRadius: '9999px',
-                      display: 'flex', alignItems: 'center', gap: '0.35rem', boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-                      fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)'
+                      width: '800px', height: '1131px',
+                      transform: 'scale(0.35)',
+                      transformOrigin: 'top left',
+                      backgroundColor: '#FFFFFF',
+                      pointerEvents: 'none'
                     }}>
-                      <Edit3 size={14} color="var(--primary)" />
-                      <span>Studio</span>
+                      <TemplateRenderer templateId={item.templateId} resumeData={resumeData} />
+                    </div>
+
+                    {/* Hover overlay button */}
+                    <div 
+                      onClick={() => handleOpenStudioWithTemplate(item.templateId, item.resumeName)}
+                      style={{
+                        position: 'absolute', inset: 0,
+                        backgroundColor: 'rgba(15, 23, 42, 0.15)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', opacity: 0.9, transition: 'opacity 0.2s ease'
+                      }}
+                    >
+                      <div style={{
+                        backgroundColor: '#FFFFFF', padding: '0.45rem 0.9rem', borderRadius: '9999px',
+                        display: 'flex', alignItems: 'center', gap: '0.35rem', boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+                        fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)'
+                      }}>
+                        <Edit3 size={14} color="var(--primary)" />
+                        <span>Open in Studio</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right: Details & CTAs */}
-                <div style={{ flex: 1, minWidth: '240px', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  <div>
-                    <h2 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.3rem 0', letterSpacing: '-0.02em' }}>
-                      {activeResumeName}
-                    </h2>
-                    <p style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>
-                      {resumeData?.personalInfo?.jobTitle || `${currentTemplateObj.name} Template`}
-                    </p>
+                  {/* Card Metadata */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {item.resumeName}
+                    </h3>
+                    <div style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--primary)' }}>
+                      {itemTplObj.name} Template
+                    </div>
                   </div>
 
-                  <div style={{
-                    fontSize: '0.8rem', color: 'var(--text-muted)',
-                    padding: '0.65rem 0.85rem', backgroundColor: '#F8FAFC',
-                    borderRadius: '10px', border: '1px solid var(--border-color)',
-                    display: 'flex', flexDirection: 'column', gap: '0.25rem'
-                  }}>
-                    <div>Selected Template: <strong style={{ color: 'var(--text-main)' }}>{currentTemplateObj.name}</strong></div>
-                    <div>Account / Session: <strong style={{ color: 'var(--text-main)' }}>{user?.email || 'Local Studio Draft'}</strong></div>
-                  </div>
-
+                  {/* CTA Button */}
                   <button
-                    onClick={() => handleOpenStudioWithTemplate(activeTemplateId, activeResumeName)}
+                    onClick={() => handleOpenStudioWithTemplate(item.templateId, item.resumeName)}
                     className="aura-btn-primary"
-                    style={{ width: '100%', padding: '0.75rem 1.25rem', fontSize: '0.875rem', borderRadius: '10px' }}
+                    style={{ width: '100%', padding: '0.75rem', fontSize: '0.875rem', borderRadius: '10px' }}
                   >
                     <Edit3 size={15} />
-                    <span>Rebuild / Modify in Studio</span>
+                    <span>Rebuild in Studio</span>
                   </button>
+
                 </div>
-
               </div>
-            </div>
-
-          </div>
+            );
+          })}
         </div>
 
         {/* Future Capabilities Module */}
         <div style={{
-          marginTop: '3rem',
+          marginTop: '3.5rem',
           backgroundColor: '#FFFFFF',
           borderRadius: '20px',
           border: '1.5px dashed var(--primary-border)',
