@@ -162,6 +162,7 @@ export default function LandingPage() {
     (resumeData?.skills && (Array.isArray(resumeData.skills) ? resumeData.skills.length > 0 : Object.values(resumeData.skills).flat().filter(Boolean).length > 0))
   );
 
+  const [activities, setActivities] = useState([]);
   const recentDownloadStored = (() => {
     try {
       return JSON.parse(localStorage.getItem('lumen_recent_download') || 'null');
