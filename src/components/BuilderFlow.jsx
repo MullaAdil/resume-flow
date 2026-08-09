@@ -2183,14 +2183,17 @@ const BuilderFlow = () => {
           </div>
         </div>
 
-        {/* 4. Section Toggles */}
-        <div className="premium-card">
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: '0 0 0.25rem 0' }}>
-            👁️ Section Visibility Toggles
-          </h3>
-          <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '0 0 1rem 0' }}>
-            Toggle sections on or off to customize your document layout.
-          </p>
+        {/* 4. Section Toggles & Custom Add */}
+        <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1E293B', margin: '0 0 0.25rem 0' }}>
+              👁️ Section Visibility Toggles
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748B', margin: 0 }}>
+              Toggle sections on or off to customize your document layout. Add custom toggles with matching theme styling.
+            </p>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
             {[
               { key: 'showSummary', label: 'Professional Summary' },
@@ -2216,6 +2219,90 @@ const BuilderFlow = () => {
               );
             })}
           </div>
+
+          {/* Dynamic Custom Section Toggles */}
+          {(resumeData.customSections || []).length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '0.5rem', paddingTop: '0.75rem', borderTop: '1px dashed #CBD5E1' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Themed Custom Sections
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+                {(resumeData.customSections || []).map(cs => {
+                  const isChecked = resumeData.settings?.[`show_custom_${cs.id}`] !== false;
+                  return (
+                    <div key={cs.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--primary-light)', padding: '0.45rem 0.75rem', borderRadius: '8px', border: '1.5px solid var(--primary-border)' }}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => updateSettings(`show_custom_${cs.id}`, e.target.checked)}
+                        style={{ accentColor: 'var(--primary)', width: '16px', height: '16px', cursor: 'pointer' }}
+                      />
+                      <input
+                        type="text"
+                        value={cs.title}
+                        onChange={(e) => {
+                          const updated = (resumeData.customSections || []).map(item => item.id === cs.id ? { ...item, title: e.target.value } : item);
+                          updateSection('customSections', updated);
+                        }}
+                        style={{ border: 'none', background: 'transparent', fontWeight: 700, fontSize: '0.85rem', color: 'var(--primary)', outline: 'none', flex: 1 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = (resumeData.customSections || []).filter(item => item.id !== cs.id);
+                          updateSection('customSections', updated);
+                        }}
+                        style={{ border: 'none', background: 'transparent', color: '#EF4444', cursor: 'pointer', fontWeight: 800, fontSize: '1.1rem', padding: '0 4px', lineHeight: 1 }}
+                        title="Delete custom section toggle"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Add Custom Section Button */}
+          <button
+            type="button"
+            onClick={() => {
+              const newId = 'custom_' + Date.now();
+              const count = (resumeData.customSections || []).length + 1;
+              const newCustom = {
+                id: newId,
+                title: `Custom Section #${count}`,
+                items: [
+                  { id: 'item_1', name: 'Achievement / Detail', description: 'Highlighted custom achievement or section content with theme styling.' }
+                ]
+              };
+              const nextCustoms = [...(resumeData.customSections || []), newCustom];
+              updateSection('customSections', nextCustoms);
+              updateSettings('showCustomSections', true);
+              updateSettings(`show_custom_${newId}`, true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              width: '100%',
+              padding: '0.75rem',
+              borderRadius: '10px',
+              border: '1.5px dashed var(--primary)',
+              backgroundColor: 'var(--primary-light)',
+              color: 'var(--primary)',
+              fontWeight: 700,
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              marginTop: '0.5rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>➕ Add Custom Section & Toggle (Same Theme)</span>
+          </button>
+
         </div>
 
       </div>

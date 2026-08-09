@@ -281,7 +281,7 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
       ? (hasUserLanguages ? resumeData.languages : fallbackLanguages)
       : [],
     customSections: (activeSettings.showCustomSections !== false)
-      ? (resumeData?.customSections || [])
+      ? (resumeData?.customSections || []).filter(cs => activeSettings[`show_custom_${cs.id}`] !== false)
       : [],
     settings: activeSettings
   };
@@ -327,22 +327,43 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
   };
   const selectedFontSize = fontSizeMap[activeSettings.fontSize] || '15px';
 
-  const selectedLineHeight = activeSettings.lineSpacing || '1.5';
+  const fontScaleMap = {
+    'Small': 0.88,
+    'Medium': 1.0,
+    'Large': 1.12
+  };
+  const fontScale = fontScaleMap[activeSettings.fontSize] || 1.0;
 
   return (
     <div
       className="customized-resume-wrapper"
+      data-font-size={activeSettings.fontSize || 'Medium'}
       style={{
         fontFamily: selectedFont,
         fontSize: selectedFontSize,
         lineHeight: selectedLineHeight,
+        zoom: fontScale,
         '--resume-font-family': selectedFont,
+        '--resume-font-size': selectedFontSize,
         '--resume-line-spacing': selectedLineHeight,
         '--primary-color': activeSettings.primaryColor || '#1e40af',
         '--primary': activeSettings.primaryColor || '#1e40af',
         '--secondary-color': activeSettings.secondaryColor || '#4f46e5'
       }}
     >
+      <style>{`
+        .customized-resume-wrapper,
+        .customized-resume-wrapper p,
+        .customized-resume-wrapper div,
+        .customized-resume-wrapper span,
+        .customized-resume-wrapper li,
+        .customized-resume-wrapper h1,
+        .customized-resume-wrapper h2,
+        .customized-resume-wrapper h3,
+        .customized-resume-wrapper h4 {
+          font-family: ${selectedFont} !important;
+        }
+      `}</style>
       <TemplateComponent resumeData={mergedData} />
     </div>
   );
