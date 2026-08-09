@@ -87,68 +87,52 @@ const ActivityPage = () => {
         </div>
 
         {/* Section Title */}
-        <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.5rem 0', letterSpacing: '-0.03em' }}>
+        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '2.1rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.4rem 0', letterSpacing: '-0.03em' }}>
             LED — Career Activity & Recent Asset
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', margin: 0 }}>
-            Live scaled preview of your active resume draft and recently selected template layout.
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: 0 }}>
+            Live preview of your active resume draft and recently selected template layout.
           </p>
         </div>
 
-        {/* Centered Scaled Asset Preview Card */}
+        {/* Small Horizontal Scaled Asset Preview Card */}
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: '100%', maxWidth: '520px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ width: '100%', maxWidth: '720px' }}>
             
             <div style={{ position: 'relative', width: '100%' }}>
               {/* Sheet 3: Slate bottom layer */}
               <div style={{
                 position: 'absolute', inset: 0, borderRadius: '24px',
                 background: '#F1F5F9', border: '1px solid #CBD5E1',
-                transform: 'translate(8px, 9px) rotate(1.2deg)', zIndex: 0
+                transform: 'translate(6px, 7px) rotate(0.8deg)', zIndex: 0
               }} />
 
               {/* Sheet 2: Linen middle layer */}
               <div style={{
                 position: 'absolute', inset: 0, borderRadius: '24px',
                 background: 'var(--primary-light, #FAF9F5)', border: '1.5px solid var(--primary-border, #E7E5E0)',
-                transform: 'translate(4px, 5px) rotate(0.5deg)', zIndex: 1
+                transform: 'translate(3px, 4px) rotate(0.4deg)', zIndex: 1
               }} />
 
-              {/* Main Top Studio Card */}
+              {/* Main Top Studio Card (Horizontal Split) */}
               <div style={{
                 position: 'relative', zIndex: 2, backgroundColor: '#FFFFFF',
                 borderRadius: '24px', border: '1.5px solid var(--primary-border)',
-                padding: '2rem', boxShadow: 'var(--shadow-md)',
-                display: 'flex', flexDirection: 'column', gap: '1.5rem'
+                padding: '1.5rem 1.75rem', boxShadow: 'var(--shadow-md)',
+                display: 'flex', gap: '1.75rem', alignItems: 'center', flexWrap: 'wrap'
               }}>
 
-                {/* Card Header & Status Badge */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', fontWeight: 700, color: '#059669', background: '#ECFDF5', border: '1px solid #A7F3D0', padding: '0.25rem 0.65rem', borderRadius: '9999px' }}>
-                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-                    <span>Recent Active Draft</span>
-                  </div>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)', backgroundColor: 'var(--primary-light)', padding: '0.2rem 0.55rem', borderRadius: '6px' }}>
-                    {currentTemplateObj.name}
-                  </span>
-                </div>
-
-                {/* Live Scaled Resume Preview Container using Recent Template */}
+                {/* Left: Compact Scaled Preview Thumbnail */}
                 <div style={{
-                  width: '100%',
-                  height: '420px',
-                  overflow: 'hidden',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: '#F8FAFC',
-                  position: 'relative',
-                  boxShadow: 'inset 0 2px 6px rgba(15,23,42,0.04)'
+                  width: '190px', height: '260px', borderRadius: '14px',
+                  border: '1px solid var(--border-color)', backgroundColor: '#F8FAFC',
+                  overflow: 'hidden', position: 'relative', flexShrink: 0,
+                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.06)'
                 }}>
                   <div style={{
-                    width: '800px',
-                    height: '1131px',
-                    transform: 'scale(0.52)',
+                    width: '800px', height: '1131px',
+                    transform: 'scale(' + (190 / 800) + ')',
                     transformOrigin: 'top left',
                     backgroundColor: '#FFFFFF',
                     pointerEvents: 'none'
@@ -167,44 +151,46 @@ const ActivityPage = () => {
                     }}
                   >
                     <div style={{
-                      backgroundColor: '#FFFFFF', padding: '0.6rem 1.25rem', borderRadius: '9999px',
-                      display: 'flex', alignItems: 'center', gap: '0.45rem', boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-                      fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-main)'
+                      backgroundColor: '#FFFFFF', padding: '0.45rem 0.85rem', borderRadius: '9999px',
+                      display: 'flex', alignItems: 'center', gap: '0.35rem', boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+                      fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)'
                     }}>
-                      <Edit3 size={16} color="var(--primary)" />
-                      <span>Open in Studio</span>
+                      <Edit3 size={14} color="var(--primary)" />
+                      <span>Studio</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Metadata Summary */}
-                <div style={{ backgroundColor: '#F8FAFC', borderRadius: '12px', padding: '1.15rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {activeResumeName}
+                {/* Right: Details & CTAs */}
+                <div style={{ flex: 1, minWidth: '240px', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 0.3rem 0', letterSpacing: '-0.02em' }}>
+                      {activeResumeName}
+                    </h2>
+                    <p style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>
+                      {resumeData?.personalInfo?.jobTitle || `${currentTemplateObj.name} Template`}
+                    </p>
                   </div>
-                  {resumeData?.personalInfo?.jobTitle ? (
-                    <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
-                      {resumeData.personalInfo.jobTitle}
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)' }}>
-                      {currentTemplateObj.name} Template
-                    </div>
-                  )}
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', marginTop: '0.4rem', paddingTop: '0.5rem', borderTop: '1px dashed #CBD5E1' }}>
-                    <span>Selected Template: <strong>{currentTemplateObj.name}</strong></span>
-                    <span>Status: <strong>Active Task</strong></span>
-                  </div>
-                </div>
 
-                {/* Primary CTA */}
-                <button
-                  onClick={() => handleOpenStudioWithTemplate(activeTemplateId, activeResumeName)}
-                  className="aura-btn-primary"
-                  style={{ width: '100%', padding: '0.85rem', fontSize: '0.925rem', borderRadius: '10px' }}
-                >
-                  <span>Rebuild / Modify in Studio</span>
-                </button>
+                  <div style={{
+                    fontSize: '0.8rem', color: 'var(--text-muted)',
+                    padding: '0.65rem 0.85rem', backgroundColor: '#F8FAFC',
+                    borderRadius: '10px', border: '1px solid var(--border-color)',
+                    display: 'flex', flexDirection: 'column', gap: '0.25rem'
+                  }}>
+                    <div>Selected Template: <strong style={{ color: 'var(--text-main)' }}>{currentTemplateObj.name}</strong></div>
+                    <div>Account / Session: <strong style={{ color: 'var(--text-main)' }}>{user?.email || 'Local Studio Draft'}</strong></div>
+                  </div>
+
+                  <button
+                    onClick={() => handleOpenStudioWithTemplate(activeTemplateId, activeResumeName)}
+                    className="aura-btn-primary"
+                    style={{ width: '100%', padding: '0.75rem 1.25rem', fontSize: '0.875rem', borderRadius: '10px' }}
+                  >
+                    <Edit3 size={15} />
+                    <span>Rebuild / Modify in Studio</span>
+                  </button>
+                </div>
 
               </div>
             </div>
@@ -214,11 +200,11 @@ const ActivityPage = () => {
 
         {/* Future Capabilities Module */}
         <div style={{
-          marginTop: '3.5rem',
+          marginTop: '3rem',
           backgroundColor: '#FFFFFF',
           borderRadius: '20px',
           border: '1.5px dashed var(--primary-border)',
-          padding: '1.75rem 2.25rem',
+          padding: '1.5rem 2rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
