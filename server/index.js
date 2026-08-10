@@ -80,7 +80,7 @@ app.post('/api/auth/signup', async (req, res) => {
   const cleanEmail = email.trim().toLowerCase();
 
   try {
-    if (mongoose.connection.readyState === 1) {
+    if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
       const existingUser = await User.findOne({ email: cleanEmail });
       if (existingUser) {
         return res.status(400).json({ error: 'An account with this email already exists. Please sign in instead.' });
@@ -139,7 +139,7 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     let user = null;
 
-    if (mongoose.connection.readyState === 1) {
+    if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
       user = await User.findOne({ email: cleanEmail });
     }
 

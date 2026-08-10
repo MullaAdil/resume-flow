@@ -5,7 +5,7 @@ if (API_BASE_URL && !API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsW
 }
 
 // Helper function to perform fetch requests with JWT token automatically attached, timeout, and fallback
-async function request(url, options = {}, timeoutMs = 6000) {
+async function request(url, options = {}, timeoutMs = 4000) {
   const token = localStorage.getItem(TOKEN_KEY);
   
   const headers = {
@@ -17,9 +17,9 @@ async function request(url, options = {}, timeoutMs = 6000) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const fetchWithTimeout = async (targetUrl) => {
+  const fetchWithTimeout = async (targetUrl, customTimeout = timeoutMs) => {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const timer = setTimeout(() => controller.abort(), customTimeout);
     try {
       const res = await fetch(targetUrl, {
         ...options,
@@ -33,22 +33,38 @@ async function request(url, options = {}, timeoutMs = 6000) {
   };
 
   let response;
-  const primaryUrl = `${API_BASE_URL}${url}`;
+  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-  try {
-    response = await fetchWithTimeout(primaryUrl);
-  } catch (err) {
-    // If primary URL failed (e.g., connection timed out or unreachable host) and API_BASE_URL was set,
-    // attempt fallback to relative URL (which uses Vite dev proxy or current domain origin)
-    if (API_BASE_URL) {
-      console.warn(`Primary API endpoint ${primaryUrl} failed (${err.message}). Trying fallback relative path...`);
-      try {
-        response = await fetchWithTimeout(url);
-      } catch (fallbackErr) {
+  if (isLocalhost) {
+    try {
+      // Prioritize relative URL on localhost (leverages Vite dev proxy directly)
+      response = await fetchWithTimeout(url, 2500);
+    } catch (err) {
+      if (API_BASE_URL) {
+        const fallbackUrl = `${API_BASE_URL}${url}`;
+        try {
+          response = await fetchWithTimeout(fallbackUrl, 2500);
+        } catch (fallbackErr) {
+          throw new Error(`API request to ${url} failed: ${err.message}`);
+        }
+      } else {
         throw new Error(`API request to ${url} failed: ${err.message}`);
       }
-    } else {
-      throw new Error(`API request to ${url} failed: ${err.message}`);
+    }
+  } else {
+    const primaryUrl = API_BASE_URL ? `${API_BASE_URL}${url}` : url;
+    try {
+      response = await fetchWithTimeout(primaryUrl, timeoutMs);
+    } catch (err) {
+      if (API_BASE_URL) {
+        try {
+          response = await fetchWithTimeout(url, timeoutMs);
+        } catch (fallbackErr) {
+          throw new Error(`API request to ${url} failed: ${err.message}`);
+        }
+      } else {
+        throw new Error(`API request to ${url} failed: ${err.message}`);
+      }
     }
   }
 
