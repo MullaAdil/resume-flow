@@ -43,7 +43,7 @@ echo "🔄 [3/3] Installing dependencies and restarting server..."
 ssh -i "$KEY" "$EC2_HOST" << 'REMOTE_SCRIPT'
   cd ~/resume-builder
   npm install --omit=dev
-  pm2 restart resume-builder-api || pm2 start server/index.js --name "resume-builder-api"
+  pm2 restart resume-builder-api --update-env || NODE_ENV=production pm2 start server/index.js --name "resume-builder-api"
   pm2 save
 REMOTE_SCRIPT
 echo "   ✅ Server restarted"

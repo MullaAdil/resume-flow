@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -149,7 +150,7 @@ app.post('/api/auth/login', async (req, res) => {
       if (memUser) {
         const isMatch = await bcrypt.compare(password, memUser.password);
         if (!isMatch) {
-          return res.status(400).json({ error: 'Incorrect password. Please double check and try again.' });
+          return res.status(401).json({ error: 'Incorrect password. Please double check and try again.' });
         }
         const token = jwt.sign({ id: memUser.id, email: memUser.email }, JWT_SECRET, { expiresIn: '7d' });
         return res.json({
@@ -158,19 +159,19 @@ app.post('/api/auth/login', async (req, res) => {
         });
       }
 
-      return res.status(400).json({ error: 'No account found with this email. Please check your email or click "Create Free Account" below.' });
+      return res.status(401).json({ error: 'No account found with this email. Please check your email or click "Create Free Account" below.' });
     }
 
     // User was found in DB
     if (user.authProvider && user.authProvider !== 'email') {
-      return res.status(400).json({
+      return res.status(401).json({
         error: `This account was registered using ${user.authProvider.toUpperCase()} sign-in. Please use the ${user.authProvider.toUpperCase()} button below.`
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: 'Incorrect password. Please double check and try again.' });
+      return res.status(401).json({ error: 'Incorrect password. Please double check and try again.' });
     }
 
     const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
@@ -628,9 +629,9 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
 });
 
-// Serve Vite build output in production
-if (process.env.NODE_ENV === 'production') {
-  const distPath = path.join(__dirname, '..', 'dist');
+// Serve Vite build output if dist directory exists
+const distPath = path.join(__dirname, '..', 'dist');
+if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 
   // SPA fallback — serve index.html for all non-API routes
