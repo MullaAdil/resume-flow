@@ -20,7 +20,7 @@ const LivePreview = ({ disableScaling = false }) => {
         const { width } = entries[0].contentRect;
         // Resume width is 800px. Add 40px padding.
         const newScale = Math.min(1, (width - 40) / 800);
-        setScale(newScale);
+        setScale(prev => Math.abs(prev - newScale) > 0.01 ? newScale : prev);
       }
     });
     
@@ -32,28 +32,36 @@ const LivePreview = ({ disableScaling = false }) => {
   }, [disableScaling]);
 
   useEffect(() => {
+    let animationFrameId;
     const updateH = () => {
       if (contentRef.current) {
         const h = Math.max(contentRef.current.scrollHeight || 0, contentRef.current.offsetHeight || 0, 1131);
-        setMeasuredHeight(h);
+        setMeasuredHeight(prev => Math.abs(prev - h) > 5 ? h : prev);
       }
     };
-    updateH();
-    const timer = setTimeout(updateH, 200);
-    return () => clearTimeout(timer);
+    
+    animationFrameId = requestAnimationFrame(updateH);
+    const timer = setTimeout(() => {
+      animationFrameId = requestAnimationFrame(updateH);
+    }, 150);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearTimeout(timer);
+    };
   }, [resumeData, selectedTemplate]);
 
   const marginOffset = disableScaling ? 0 : -((1 - scale) * measuredHeight);
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center' }}>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout">
         <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: scale }}
+          exit={{ opacity: 0, scale: 0.98 }}
           key={selectedTemplate}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
           style={{ 
             transform: `scale(${scale})`, 
             transformOrigin: 'top center',
@@ -69,4 +77,5 @@ const LivePreview = ({ disableScaling = false }) => {
   );
 };
 
-export default LivePreview;
+export default React.memo(LivePreview);
+

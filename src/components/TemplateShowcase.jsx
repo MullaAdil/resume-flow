@@ -8,6 +8,139 @@ import { mockResumeData, templateMockData } from '../utils/mockResumeData';
 import AuraHeader from './AuraHeader';
 import { ZoomIn, Eye, X, Check, Layout, Search, Heart } from 'lucide-react';
 
+const ShowcaseCardItem = React.memo(({ template, index, cardWidth, isWishlisted, onToggleWishlist, onSelectTemplate, onPreviewTemplate }) => {
+  const scale = cardWidth / 800;
+  const scaledHeight = 1131 * scale;
+  const previewData = templateMockData[template.id] || mockResumeData;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.03 }}
+      className="template-card"
+      style={{
+        display: 'flex', flexDirection: 'column',
+        background: '#FFFFFF',
+        borderRadius: '16px',
+        border: '1px solid #E2E8F0',
+        padding: '1.25rem',
+        boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.06)',
+        transition: 'all 0.2s ease',
+        position: 'relative',
+        cursor: 'pointer'
+      }}
+      onClick={() => onSelectTemplate(template.id)}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', padding: '0 0.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+            {template.name}
+          </h3>
+          {index === 0 && (
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', background: 'rgba(5, 150, 105, 0.1)', padding: '0.15rem 0.55rem', borderRadius: '9999px' }}>
+              Popular
+            </span>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleWishlist(template.id);
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '34px',
+            height: '34px',
+            borderRadius: '50%',
+            backgroundColor: isWishlisted ? '#FFF1F2' : '#F8FAFC',
+            border: isWishlisted ? '1.5px solid #FECDD3' : '1px solid #E2E8F0',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+          }}
+          title={isWishlisted ? 'Remove from Wishlist' : 'Save to Wishlist'}
+        >
+          <Heart
+            size={17}
+            color={isWishlisted ? '#E11D48' : '#94A3B8'}
+            fill={isWishlisted ? '#E11D48' : 'none'}
+          />
+        </button>
+      </div>
+      
+      <div style={{
+          width: '100%',
+          height: `${scaledHeight}px`,
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: '8px',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+      }}>
+        <div style={{
+          width: '800px',
+          height: '1131px',
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+          backgroundColor: '#FFFFFF'
+        }}>
+          <TemplateRenderer templateId={template.id} resumeData={previewData} />
+        </div>
+
+        <div 
+          className="template-hover-zoom"
+          style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0,
+            transition: 'opacity 0.2s ease'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPreviewTemplate(template.id);
+          }}
+        >
+          <div style={{
+            width: '56px', height: '56px', borderRadius: '50%',
+            background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 6px 16px rgba(0,0,0,0.2)'
+          }}>
+             <ZoomIn size={26} color="#0F172A" />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: '1.25rem' }}>
+         <button 
+           className="aura-btn-primary"
+           style={{
+             width: '100%',
+             padding: '0.75rem',
+             fontSize: '0.95rem'
+           }}
+         >
+           Use Template
+         </button>
+      </div>
+
+      {index === 0 && (
+        <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#A7F3D0', color: '#047857', padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
+          Recommended
+        </div>
+      )}
+    </motion.div>
+  );
+});
+
 const TemplateShowcase = () => {
   const [selectedColor, setSelectedColor] = React.useState(null);
   const navigate = useNavigate();
@@ -151,152 +284,18 @@ const TemplateShowcase = () => {
             gap: '2.5rem' 
           }}
         >
-          {filteredTemplates.map((template, index) => {
-             // The scale calculation ensures the template perfectly fits the grid column width
-             // 800px is the fixed width of our templates.
-             const scale = cardWidth / 800;
-             const scaledHeight = 1131 * scale; 
-
-             return (
-               <motion.div
-                 key={template.id}
-                 initial={{ opacity: 0, y: 20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                 className="template-card"
-                 style={{ 
-                   display: 'flex', flexDirection: 'column',
-                   background: '#FFFFFF',
-                   borderRadius: '16px',
-                   border: '1px solid #E2E8F0',
-                   padding: '1.25rem',
-                   boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.06)',
-                   transition: 'all 0.2s ease',
-                   position: 'relative',
-                   cursor: 'pointer'
-                 }}
-                 onClick={() => handleSelectTemplate(template.id)}
-               >
-                 {/* Top Template Header Info */}
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', padding: '0 0.25rem' }}>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                     <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                       {template.name}
-                     </h3>
-                     {index === 0 && (
-                       <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', background: 'rgba(5, 150, 105, 0.1)', padding: '0.15rem 0.55rem', borderRadius: '9999px' }}>
-                         Popular
-                       </span>
-                     )}
-                   </div>
-
-                   {/* Heart Wishlist Toggle */}
-                   <button
-                     type="button"
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       handleToggleWishlist(template.id);
-                     }}
-                     style={{
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center',
-                       width: '34px',
-                       height: '34px',
-                       borderRadius: '50%',
-                       backgroundColor: wishlist.includes(template.id) ? '#FFF1F2' : '#F8FAFC',
-                       border: wishlist.includes(template.id) ? '1.5px solid #FECDD3' : '1px solid #E2E8F0',
-                       cursor: 'pointer',
-                       transition: 'all 0.15s ease',
-                       boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
-                     }}
-                     title={wishlist.includes(template.id) ? 'Remove from Wishlist' : 'Save to Wishlist'}
-                   >
-                     <Heart
-                       size={17}
-                       color={wishlist.includes(template.id) ? '#E11D48' : '#94A3B8'}
-                       fill={wishlist.includes(template.id) ? '#E11D48' : 'none'}
-                     />
-                   </button>
-                 </div>
-                 
-                 {/* Preview Container */}
-                 <div style={{
-                     width: '100%',
-                     height: `${scaledHeight}px`,
-                     position: 'relative',
-                     overflow: 'hidden',
-                     borderRadius: '8px',
-                     border: '1px solid #E2E8F0',
-                     boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                 }}>
-                   {/* The actual high-fidelity template render */}
-                   <div style={{
-                     width: '800px',
-                     height: '1131px',
-                     transform: `scale(${scale})`,
-                     transformOrigin: 'top left',
-                     backgroundColor: '#FFFFFF'
-                   }}>
-                     {
-                       (() => {
-                         const previewData = templateMockData[template.id] || mockResumeData;
-                         return <TemplateRenderer templateId={template.id} resumeData={previewData} />;
-                       })()
-                     }
-                   </div>
-
-                   {/* Hover Overlay */}
-                   <div 
-                     className="template-hover-zoom"
-                     style={{
-                       position: 'absolute',
-                       top: 0, left: 0, right: 0, bottom: 0,
-                       backgroundColor: 'rgba(15, 23, 42, 0.25)',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center',
-                       opacity: 0,
-                       transition: 'opacity 0.2s ease'
-                     }}
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       setPreviewTemplate(template.id);
-                     }}
-                   >
-                     <div style={{
-                       width: '56px', height: '56px', borderRadius: '50%',
-                       background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                       boxShadow: '0 6px 16px rgba(0,0,0,0.2)'
-                     }}>
-                        <ZoomIn size={26} color="#0F172A" />
-                     </div>
-                   </div>
-                 </div>
-
-                 {/* Reshaped Button */}
-                 <div style={{ marginTop: '1.25rem' }}>
-                    <button 
-                      className="aura-btn-primary"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        fontSize: '0.95rem'
-                      }}
-                    >
-                      Use Template
-                    </button>
-                 </div>
-
-                 {/* Top tags (like 'Recommended') */}
-                 {index === 0 && (
-                   <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#A7F3D0', color: '#047857', padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
-                     Recommended
-                   </div>
-                 )}
-               </motion.div>
-             );
-          })}
+          {filteredTemplates.map((template, index) => (
+            <ShowcaseCardItem
+              key={template.id}
+              template={template}
+              index={index}
+              cardWidth={cardWidth}
+              isWishlisted={wishlist.includes(template.id)}
+              onToggleWishlist={handleToggleWishlist}
+              onSelectTemplate={handleSelectTemplate}
+              onPreviewTemplate={setPreviewTemplate}
+            />
+          ))}
         </div>
 
         {filteredTemplates.length === 0 && (

@@ -111,8 +111,65 @@ const ACCENT_COLOR_PRESETS = [
   { id: 'obsidian', name: 'Obsidian Slate', primary: '#0F172A', hover: '#020617', light: '#F8FAFC', border: '#CBD5E1', glow: 'rgba(15,23,42,0.25)' },
 ];
 
+// Memoized Template Grid Card to prevent main thread blocking
+const TemplateCardItem = React.memo(({ tpl, isSelected, onSelect, resumeData }) => {
+  const CARD_PREVIEW_WIDTH = 180;
+  const CARD_PREVIEW_HEIGHT = 255;
+  const scaleX = CARD_PREVIEW_WIDTH / 800;
 
+  return (
+    <div
+      onClick={() => onSelect(tpl.id)}
+      style={{
+        border: isSelected ? '3px solid var(--primary)' : '1.5px solid #CBD5E1',
+        borderRadius: '14px',
+        cursor: 'pointer',
+        background: '#FFFFFF',
+        transition: 'all 0.2s ease',
+        overflow: 'hidden',
+        position: 'relative',
+        boxShadow: isSelected
+          ? '0 0 0 4px var(--primary-glow), 0 10px 25px -5px rgba(15,23,42,0.15)'
+          : '0 4px 12px -4px rgba(15, 23, 42, 0.06)',
+      }}
+    >
+      <div style={{
+        width: '100%',
+        height: `${CARD_PREVIEW_HEIGHT}px`,
+        overflow: 'hidden',
+        position: 'relative',
+        background: '#F8FAFC',
+      }}>
+        <div style={{
+          width: '800px',
+          height: '1131px',
+          transform: `scale(${scaleX})`,
+          transformOrigin: 'top left',
+          pointerEvents: 'none',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+        }}>
+          <TemplateRenderer templateId={tpl.id} resumeData={resumeData} />
+        </div>
+      </div>
 
+      <div style={{
+        padding: '0.65rem 0.85rem',
+        background: isSelected ? 'var(--primary)' : '#FFFFFF',
+        borderTop: `1px solid ${isSelected ? 'var(--primary)' : '#E2E8F0'}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <span style={{ fontWeight: 700, color: isSelected ? '#FFFFFF' : '#1E293B', fontSize: '0.85rem' }}>
+          {tpl.name}
+        </span>
+        {isSelected && <Check size={16} color="#FFFFFF" />}
+      </div>
+    </div>
+  );
+});
 
 const BuilderFlow = () => {
   const navigate = useNavigate();
@@ -348,23 +405,23 @@ const BuilderFlow = () => {
   const [contentHeight, setContentHeight] = useState(1131);
 
   useEffect(() => {
+    let animFrame;
     const updateHeight = () => {
       if (previewContentRef.current) {
         const el = previewContentRef.current.querySelector('#resume-pdf-content') || previewContentRef.current;
         const h = Math.max(el.scrollHeight || 0, el.offsetHeight || 0, 1131);
-        if (h > 0 && Math.abs(h - contentHeight) > 2) setContentHeight(h);
+        setContentHeight(prev => (h > 0 && Math.abs(h - prev) > 5) ? h : prev);
       }
     };
-    updateHeight();
-    const timer = setTimeout(updateHeight, 250);
-    let observer;
-    if (previewContentRef.current && typeof ResizeObserver !== 'undefined') {
-      observer = new ResizeObserver(updateHeight);
-      observer.observe(previewContentRef.current);
-    }
+
+    animFrame = requestAnimationFrame(updateHeight);
+    const timer = setTimeout(() => {
+      animFrame = requestAnimationFrame(updateHeight);
+    }, 200);
+
     return () => {
+      cancelAnimationFrame(animFrame);
       clearTimeout(timer);
-      if (observer) observer.disconnect();
     };
   }, [resumeData, selectedTemplate, leftPaneMode]);
 
@@ -1962,66 +2019,15 @@ const BuilderFlow = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.25rem', marginTop: '0.5rem' }}>
           {templates
             .filter(tpl => customizeFilterTag === 'All' || tpl.tags.includes(customizeFilterTag))
-            .map((tpl) => {
-              const CARD_PREVIEW_WIDTH = 180;
-              const CARD_PREVIEW_HEIGHT = 255;
-              const scaleX = CARD_PREVIEW_WIDTH / 800;
-              const isSelected = selectedTemplate === tpl.id;
-
-              return (
-                <div
-                  key={tpl.id}
-                  onClick={() => setSelectedTemplate(tpl.id)}
-                  style={{
-                    border: isSelected ? '3px solid var(--primary)' : '1.5px solid #CBD5E1',
-                    borderRadius: '14px',
-                    cursor: 'pointer',
-                    background: '#FFFFFF',
-                    transition: 'all 0.2s ease',
-                    overflow: 'hidden',
-                    position: 'relative',
-                    boxShadow: isSelected
-                      ? '0 0 0 4px var(--primary-glow), 0 10px 25px -5px rgba(15,23,42,0.15)'
-                      : '0 4px 12px -4px rgba(15, 23, 42, 0.06)',
-                  }}
-                >
-                  <div style={{
-                    width: '100%',
-                    height: `${CARD_PREVIEW_HEIGHT}px`,
-                    overflow: 'hidden',
-                    position: 'relative',
-                    background: '#F8FAFC',
-                  }}>
-                    <div style={{
-                      width: '800px',
-                      height: '1131px',
-                      transform: `scale(${scaleX})`,
-                      transformOrigin: 'top left',
-                      pointerEvents: 'none',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                    }}>
-                      <TemplateRenderer templateId={tpl.id} resumeData={resumeData} />
-                    </div>
-                  </div>
-
-                  <div style={{
-                    padding: '0.65rem 0.85rem',
-                    background: isSelected ? 'var(--primary)' : '#FFFFFF',
-                    borderTop: `1px solid ${isSelected ? 'var(--primary)' : '#E2E8F0'}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}>
-                    <span style={{ fontWeight: 700, color: isSelected ? '#FFFFFF' : '#1E293B', fontSize: '0.85rem' }}>
-                      {tpl.name}
-                    </span>
-                    {isSelected && <Check size={16} color="#FFFFFF" />}
-                  </div>
-                </div>
-              );
-            })}
+            .map((tpl) => (
+              <TemplateCardItem
+                key={tpl.id}
+                tpl={tpl}
+                isSelected={selectedTemplate === tpl.id}
+                onSelect={setSelectedTemplate}
+                resumeData={resumeData}
+              />
+            ))}
         </div>
       </div>
     </motion.div>

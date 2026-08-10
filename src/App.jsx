@@ -14,7 +14,7 @@ import { AuthProvider } from './context/AuthContext';
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage initialMode="login" />} />

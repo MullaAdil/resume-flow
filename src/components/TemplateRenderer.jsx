@@ -343,7 +343,8 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
         fontFamily: selectedFont,
         fontSize: selectedFontSize,
         lineHeight: selectedLineHeight,
-        zoom: fontScale,
+        transform: fontScale !== 1.0 ? `scale(${fontScale})` : 'none',
+        transformOrigin: 'top left',
         '--resume-font-family': selectedFont,
         '--resume-font-size': selectedFontSize,
         '--resume-line-spacing': selectedLineHeight,
@@ -370,4 +371,5 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
   );
 };
 
-export default TemplateRenderer;
+export default React.memo(TemplateRenderer);
+
