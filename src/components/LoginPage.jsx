@@ -51,7 +51,9 @@ const LoginPage = ({ initialMode = 'login' }) => {
     setError('');
     setSuccessMsg('');
 
-    if (!email || !password) {
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail || !password) {
       setError('Please enter your email and password.');
       return;
     }
@@ -66,11 +68,11 @@ const LoginPage = ({ initialMode = 'login' }) => {
     try {
       isAuthActionRef.current = true;
       if (isSignUp) {
-        await signUp(email, password);
+        await signUp(cleanEmail, password);
         setSuccessMsg('Account created successfully! Directing to Home...');
         setTimeout(() => navigate('/'), 700);
       } else {
-        await signInWithPassword(email, password);
+        await signInWithPassword(cleanEmail, password);
         setSuccessMsg('Signed in successfully! Directing to Home...');
         setTimeout(() => navigate('/'), 700);
       }
@@ -232,12 +234,54 @@ const LoginPage = ({ initialMode = 'login' }) => {
                   color: '#991B1B',
                   fontSize: '0.85rem',
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: 'column',
                   gap: '0.5rem',
                   marginBottom: '1.25rem'
                 }}>
-                  <AlertCircle size={16} />
-                  <span>{error}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                    <span>{error}</span>
+                  </div>
+                  {error.includes('No account found') && (
+                    <button
+                      type="button"
+                      onClick={() => { setIsSignUp(true); setError(''); }}
+                      style={{
+                        alignSelf: 'flex-start',
+                        marginTop: '0.2rem',
+                        padding: '0.3rem 0.75rem',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        backgroundColor: '#DC2626',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Click to Create Free Account →
+                    </button>
+                  )}
+                  {error.includes('already exists') && (
+                    <button
+                      type="button"
+                      onClick={() => { setIsSignUp(false); setError(''); }}
+                      style={{
+                        alignSelf: 'flex-start',
+                        marginTop: '0.2rem',
+                        padding: '0.3rem 0.75rem',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        backgroundColor: '#DC2626',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Click to Sign In →
+                    </button>
+                  )}
                 </div>
               )}
 

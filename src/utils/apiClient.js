@@ -65,9 +65,10 @@ async function request(url, options = {}, timeoutMs = 6000) {
 export const apiClient = {
   auth: {
     async signUp({ email, password }) {
+      const cleanEmail = (email || '').trim();
       const data = await request('/api/auth/signup', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: cleanEmail, password }),
       });
       if (data.token) {
         localStorage.setItem(TOKEN_KEY, data.token);
@@ -76,9 +77,10 @@ export const apiClient = {
     },
 
     async signInWithPassword({ email, password }) {
+      const cleanEmail = (email || '').trim();
       const data = await request('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: cleanEmail, password }),
       });
       if (data.token) {
         localStorage.setItem(TOKEN_KEY, data.token);

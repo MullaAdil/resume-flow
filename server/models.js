@@ -12,6 +12,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  authProvider: {
+    type: String,
+    enum: ['email', 'google', 'github'],
+    default: 'email',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

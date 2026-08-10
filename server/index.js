@@ -77,19 +77,20 @@ app.post('/api/auth/signup', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
-  const lowercaseEmail = email.toLowerCase();
+  const cleanEmail = email.trim().toLowerCase();
 
   try {
     if (mongoose.connection.readyState === 1) {
-      const existingUser = await User.findOne({ email: lowercaseEmail });
+      const existingUser = await User.findOne({ email: cleanEmail });
       if (existingUser) {
-        return res.status(400).json({ error: 'An account with this email already exists' });
+        return res.status(400).json({ error: 'An account with this email already exists. Please sign in instead.' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({
-        email: lowercaseEmail,
+        email: cleanEmail,
         password: hashedPassword,
+        authProvider: 'email',
       });
 
       await newUser.save();
@@ -109,13 +110,13 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 
   // In-Memory Fallback
-  const existingMem = inMemoryUsers.find(u => u.email === lowercaseEmail);
+  const existingMem = inMemoryUsers.find(u => u.email === cleanEmail);
   if (existingMem) {
-    return res.status(400).json({ error: 'An account with this email already exists' });
+    return res.status(400).json({ error: 'An account with this email already exists. Please sign in instead.' });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const memUser = { id: 'mem_u_' + Date.now(), email: lowercaseEmail, password: hashedPassword };
+  const memUser = { id: 'mem_u_' + Date.now(), email: cleanEmail, password: hashedPassword, authProvider: 'email' };
   inMemoryUsers.push(memUser);
 
   const token = jwt.sign({ id: memUser.id, email: memUser.email }, JWT_SECRET, { expiresIn: '7d' });
@@ -133,46 +134,58 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
-  const lowercaseEmail = email.toLowerCase();
+  const cleanEmail = email.trim().toLowerCase();
 
   try {
+    let user = null;
+
     if (mongoose.connection.readyState === 1) {
-      const user = await User.findOne({ email: lowercaseEmail });
-      if (user) {
-        const isMatch = await bcrypt.compare(password, user.password);
+      user = await User.findOne({ email: cleanEmail });
+    }
+
+    // Fallback check in-memory store if DB query returned nothing or DB is disconnected
+    if (!user) {
+      const memUser = inMemoryUsers.find(u => u.email === cleanEmail);
+      if (memUser) {
+        const isMatch = await bcrypt.compare(password, memUser.password);
         if (!isMatch) {
-          return res.status(400).json({ error: 'Invalid email or password' });
+          return res.status(400).json({ error: 'Incorrect password. Please double check and try again.' });
         }
-
-        const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-
+        const token = jwt.sign({ id: memUser.id, email: memUser.email }, JWT_SECRET, { expiresIn: '7d' });
         return res.json({
           token,
-          user: {
-            id: user._id,
-            email: user.email,
-          }
+          user: { id: memUser.id, email: memUser.email }
         });
       }
-    }
-  } catch (err) {
-    console.warn('DB Login failed, checking in-memory store fallback:', err.message);
-  }
 
-  // In-Memory Fallback
-  const memUser = inMemoryUsers.find(u => u.email === lowercaseEmail);
-  if (memUser) {
-    const isMatch = await bcrypt.compare(password, memUser.password);
-    if (isMatch) {
-      const token = jwt.sign({ id: memUser.id, email: memUser.email }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({
-        token,
-        user: { id: memUser.id, email: memUser.email }
+      return res.status(400).json({ error: 'No account found with this email. Please check your email or click "Create Free Account" below.' });
+    }
+
+    // User was found in DB
+    if (user.authProvider && user.authProvider !== 'email') {
+      return res.status(400).json({
+        error: `This account was registered using ${user.authProvider.toUpperCase()} sign-in. Please use the ${user.authProvider.toUpperCase()} button below.`
       });
     }
-  }
 
-  return res.status(400).json({ error: 'Invalid email or password' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Incorrect password. Please double check and try again.' });
+    }
+
+    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+
+    return res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+      }
+    });
+  } catch (err) {
+    console.error('DB Login error:', err);
+    return res.status(500).json({ error: 'An unexpected error occurred during login. Please try again.' });
+  }
 });
 
 // Get Current User
@@ -290,13 +303,14 @@ app.get('/api/auth/google/callback', async (req, res) => {
     }
 
     // Find or create user in DB
-    let user = await User.findOne({ email: email.toLowerCase() });
+    let user = await User.findOne({ email: email.trim().toLowerCase() });
     if (!user) {
       const randomPassword = Math.random().toString(36) + Math.random().toString(36);
       const hashedPassword = await bcrypt.hash(randomPassword, 10);
       user = new User({
-        email: email.toLowerCase(),
-        password: hashedPassword
+        email: email.trim().toLowerCase(),
+        password: hashedPassword,
+        authProvider: 'google'
       });
       await user.save();
     }
@@ -384,13 +398,14 @@ app.get('/api/auth/github/callback', async (req, res) => {
     }
 
     // Find or create user in DB
-    let user = await User.findOne({ email: email.toLowerCase() });
+    let user = await User.findOne({ email: email.trim().toLowerCase() });
     if (!user) {
       const randomPassword = Math.random().toString(36) + Math.random().toString(36);
       const hashedPassword = await bcrypt.hash(randomPassword, 10);
       user = new User({
-        email: email.toLowerCase(),
-        password: hashedPassword
+        email: email.trim().toLowerCase(),
+        password: hashedPassword,
+        authProvider: 'github'
       });
       await user.save();
     }
