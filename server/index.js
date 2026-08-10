@@ -207,7 +207,7 @@ const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 const SERVER_URL = process.env.SERVER_URL || 'http://localhost:5001';
 
-// Helper to get client origin dynamically from query parameter or referer header
+// Helper to get client origin dynamically from query parameter, referer header, or request host
 const getClientOrigin = (req) => {
   if (req.query.origin) return req.query.origin;
   const referer = req.headers.referer;
@@ -216,7 +216,8 @@ const getClientOrigin = (req) => {
       return new URL(referer).origin;
     } catch (e) {}
   }
-  return CLIENT_URL;
+  if (process.env.CLIENT_URL) return process.env.CLIENT_URL;
+  return getServerUrl(req);
 };
 
 // Helper to get server's own URL dynamically (protocol + host)
@@ -246,10 +247,10 @@ const getServerUrl = (req) => {
 
 // Initiate Google Login
 app.get('/api/auth/google', (req, res) => {
-  if (!GOOGLE_CLIENT_ID) {
-    return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('Google Client ID is not configured on the server.')}`);
-  }
   const clientOrigin = getClientOrigin(req);
+  if (!GOOGLE_CLIENT_ID) {
+    return res.redirect(`${clientOrigin}/login?error=${encodeURIComponent('Google Client ID is not configured on the server.')}`);
+  }
   const serverUrl = getServerUrl(req);
   const redirectUri = `${serverUrl}/api/auth/google/callback`;
   const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&state=${encodeURIComponent(clientOrigin)}`;
@@ -259,7 +260,7 @@ app.get('/api/auth/google', (req, res) => {
 // Google Callback
 app.get('/api/auth/google/callback', async (req, res) => {
   const { code, state } = req.query;
-  const clientOrigin = state || CLIENT_URL;
+  const clientOrigin = state || getClientOrigin(req);
   const serverUrl = getServerUrl(req);
   const redirectUri = `${serverUrl}/api/auth/google/callback`;
   
@@ -329,10 +330,10 @@ app.get('/api/auth/google/callback', async (req, res) => {
 
 // Initiate GitHub Login
 app.get('/api/auth/github', (req, res) => {
-  if (!GITHUB_CLIENT_ID) {
-    return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent('GitHub Client ID is not configured on the server.')}`);
-  }
   const clientOrigin = getClientOrigin(req);
+  if (!GITHUB_CLIENT_ID) {
+    return res.redirect(`${clientOrigin}/login?error=${encodeURIComponent('GitHub Client ID is not configured on the server.')}`);
+  }
   const serverUrl = getServerUrl(req);
   const redirectUri = `${serverUrl}/api/auth/github/callback`;
   const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email&state=${encodeURIComponent(clientOrigin)}`;
@@ -342,7 +343,7 @@ app.get('/api/auth/github', (req, res) => {
 // GitHub Callback
 app.get('/api/auth/github/callback', async (req, res) => {
   const { code, state } = req.query;
-  const clientOrigin = state || CLIENT_URL;
+  const clientOrigin = state || getClientOrigin(req);
   
   if (!code) {
     return res.redirect(`${clientOrigin}/login?error=auth_failed`);
