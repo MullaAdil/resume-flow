@@ -1,8 +1,19 @@
 const TOKEN_KEY = 'auth_token';
-let API_BASE_URL = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
-if (API_BASE_URL && !API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsWith('https://')) {
-  API_BASE_URL = `https://${API_BASE_URL}`;
-}
+
+export const getApiBaseUrl = () => {
+  let url = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+  const isLocalhostDomain = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  // Strip hardcoded localhost URLs when running on live non-localhost domains
+  if (!isLocalhostDomain && (url.includes('localhost') || url.includes('127.0.0.1'))) {
+    url = '';
+  }
+
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+  return url;
+};
 
 // Helper function to perform fetch requests with JWT token automatically attached, timeout, and fallback
 async function request(url, options = {}, timeoutMs = 4000) {
@@ -33,6 +44,7 @@ async function request(url, options = {}, timeoutMs = 4000) {
   };
 
   let response;
+  const baseUrl = getApiBaseUrl();
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   if (isLocalhost) {
@@ -40,8 +52,8 @@ async function request(url, options = {}, timeoutMs = 4000) {
       // Prioritize relative URL on localhost (leverages Vite dev proxy directly)
       response = await fetchWithTimeout(url, 2500);
     } catch (err) {
-      if (API_BASE_URL) {
-        const fallbackUrl = `${API_BASE_URL}${url}`;
+      if (baseUrl) {
+        const fallbackUrl = `${baseUrl}${url}`;
         try {
           response = await fetchWithTimeout(fallbackUrl, 2500);
         } catch (fallbackErr) {
@@ -52,11 +64,11 @@ async function request(url, options = {}, timeoutMs = 4000) {
       }
     }
   } else {
-    const primaryUrl = API_BASE_URL ? `${API_BASE_URL}${url}` : url;
+    const primaryUrl = baseUrl ? `${baseUrl}${url}` : url;
     try {
       response = await fetchWithTimeout(primaryUrl, timeoutMs);
     } catch (err) {
-      if (API_BASE_URL) {
+      if (baseUrl) {
         try {
           response = await fetchWithTimeout(url, timeoutMs);
         } catch (fallbackErr) {

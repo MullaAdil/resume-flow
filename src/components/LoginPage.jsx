@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getApiBaseUrl } from '../utils/apiClient';
 import AuraHeader from './AuraHeader';
 import { Mail, Lock, ArrowRight, CheckCircle, AlertCircle, Zap, BarChart3, Layers, Eye, EyeOff, Check, X } from 'lucide-react';
 
@@ -84,9 +85,10 @@ const LoginPage = ({ initialMode = 'login' }) => {
   };
 
   const handleOAuthLogin = (provider) => {
-    let backendUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+    const backendUrl = getApiBaseUrl();
     const currentOrigin = window.location.origin;
-    window.location.href = `${backendUrl}/api/auth/${provider}?origin=${encodeURIComponent(currentOrigin)}`;
+    const targetUrl = backendUrl ? `${backendUrl}/api/auth/${provider}` : `${currentOrigin}/api/auth/${provider}`;
+    window.location.href = `${targetUrl}?origin=${encodeURIComponent(currentOrigin)}`;
   };
 
   return (
