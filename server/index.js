@@ -209,7 +209,7 @@ const SERVER_URL = process.env.SERVER_URL || 'http://localhost:5001';
 
 // Helper to get client origin dynamically from query parameter, referer header, or request host
 const getClientOrigin = (req) => {
-  let origin = req.query.origin;
+  let origin = req.query.origin || req.headers.origin;
   const serverUrl = getServerUrl(req);
 
   if (origin) {
