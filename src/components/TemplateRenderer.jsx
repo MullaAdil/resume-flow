@@ -321,12 +321,12 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
   const selectedFont = fontFamilyMap[activeSettings.fontFamily] || activeSettings.fontFamily || "'Inter', sans-serif";
 
   const fontSizeMap = {
-    'Small': '13px',
-    'Medium': '14.5px',
-    'Large': '16.5px'
+    'Small': '12px',
+    'Medium': '13.5px',
+    'Large': '15px'
   };
-  const selectedFontSize = fontSizeMap[activeSettings.fontSize] || '14.5px';
-  const selectedLineHeight = activeSettings.lineSpacing || '1.5';
+  const selectedFontSize = fontSizeMap[activeSettings.fontSize] || '13.5px';
+  const selectedLineHeight = activeSettings.lineSpacing || '1.4';
 
   return (
     <div

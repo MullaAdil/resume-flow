@@ -115,11 +115,7 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
     });
 
     // Standard A4 dimensions in mm: 210mm x 297mm
-    // 800px width maps to 210mm (scale ratio = 210 / 800 = 0.2625 mm/px)
-    // Height of 1 A4 page in 800px canvas = 800 * (297 / 210) = 1131.42857 px
     const a4PxHeight = 1131.42857;
-    // Allow 12px overflow tolerance before adding an additional page
-    const totalPages = Math.max(1, Math.ceil((actualHeight - 12) / a4PxHeight));
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -133,38 +129,45 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
       subject: 'Resume'
     });
 
-    const sliceHeightPx = Math.round(a4PxHeight * canvasScale);
-    const canvasWidth = canvas.width;
-    const totalCanvasHeight = canvas.height;
+    // If actualHeight is within standard single-page resume range (up to 1450px),
+    // scale to fit EXCLUSIVELY onto 1 Single A4 page (210mm x 297mm) perfectly!
+    if (actualHeight <= 1450) {
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+    } else {
+      // Multi-page logic for genuinely multi-page documents (>1450px)
+      const totalPages = Math.ceil(actualHeight / a4PxHeight);
+      const sliceHeightPx = Math.round(a4PxHeight * canvasScale);
+      const canvasWidth = canvas.width;
+      const totalCanvasHeight = canvas.height;
 
-    for (let page = 0; page < totalPages; page++) {
-      if (page > 0) {
-        pdf.addPage('a4', 'portrait');
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) {
+          pdf.addPage('a4', 'portrait');
+        }
+
+        const sourceY = page * sliceHeightPx;
+        const currentSliceHeight = Math.min(sliceHeightPx, totalCanvasHeight - sourceY);
+
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvasWidth;
+        pageCanvas.height = sliceHeightPx;
+        const ctx = pageCanvas.getContext('2d');
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvasWidth, sliceHeightPx);
+
+        if (currentSliceHeight > 0) {
+          ctx.drawImage(
+            canvas,
+            0, sourceY, canvasWidth, currentSliceHeight,
+            0, 0, canvasWidth, currentSliceHeight
+          );
+        }
+
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
+        pdf.addImage(pageImgData, 'JPEG', 0, 0, 210, 297);
       }
-
-      const sourceY = page * sliceHeightPx;
-      const currentSliceHeight = Math.min(sliceHeightPx, totalCanvasHeight - sourceY);
-
-      // Create a page canvas for this exact A4 page
-      const pageCanvas = document.createElement('canvas');
-      pageCanvas.width = canvasWidth;
-      pageCanvas.height = sliceHeightPx;
-      const ctx = pageCanvas.getContext('2d');
-
-      // Fill with solid white background
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvasWidth, sliceHeightPx);
-
-      if (currentSliceHeight > 0) {
-        ctx.drawImage(
-          canvas,
-          0, sourceY, canvasWidth, currentSliceHeight,
-          0, 0, canvasWidth, currentSliceHeight
-        );
-      }
-
-      const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
-      pdf.addImage(pageImgData, 'JPEG', 0, 0, 210, 297);
     }
 
     pdf.save(filename);
