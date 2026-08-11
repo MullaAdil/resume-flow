@@ -402,7 +402,28 @@ const BuilderFlow = () => {
 
   const previewContainerRef = useRef(null);
   const previewContentRef = useRef(null);
-  const [contentHeight] = useState(1131);
+  const [contentHeight, setContentHeight] = useState(1131);
+
+  useEffect(() => {
+    let animFrame;
+    const updateHeight = () => {
+      if (previewContentRef.current) {
+        const el = previewContentRef.current.querySelector('#resume-pdf-content') || previewContentRef.current;
+        const h = Math.max(el.scrollHeight || 0, el.offsetHeight || 0, 1131);
+        setContentHeight(prev => (h > 0 && Math.abs(h - prev) > 5) ? h : prev);
+      }
+    };
+
+    animFrame = requestAnimationFrame(updateHeight);
+    const timer = setTimeout(() => {
+      animFrame = requestAnimationFrame(updateHeight);
+    }, 200);
+
+    return () => {
+      cancelAnimationFrame(animFrame);
+      clearTimeout(timer);
+    };
+  }, [resumeData, selectedTemplate, leftPaneMode]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -2765,7 +2786,7 @@ const BuilderFlow = () => {
           {/* Page Counter Indicator */}
           <div style={{ position: 'absolute', bottom: '1.5rem', background: '#0F172A', color: '#FFF', padding: '6px 16px', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(15,23,42,0.15)' }}>
             <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronLeft size={16} /></span> 
-            1 / 1 
+            1 / {Math.max(1, Math.ceil((contentHeight - 15) / 1131.43))}
             <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronRight size={16} /></span>
           </div>
         </div>

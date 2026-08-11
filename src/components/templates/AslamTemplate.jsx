@@ -35,14 +35,28 @@ export const localDummyData = {
       name: "E-Commerce Platform - Full Stack Web Application",
       technologies: "React | Node.js | MongoDB | Docker",
       description:
-        "Designed and developed a full-stack e-commerce application with secure user authentication and REST API endpoints.\nImplemented normalized database schema and containerized the application using Docker for consistent environment deployment.",
+        "Designed and developed a full-stack e-commerce application from scratch with secure user authentication (login, register, session management)\nBuilt backend architecture following MVC pattern with REST API endpoints for create, read, update, and delete operations\nImplemented database with normalized schema for efficient data storage and retrieval across multiple user accounts\nWrote automated end-to-end test suite using Selenium WebDriver to simulate real user interactions including form submissions, navigation, and authentication flows\nContainerized the entire application using Docker ensuring consistent deployment across different environments with zero configuration issues\nIdentified and resolved a hardcoded credential vulnerability during development — applied OWASP Top 10 security principles to harden the application",
     },
     {
       id: "dummy-proj-2",
       name: "Smart Home Dashboard - Capstone Project",
       technologies: "Python | React | IoT Sensors | WebSockets",
       description:
-        "Designed a real-time smart home monitoring system integrating hardware sensors with WebSockets live data feeds.\nDeveloped Python backend API to process sensor data and update dashboard status in real time.",
+        "Designed and built a real-time smart home monitoring system as final year capstone project, integrating hardware and software components end to end\nAssembled hardware circuit with temperature sensors connected to microcontroller for detecting environmental changes simultaneously\nDeveloped Python backend to receive and process live sensor data via WebSockets, updating dashboard status in real time\nDocumented full system architecture including circuit diagrams, data flow, and test results for academic submission",
+    },
+    {
+      id: "dummy-proj-3",
+      name: "Customer Churn Predictor - Machine Learning",
+      technologies: "Python | Scikit-learn | Pandas | Flask",
+      description:
+        "Built a binary classification model using Random Forest and XGBoost algorithms, achieving 92%+ accuracy on held-out test data\nEngineered full data preprocessing pipeline — missing value imputation, feature scaling, one-hot encoding — to convert raw data into model-ready features\nDeployed real-time prediction interface using Flask for live customer risk assessment",
+    },
+    {
+      id: "dummy-proj-4",
+      name: "Sales Data Analysis - Enterprise Database",
+      technologies: "PostgreSQL | Advanced SQL | PowerBI",
+      description:
+        "Conducted end-to-end business data analysis on enterprise sample database simulating a real retail company dataset\nAnalysed revenue performance, customer lifetime value, product profitability, store efficiency, and time-based sales trends across the full dataset\nWrote advanced SQL queries using multi-table joins, correlated subqueries, CTEs, and window functions for ranking, cumulative totals, and segmentation\nDerived actionable insights including top revenue-generating products, high-value customer segments, underperforming regions, and peak sales periods",
     },
   ],
   certifications: [

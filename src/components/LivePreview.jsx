@@ -8,7 +8,7 @@ const LivePreview = ({ disableScaling = false }) => {
   const containerRef = useRef(null);
   const contentRef = useRef(null);
   const [scale, setScale] = useState(1);
-  const [measuredHeight] = useState(1131);
+  const [measuredHeight, setMeasuredHeight] = useState(1131);
 
   useEffect(() => {
     if (disableScaling) {
@@ -31,7 +31,27 @@ const LivePreview = ({ disableScaling = false }) => {
     return () => observer.disconnect();
   }, [disableScaling]);
 
-  const marginOffset = disableScaling ? 0 : -((1 - scale) * 1131);
+  useEffect(() => {
+    let animationFrameId;
+    const updateH = () => {
+      if (contentRef.current) {
+        const h = Math.max(contentRef.current.scrollHeight || 0, contentRef.current.offsetHeight || 0, 1131);
+        setMeasuredHeight(prev => Math.abs(prev - h) > 5 ? h : prev);
+      }
+    };
+    
+    animationFrameId = requestAnimationFrame(updateH);
+    const timer = setTimeout(() => {
+      animationFrameId = requestAnimationFrame(updateH);
+    }, 150);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearTimeout(timer);
+    };
+  }, [resumeData, selectedTemplate]);
+
+  const marginOffset = disableScaling ? 0 : -((1 - scale) * measuredHeight);
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -48,7 +68,7 @@ const LivePreview = ({ disableScaling = false }) => {
             marginBottom: `${marginOffset}px`
           }}
         >
-          <div ref={contentRef} id="resume-pdf-content" style={{ width: '800px', height: '1131px', minHeight: '1131px', maxHeight: '1131px', overflow: 'hidden', position: 'relative' }}>
+          <div ref={contentRef} id="resume-pdf-content" style={{ width: '800px', minHeight: '1131px', height: 'auto', position: 'relative' }}>
             <TemplateRenderer templateId={selectedTemplate} resumeData={resumeData} />
           </div>
         </motion.div>
