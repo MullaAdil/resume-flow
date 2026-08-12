@@ -2786,7 +2786,7 @@ const BuilderFlow = () => {
           {/* Page Counter Indicator */}
           <div style={{ position: 'absolute', bottom: '1.5rem', background: '#0F172A', color: '#FFF', padding: '6px 16px', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(15,23,42,0.15)' }}>
             <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronLeft size={16} /></span> 
-            1 / {Math.max(1, Math.ceil((contentHeight - 15) / 1131.43))}
+            1 / 1 
             <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronRight size={16} /></span>
           </div>
         </div>
