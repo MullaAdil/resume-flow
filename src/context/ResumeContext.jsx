@@ -283,6 +283,7 @@ export const ResumeProvider = ({ children }) => {
       merged.languages = [];
     }
 
+    merged.isImported = true;
     return merged;
   };
 
