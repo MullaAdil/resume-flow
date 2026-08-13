@@ -92,7 +92,7 @@ const ImportFlow = () => {
                       Import Your Resume
                     </h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: 0 }}>
-                      Upload your PDF or Word file to auto-extract sections into the editor.
+                      Upload your PDF, Word, Text, JSON, RTF, HTML, or Resume Image to auto-extract sections into the editor.
                     </p>
                   </div>
 
@@ -167,7 +167,7 @@ const ImportFlow = () => {
                   <input 
                     ref={fileInputRef} 
                     type="file" 
-                    accept=".pdf,.docx,.doc" 
+                    accept=".pdf,.docx,.doc,.txt,.text,.rtf,.md,.markdown,.json,.html,.htm,image/*" 
                     onChange={handleFileChange} 
                     style={{ display: 'none' }} 
                   />
@@ -187,7 +187,7 @@ const ImportFlow = () => {
                       Click to select file or drag & drop here
                     </div>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      Supports PDF or DOCX format (Up to 10MB)
+                      Supports PDF, DOCX, DOC, TXT, RTF, JSON, HTML & Resume Images (PNG/JPG/WEBP)
                     </div>
                   </div>
 

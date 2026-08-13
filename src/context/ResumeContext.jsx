@@ -290,13 +290,38 @@ export const ResumeProvider = ({ children }) => {
   const processRealFile = async (file) => {
     try {
       let rawText = '';
+      let isImageData = false;
+      let imageDataUrl = '';
       const extension = file.name.split('.').pop().toLowerCase();
-      if (extension === 'txt') {
+      const mimeType = file.type || '';
+
+      if (extension === 'json') {
+        try {
+          const text = await file.text();
+          const jsonObj = JSON.parse(text);
+          if (jsonObj && (jsonObj.personalInfo || jsonObj.experience || jsonObj.education || jsonObj.skills)) {
+            const normalized = normalizeExtractedResumeData(jsonObj);
+            setResumeData(normalized);
+            return true;
+          }
+          rawText = text;
+        } catch (e) {
+          rawText = await file.text();
+        }
+      } else if (['txt', 'text', 'md', 'markdown'].includes(extension)) {
         rawText = await file.text();
+      } else if (['rtf', 'html', 'htm'].includes(extension)) {
+        const text = await file.text();
+        rawText = text.replace(/<[^>]*>/g, ' ').replace(/\{\\[^{}]+\}/g, ' ').replace(/\s+/g, ' ');
       } else if (extension === 'docx' || extension === 'doc') {
-        const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer });
-        rawText = result.value;
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          rawText = result.value || '';
+        } catch (mErr) {
+          const text = await file.text();
+          rawText = text.replace(/[^\x20-\x7E\n\r\t]/g, ' ').replace(/\s+/g, ' ');
+        }
       } else if (extension === 'pdf') {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -320,7 +345,17 @@ export const ResumeProvider = ({ children }) => {
           }
           rawText += pageText + '\n\n';
         }
-      } else throw new Error("Unsupported format");
+      } else if (mimeType.startsWith('image/') || ['png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif', 'svg'].includes(extension)) {
+        isImageData = true;
+        const reader = new FileReader();
+        imageDataUrl = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+      } else {
+        // Generic fallback text reader for any custom extension
+        rawText = await file.text();
+      }
 
       const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
 
@@ -330,19 +365,8 @@ export const ResumeProvider = ({ children }) => {
             ? "The user is a student/fresher. Focus on academic projects, education, and technical skills."
             : "The user is a professional. Extract work history, achievements, projects, and skills.";
 
-          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${groqApiKey}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              model: 'llama-3.3-70b-versatile',
-              messages: [
-                {
-                  role: 'system',
-                  content: `You are an expert resume parser. Extract the details from the user's resume into a strict JSON format. 
-CRITICAL: DO NOT invent, fabricate, or hallucinate any information. Only extract data explicitly present in the provided text. If a detail is missing, leave the field as an empty string or an empty array.
+          const systemPrompt = `You are an expert resume parser. Extract the details from the user's resume into a strict JSON format. 
+CRITICAL: DO NOT invent, fabricate, or hallucinate any information. Only extract data explicitly present in the provided text or image. If a detail is missing, leave the field as an empty string or an empty array.
 ${profileContext}
 DO NOT output any markdown, only valid JSON. The JSON must exactly match this structure:
 {
@@ -355,17 +379,31 @@ DO NOT output any markdown, only valid JSON. The JSON must exactly match this st
   "languages": [{ "id": "lang1", "name": "", "proficiency": "" }],
   "customSections": []
 }
-Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If information is missing, leave the field empty or as an empty array.`
-                },
-                {
-                  role: 'user',
-                  content: rawText
-                }
+Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If information is missing, leave the field empty or as an empty array.`;
+
+          const userMessageContent = isImageData ? [
+            { type: "text", text: "Extract all text and sections from this resume image." },
+            { type: "image_url", image_url: { url: imageDataUrl } }
+          ] : rawText;
+
+          const modelName = isImageData ? 'llama-3.2-11b-vision-preview' : 'llama-3.3-70b-versatile';
+
+          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${groqApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: modelName,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userMessageContent }
               ],
               response_format: { type: "json_object" }
             })
           });
-          
+
           if (response.ok) {
             const data = await response.json();
             const parsedData = JSON.parse(data.choices[0].message.content);

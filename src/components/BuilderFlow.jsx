@@ -2783,12 +2783,17 @@ const BuilderFlow = () => {
             </div>
           </div>
           
-          {/* Page Counter Indicator */}
-          <div style={{ position: 'absolute', bottom: '1.5rem', background: '#0F172A', color: '#FFF', padding: '6px 16px', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(15,23,42,0.15)' }}>
-            <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronLeft size={16} /></span> 
-            1 / 1 
-            <span style={{ cursor: 'pointer', opacity: 0.7 }}><ChevronRight size={16} /></span>
-          </div>
+          {/* Dynamic Page Counter Indicator */}
+          {(() => {
+            const calculatedTotalPages = Math.max(1, Math.ceil((contentHeight || 1131) / 1131.42857));
+            return (
+              <div style={{ position: 'sticky', bottom: '1.5rem', marginTop: '-3rem', zIndex: 10, background: '#0F172A', color: '#FFF', padding: '6px 18px', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 4px 14px rgba(15,23,42,0.2)' }}>
+                <span style={{ opacity: 0.7 }}><ChevronLeft size={16} /></span> 
+                <span>A4 Document Size: <strong style={{ color: '#38BDF8' }}>{calculatedTotalPages} {calculatedTotalPages === 1 ? 'Page' : 'Pages'}</strong></span>
+                <span style={{ opacity: 0.7 }}><ChevronRight size={16} /></span>
+              </div>
+            );
+          })()}
         </div>
 
       </div>
