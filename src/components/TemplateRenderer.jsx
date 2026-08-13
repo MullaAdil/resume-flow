@@ -322,49 +322,61 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
 
   const fontSizeMap = {
     'Small': '13px',
-    'Medium': '15px',
-    'Large': '17px'
+    'Medium': '14.5px',
+    'Large': '16px'
   };
-  const selectedFontSize = fontSizeMap[activeSettings.fontSize] || '15px';
+  const selectedFontSize = fontSizeMap[activeSettings.fontSize] || '14.5px';
 
   const fontScaleMap = {
-    'Small': 0.88,
+    'Small': 0.9,
     'Medium': 1.0,
-    'Large': 1.12
+    'Large': 1.1
   };
   const fontScale = fontScaleMap[activeSettings.fontSize] || 1.0;
   const selectedLineHeight = activeSettings.lineSpacing || '1.5';
+  const primaryAccent = activeSettings.primaryColor || '#6366F1';
+  const secondaryAccent = activeSettings.secondaryColor || '#4F46E5';
 
   return (
     <div
       className="customized-resume-wrapper"
       data-font-size={activeSettings.fontSize || 'Medium'}
       style={{
+        width: '800px',
+        minHeight: '1131.43px',
+        position: 'relative',
+        boxSizing: 'border-box',
+        backgroundColor: '#FFFFFF',
         fontFamily: selectedFont,
         fontSize: selectedFontSize,
         lineHeight: selectedLineHeight,
-        transform: fontScale !== 1.0 ? `scale(${fontScale})` : 'none',
-        transformOrigin: 'top left',
         '--resume-font-family': selectedFont,
         '--resume-font-size': selectedFontSize,
         '--resume-line-spacing': selectedLineHeight,
-        '--primary-color': activeSettings.primaryColor || '#1e40af',
-        '--primary': activeSettings.primaryColor || '#1e40af',
-        '--secondary-color': activeSettings.secondaryColor || '#4f46e5'
+        '--primary-color': primaryAccent,
+        '--primary': primaryAccent,
+        '--primary-hover': secondaryAccent,
+        '--secondary-color': secondaryAccent
       }}
     >
       <style>{`
         .customized-resume-wrapper,
-        .customized-resume-wrapper p,
-        .customized-resume-wrapper div,
-        .customized-resume-wrapper span,
-        .customized-resume-wrapper li,
-        .customized-resume-wrapper h1,
-        .customized-resume-wrapper h2,
-        .customized-resume-wrapper h3,
-        .customized-resume-wrapper h4 {
+        .customized-resume-wrapper * {
           font-family: ${selectedFont} !important;
         }
+        .customized-resume-wrapper p,
+        .customized-resume-wrapper li,
+        .customized-resume-wrapper span,
+        .customized-resume-wrapper div {
+          line-height: ${selectedLineHeight} !important;
+        }
+        ${fontScale !== 1.0 ? `
+          .customized-resume-wrapper p,
+          .customized-resume-wrapper li,
+          .customized-resume-wrapper span {
+            font-size: ${selectedFontSize} !important;
+          }
+        ` : ''}
       `}</style>
       <TemplateComponent resumeData={mergedData} />
     </div>
