@@ -80,9 +80,9 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
   // Measure initial clone content height
   let rawContentHeight = Math.max(A4_PX_HEIGHT, clone.scrollHeight, clone.offsetHeight);
 
-  // Auto-fit check: if content is slightly over 1 single A4 page (up to 1260px),
-  // apply proportional scaling so it fits 100% onto 1 single clean A4 page without spilling 2 lines to page 2.
-  if (rawContentHeight > A4_PX_HEIGHT && rawContentHeight <= 1260) {
+  // Auto-fit check: if content exceeds 1 single A4 page height,
+  // apply proportional scaling so 100% of data fits cleanly onto 1 single A4 page without removing any content.
+  if (rawContentHeight > A4_PX_HEIGHT) {
     const scaleFactor = A4_PX_HEIGHT / rawContentHeight;
     clone.style.transform = `scale(${scaleFactor})`;
     clone.style.transformOrigin = 'top left';
