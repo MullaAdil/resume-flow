@@ -9,8 +9,12 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_GROQ_API_KEY': JSON.stringify(env.VITE_GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || '')
     },
+    build: {
+      target: 'es2020'
+    },
     server: {
-      host: true,
+      host: '0.0.0.0',
+      port: 5173,
       allowedHosts: true,
       cors: true,
       proxy: {

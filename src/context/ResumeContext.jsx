@@ -3,7 +3,13 @@ import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import mammoth from 'mammoth';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+try {
+  if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  }
+} catch (e) {
+  console.warn('PDF.js worker assignment warning:', e);
+}
 
 const ResumeContext = createContext();
 export const useResume = () => useContext(ResumeContext);

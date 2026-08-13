@@ -18,8 +18,10 @@ const LivePreview = ({ disableScaling = false }) => {
     const observer = new ResizeObserver(entries => {
       if (entries[0]) {
         const { width } = entries[0].contentRect;
-        // Resume width is 800px. Add 40px padding.
-        const newScale = Math.min(1, (width - 40) / 800);
+        // Dynamic padding offset based on viewport width (smaller padding on iPhone)
+        const paddingOffset = width < 600 ? 16 : 40;
+        const calculatedScale = (width - paddingOffset) / 800;
+        const newScale = Math.min(1, Math.max(0.3, calculatedScale));
         setScale(prev => Math.abs(prev - newScale) > 0.01 ? newScale : prev);
       }
     });

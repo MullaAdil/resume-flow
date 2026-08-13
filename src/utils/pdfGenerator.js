@@ -2,6 +2,17 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
 /**
+ * Detects if the current device is running iOS (iPhone / iPad / iPod)
+ */
+const isIOSDevice = () => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Macintosh/.test(navigator.userAgent))
+  );
+};
+
+/**
  * Captures an HTML element and downloads it as a standardized A4 PDF.
  * @param {string} elementId - The ID of the HTML element to capture.
  * @param {string} filename - The name of the downloaded file.
@@ -63,11 +74,86 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
 
   document.body.appendChild(clone);
 
-  // Calculate actual height
-  const actualHeight = Math.max(1131, clone.scrollHeight, clone.offsetHeight);
-  clone.style.height = `${actualHeight}px`;
+  // Exact A4 height at 800px width: 800 * (297 / 210) = 1131.42857px
+  const A4_PX_HEIGHT = 1131.42857;
 
-  // Create a small overlay feedback during generation
+  // Measure initial clone content height
+  let rawContentHeight = Math.max(A4_PX_HEIGHT, clone.scrollHeight, clone.offsetHeight);
+
+  // Auto-fit check: if content is slightly over 1 single A4 page (up to 1260px),
+  // apply proportional scaling so it fits 100% onto 1 single clean A4 page without spilling 2 lines to page 2.
+  if (rawContentHeight > A4_PX_HEIGHT && rawContentHeight <= 1260) {
+    const scaleFactor = A4_PX_HEIGHT / rawContentHeight;
+    clone.style.transform = `scale(${scaleFactor})`;
+    clone.style.transformOrigin = 'top left';
+    // Wrap clone in a parent to constrain height exactly to A4
+    const parentHolder = document.createElement('div');
+    parentHolder.style.position = 'absolute';
+    parentHolder.style.left = '-10000px';
+    parentHolder.style.top = '-10000px';
+    parentHolder.style.width = '800px';
+    parentHolder.style.height = `${A4_PX_HEIGHT}px`;
+    parentHolder.style.overflow = 'hidden';
+    parentHolder.appendChild(clone);
+    document.body.appendChild(parentHolder);
+    rawContentHeight = A4_PX_HEIGHT;
+  }
+
+  // Smart Pagination for Multi-Page Resumes (>1260px):
+  // Inspect block elements and inject breaks before elements that would be cut through the middle by an A4 page boundary.
+  if (rawContentHeight > A4_PX_HEIGHT) {
+    const breakableSelector = 'h1, h2, h3, h4, p, li, tr, .experience-item, .education-item, .project-item, .section-block, .bullet-point, [data-section]';
+    const breakableNodes = Array.from(clone.querySelectorAll(breakableSelector));
+    
+    // Sort nodes by top position
+    const cloneRect = clone.getBoundingClientRect();
+    const sortedNodes = breakableNodes
+      .map(node => ({
+        node,
+        top: node.getBoundingClientRect().top - cloneRect.top,
+        bottom: node.getBoundingClientRect().bottom - cloneRect.top,
+        height: node.getBoundingClientRect().height
+      }))
+      .filter(item => item.height > 0 && item.height < A4_PX_HEIGHT * 0.75)
+      .sort((a, b) => a.top - b.top);
+
+    let currentOffsetY = 0;
+    let pageCount = Math.ceil(rawContentHeight / A4_PX_HEIGHT);
+
+    for (let page = 1; page < pageCount; page++) {
+      const pageBoundaryY = page * A4_PX_HEIGHT;
+      
+      // Find an element straddling the pageBoundaryY
+      const straddlingItem = sortedNodes.find(item => {
+        const itemTop = item.top + currentOffsetY;
+        const itemBottom = item.bottom + currentOffsetY;
+        return itemTop < pageBoundaryY - 15 && itemBottom > pageBoundaryY + 15;
+      });
+
+      if (straddlingItem) {
+        const itemTop = straddlingItem.top + currentOffsetY;
+        const pushDistance = pageBoundaryY - itemTop + 12; // Gap to push element to top of next page
+        
+        if (pushDistance > 0 && pushDistance < A4_PX_HEIGHT * 0.45) {
+          const spacer = document.createElement('div');
+          spacer.className = 'pdf-page-break-spacer';
+          spacer.style.display = 'block';
+          spacer.style.width = '100%';
+          spacer.style.height = `${pushDistance}px`;
+          spacer.style.clear = 'both';
+          straddlingItem.node.parentNode.insertBefore(spacer, straddlingItem.node);
+          currentOffsetY += pushDistance;
+        }
+      }
+    }
+
+    // Re-measure height after injecting spacers
+    rawContentHeight = Math.max(A4_PX_HEIGHT, clone.scrollHeight, clone.offsetHeight);
+  }
+
+  clone.style.height = `${rawContentHeight}px`;
+
+  // Create overlay feedback during generation
   const overlay = document.createElement('div');
   overlay.id = 'pdf-gen-overlay';
   overlay.style.position = 'fixed';
@@ -78,44 +164,55 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
   overlay.style.display = 'flex';
   overlay.style.alignItems = 'center';
   overlay.style.justifyContent = 'center';
-  overlay.style.background = 'rgba(0,0,0,0.35)';
+  overlay.style.background = 'rgba(15, 23, 42, 0.45)';
+  overlay.style.backdropFilter = 'blur(4px)';
+  overlay.style.webkitBackdropFilter = 'blur(4px)';
   overlay.style.zIndex = '999999';
-  overlay.style.color = '#fff';
+  overlay.style.color = '#ffffff';
   overlay.style.fontWeight = '600';
-  overlay.style.fontSize = '1.1rem';
-  overlay.innerText = 'Preparing PDF...';
+  overlay.style.fontSize = '1.05rem';
+  overlay.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+  overlay.innerText = isIOSDevice() ? 'Generating PDF for iOS...' : 'Preparing standard A4 PDF...';
   document.body.appendChild(overlay);
 
   try {
-    // Wait a brief moment for layout/rendering to settle
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    // Brief layout settle wait
+    await new Promise((resolve) => setTimeout(resolve, 220));
 
-    // Wait for images inside clone to load to avoid missing assets in PDF
+    // Ensure all internal images are fully loaded
     const imgs = Array.from(clone.querySelectorAll('img'));
-    await Promise.all(imgs.map(img => new Promise(res => {
-      if (img.complete && img.naturalWidth !== 0) return res();
-      img.addEventListener('load', res);
-      img.addEventListener('error', res);
-    })));
+    await Promise.all(
+      imgs.map(
+        (img) =>
+          new Promise((res) => {
+            if (img.complete && img.naturalWidth !== 0) return res();
+            img.addEventListener('load', res);
+            img.addEventListener('error', res);
+          })
+      )
+    );
 
-    const canvasScale = 2; // High resolution capture
+    const isIOS = isIOSDevice();
+    // Dynamically calculate canvas scale to stay within iOS WebKit canvas memory limits (~3800px max height)
+    let canvasScale = 2;
+    if (isIOS) {
+      canvasScale = Math.min(1.5, Math.max(1, 3800 / rawContentHeight));
+    }
+
     const canvas = await html2canvas(clone, {
       scale: canvasScale,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
       width: 800,
-      height: actualHeight,
+      height: rawContentHeight,
       windowWidth: 800,
-      windowHeight: actualHeight,
+      windowHeight: rawContentHeight,
       x: 0,
       y: 0,
       scrollX: 0,
       scrollY: 0
     });
-
-    // Standard A4 dimensions: 210mm x 297mm
-    const a4PxHeight = 1131.42857;
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -123,54 +220,86 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
       format: 'a4'
     });
 
+    const cleanTitle = filename.replace(/\.pdf$/i, '');
     pdf.setProperties({
-      title: filename.replace(/\.pdf$/i, ''),
+      title: cleanTitle,
       creator: 'LED — Learning Experience Delivery',
       subject: 'Resume'
     });
 
-    // If actualHeight is within standard single-page resume range (up to 1450px),
-    // scale to fit EXCLUSIVELY onto 1 Single A4 page (210mm x 297mm) perfectly!
-    if (actualHeight <= 1450) {
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
-      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-    } else {
-      // Multi-page logic for genuinely multi-page documents (>1450px)
-      const totalPages = Math.ceil(actualHeight / a4PxHeight);
-      const sliceHeightPx = Math.round(a4PxHeight * canvasScale);
-      const canvasWidth = canvas.width;
-      const totalCanvasHeight = canvas.height;
+    const totalPages = Math.ceil(rawContentHeight / A4_PX_HEIGHT);
+    const canvasWidth = canvas.width;
+    const canvasTotalHeight = canvas.height;
+    const sliceHeightPx = Math.round(A4_PX_HEIGHT * canvasScale);
 
-      for (let page = 0; page < totalPages; page++) {
-        if (page > 0) {
-          pdf.addPage('a4', 'portrait');
-        }
-
-        const sourceY = page * sliceHeightPx;
-        const currentSliceHeight = Math.min(sliceHeightPx, totalCanvasHeight - sourceY);
-
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = canvasWidth;
-        pageCanvas.height = sliceHeightPx;
-        const ctx = pageCanvas.getContext('2d');
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvasWidth, sliceHeightPx);
-
-        if (currentSliceHeight > 0) {
-          ctx.drawImage(
-            canvas,
-            0, sourceY, canvasWidth, currentSliceHeight,
-            0, 0, canvasWidth, currentSliceHeight
-          );
-        }
-
-        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
-        pdf.addImage(pageImgData, 'JPEG', 0, 0, 210, 297);
+    for (let page = 0; page < totalPages; page++) {
+      if (page > 0) {
+        pdf.addPage('a4', 'portrait');
       }
+
+      const sourceY = page * sliceHeightPx;
+      const currentSliceHeight = Math.min(sliceHeightPx, canvasTotalHeight - sourceY);
+
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvasWidth;
+      pageCanvas.height = sliceHeightPx;
+      const ctx = pageCanvas.getContext('2d');
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvasWidth, sliceHeightPx);
+
+      if (currentSliceHeight > 0) {
+        ctx.drawImage(
+          canvas,
+          0,
+          sourceY,
+          canvasWidth,
+          currentSliceHeight,
+          0,
+          0,
+          canvasWidth,
+          currentSliceHeight
+        );
+      }
+
+      const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
+      // addImage with (0, 0, 210, 297) maintains exact 1:1 A4 physical proportions
+      pdf.addImage(pageImgData, 'JPEG', 0, 0, 210, 297);
     }
 
-    pdf.save(filename);
+    // Handle PDF saving/sharing for desktop vs iOS/iPhone
+    const pdfBlob = pdf.output('blob');
+    const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+    if (isIOS) {
+      // Native iOS Share Sheet (iOS 15+ Safari Web Share API)
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        try {
+          await navigator.share({
+            files: [pdfFile],
+            title: cleanTitle,
+            text: `Download ${cleanTitle} PDF`
+          });
+        } catch (shareErr) {
+          // If user cancels share sheet or fails, open blob URL as fallback
+          if (shareErr.name !== 'AbortError') {
+            const blobUrl = URL.createObjectURL(pdfBlob);
+            window.open(blobUrl, '_blank');
+          }
+        }
+      } else {
+        // Fallback for older iOS Safari: Open PDF Blob URL in new tab
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        const newWindow = window.open(blobUrl, '_blank');
+        if (!newWindow) {
+          // If popup blocked, navigate current window to blobUrl
+          window.location.href = blobUrl;
+        }
+      }
+    } else {
+      // Desktop / Android direct download
+      pdf.save(filename);
+    }
   } catch (error) {
     console.error('Failed to generate PDF:', error);
   } finally {
@@ -178,9 +307,14 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
     if (document.body.contains(clone)) {
       document.body.removeChild(clone);
     }
+    const pdfClone = document.getElementById('resume-pdf-clone');
+    if (pdfClone && document.body.contains(pdfClone)) {
+      document.body.removeChild(pdfClone);
+    }
     if (document.body.contains(overlay)) {
       document.body.removeChild(overlay);
     }
   }
 };
+
 
