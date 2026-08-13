@@ -125,10 +125,20 @@ export const ResumeProvider = ({ children }) => {
   const cleanExtractedString = (str) => {
     if (!str || typeof str !== 'string') return '';
     let clean = str.trim();
-    // Strip common field prefix labels like "Full Name:", "Job Title:", "Email:", "Company:", "School:"
-    clean = clean.replace(/^(full name|name|job title|role|title|email|phone|mobile|location|address|company|organization|school|institution|degree|summary|profile|description)\s*:\s*/i, '');
-    // Strip page number noise like "Page 1 of 2", "Page 1"
+
+    // Strip leading bullet symbols
+    clean = clean.replace(/^[•\-\*\u2022\u2023\u25B6\u25C0\u25A0\u25AA\u25AB\u25CF\u25CB\u25E6\u25A1\u25A0\u203A\u2039\u27A1\u27A2\u2794\u2799\u279C\u279D\u279E\u279F\u27B1\u27B2\u27B3\u27B4\u27B5\u27B6\u27B7\u27B8\u27B9\u27BA\u27BB\u27BC\u27BD\u27BE\u27BF\s]+/gu, '');
+
+    // Strip common field prefix labels
+    clean = clean.replace(/^(full name|name|job title|role|title|email|phone|mobile|location|address|company|organization|employer|school|institution|college|university|degree|summary|profile|description|skills|projects|experience|education|certifications|languages)\s*[:|-]\s*/i, '');
+
+    // Strip page numbers & header/footer noise
     clean = clean.replace(/\bPage\s+\d+(\s+of\s+\d+)?\b/gi, '');
+    clean = clean.replace(/^(curriculum vitae|resume|cv|confidential|downloaded from|created with)\s*/gi, '');
+
+    // Strip trailing colons or bullets at beginning
+    clean = clean.replace(/^[:\s•\-\*]+/, '');
+
     return clean.trim();
   };
 
@@ -212,12 +222,17 @@ export const ResumeProvider = ({ children }) => {
       merged.projects = [];
     }
 
-    // Skills
+    // Skills Filter & Sanitizer
     const rawSkills = merged.skills;
     const cleanSkill = (s) => cleanExtractedString(typeof s === 'object' ? s.name || s.value || '' : String(s));
+    const isValidSkill = (s) => {
+      const clean = cleanSkill(s);
+      if (!clean || clean.length < 2 || clean.length > 40) return false;
+      return !/^(programming|technical skills|frameworks|tools|databases|cloud|soft skills|languages|certifications|experience|education|projects|summary|page \d+)$/i.test(clean);
+    };
 
     if (Array.isArray(rawSkills)) {
-      const stringList = rawSkills.map(cleanSkill).filter(Boolean);
+      const stringList = rawSkills.map(cleanSkill).filter(isValidSkill);
       merged.skills = {
         programming: stringList.slice(0, 8),
         frameworks: stringList.slice(8, 16),
@@ -229,13 +244,13 @@ export const ResumeProvider = ({ children }) => {
       };
     } else if (rawSkills && typeof rawSkills === 'object') {
       merged.skills = {
-        programming: (rawSkills.programming || []).map(cleanSkill).filter(Boolean),
-        frameworks: (rawSkills.frameworks || []).map(cleanSkill).filter(Boolean),
-        databases: (rawSkills.databases || []).map(cleanSkill).filter(Boolean),
-        cloud: (rawSkills.cloud || []).map(cleanSkill).filter(Boolean),
-        tools: (rawSkills.tools || []).map(cleanSkill).filter(Boolean),
-        soft: (rawSkills.soft || []).map(cleanSkill).filter(Boolean),
-        other: (rawSkills.other || []).map(cleanSkill).filter(Boolean)
+        programming: (rawSkills.programming || []).map(cleanSkill).filter(isValidSkill),
+        frameworks: (rawSkills.frameworks || []).map(cleanSkill).filter(isValidSkill),
+        databases: (rawSkills.databases || []).map(cleanSkill).filter(isValidSkill),
+        cloud: (rawSkills.cloud || []).map(cleanSkill).filter(isValidSkill),
+        tools: (rawSkills.tools || []).map(cleanSkill).filter(isValidSkill),
+        soft: (rawSkills.soft || []).map(cleanSkill).filter(isValidSkill),
+        other: (rawSkills.other || []).map(cleanSkill).filter(isValidSkill)
       };
     } else {
       merged.skills = defaultState.skills;
