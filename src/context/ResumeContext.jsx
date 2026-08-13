@@ -122,6 +122,132 @@ export const ResumeProvider = ({ children }) => {
     return { ...prev, skills: { ...prev.skills, [category]: skills } };
   });
 
+  const normalizeExtractedResumeData = (parsed) => {
+    const merged = { ...defaultState, ...(parsed || {}) };
+    
+    // Personal Info
+    const p = merged.personalInfo || {};
+    merged.personalInfo = {
+      fullName: p.fullName || p.name || (p.firstName ? `${p.firstName} ${p.lastName || ''}`.trim() : ''),
+      jobTitle: p.jobTitle || p.title || p.role || '',
+      email: p.email || '',
+      phone: p.phone || p.mobile || '',
+      location: p.location || p.address || p.city || '',
+      summary: p.summary || p.profile || p.about || '',
+      portfolio: p.portfolio || p.website || p.github || '',
+      linkedin: p.linkedin || '',
+      github: p.github || '',
+      website: p.website || ''
+    };
+
+    // Experience
+    if (Array.isArray(merged.experience)) {
+      merged.experience = merged.experience.map((exp, idx) => {
+        const title = exp.title || exp.jobTitle || exp.position || exp.role || '';
+        const company = exp.company || exp.organization || exp.employer || '';
+        return {
+          id: exp.id || `exp_${Date.now()}_${idx}`,
+          title,
+          jobTitle: title,
+          company,
+          location: exp.location || '',
+          startDate: exp.startDate || exp.date?.split('-')?.[0]?.trim() || '',
+          endDate: exp.endDate || exp.date?.split('-')?.[1]?.trim() || '',
+          currentPosition: exp.currentPosition || exp.endDate?.toLowerCase()?.includes('present') || false,
+          description: exp.description || exp.achievements || exp.details || '',
+          technologies: exp.technologies || ''
+        };
+      });
+    } else {
+      merged.experience = [];
+    }
+
+    // Education
+    if (Array.isArray(merged.education)) {
+      merged.education = merged.education.map((edu, idx) => {
+        const inst = edu.school || edu.institution || edu.university || edu.college || '';
+        return {
+          id: edu.id || `edu_${Date.now()}_${idx}`,
+          school: inst,
+          institution: inst,
+          degree: edu.degree || edu.fieldOfStudy || edu.branch || '',
+          location: edu.location || '',
+          startDate: edu.startDate || '',
+          endDate: edu.endDate || edu.year || '',
+          cgpa: edu.cgpa || edu.gpa || '',
+          details: edu.details || edu.description || ''
+        };
+      });
+    } else {
+      merged.education = [];
+    }
+
+    // Projects
+    if (Array.isArray(merged.projects)) {
+      merged.projects = merged.projects.map((proj, idx) => ({
+        id: proj.id || `proj_${Date.now()}_${idx}`,
+        name: proj.name || proj.title || '',
+        technologies: proj.technologies || proj.techStack || '',
+        duration: proj.duration || proj.date || '',
+        description: proj.description || proj.details || ''
+      }));
+    } else {
+      merged.projects = [];
+    }
+
+    // Skills
+    const rawSkills = merged.skills;
+    if (Array.isArray(rawSkills)) {
+      const stringList = rawSkills.map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+      merged.skills = {
+        programming: stringList.slice(0, 8),
+        frameworks: stringList.slice(8, 16),
+        databases: stringList.slice(16, 22),
+        cloud: [],
+        tools: stringList.slice(22, 30),
+        soft: [],
+        other: stringList.slice(30)
+      };
+    } else if (rawSkills && typeof rawSkills === 'object') {
+      merged.skills = {
+        programming: (rawSkills.programming || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
+        frameworks: (rawSkills.frameworks || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
+        databases: (rawSkills.databases || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
+        cloud: (rawSkills.cloud || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
+        tools: (rawSkills.tools || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
+        soft: (rawSkills.soft || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
+        other: (rawSkills.other || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean)
+      };
+    } else {
+      merged.skills = defaultState.skills;
+    }
+
+    // Certifications
+    if (Array.isArray(merged.certifications)) {
+      merged.certifications = merged.certifications.map((c, idx) => ({
+        id: c.id || `cert_${Date.now()}_${idx}`,
+        name: c.name || c.title || '',
+        issuer: c.issuer || c.organization || '',
+        date: c.date || c.year || ''
+      }));
+    } else {
+      merged.certifications = [];
+    }
+
+    // Languages
+    if (Array.isArray(merged.languages)) {
+      merged.languages = merged.languages.map((l, idx) => ({
+        id: l.id || `lang_${Date.now()}_${idx}`,
+        name: typeof l === 'object' ? l.name || '' : String(l),
+        proficiency: typeof l === 'object' ? l.proficiency || 'Proficient' : 'Proficient'
+      }));
+    } else {
+      merged.languages = [];
+    }
+
+    return merged;
+  };
+
   const processRealFile = async (file) => {
     try {
       let rawText = '';
@@ -138,7 +264,22 @@ export const ResumeProvider = ({ children }) => {
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          rawText += content.items.map(item => item.str).join(' ') + '\n';
+          let lastY = null;
+          let pageText = '';
+          for (const item of content.items) {
+            if (!item.str) continue;
+            const currentY = item.transform ? item.transform[5] : null;
+            if (lastY !== null && currentY !== null && Math.abs(lastY - currentY) > 5) {
+              pageText += '\n';
+            } else if (item.hasEOL) {
+              pageText += '\n';
+            } else if (pageText.length > 0 && !pageText.endsWith('\n') && !pageText.endsWith(' ')) {
+              pageText += ' ';
+            }
+            pageText += item.str;
+            lastY = currentY;
+          }
+          rawText += pageText + '\n\n';
         }
       } else throw new Error("Unsupported format");
 
@@ -147,8 +288,8 @@ export const ResumeProvider = ({ children }) => {
       if (groqApiKey) {
         try {
           const profileContext = resumeData.profileType === 'student' 
-            ? "The user is a student with NO professional work experience. DO NOT extract or invent professional experience. Emphasize their education, academic projects, and skills. Generate a professional summary focusing purely on their academic skills, enthusiasm to learn, and coursework."
-            : "The user is a professional. Extract their work experience and generate a summary highlighting their track record.";
+            ? "The user is a student/fresher. Focus on academic projects, education, and technical skills."
+            : "The user is a professional. Extract work history, achievements, projects, and skills.";
 
           const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
@@ -167,14 +308,15 @@ ${profileContext}
 DO NOT output any markdown, only valid JSON. The JSON must exactly match this structure:
 {
   "personalInfo": { "fullName": "", "jobTitle": "", "email": "", "phone": "", "location": "", "summary": "", "portfolio": "", "linkedin": "", "github": "", "website": "" },
-  "experience": [{ "id": "exp1", "company": "", "title": "", "employmentType": "", "location": "", "startDate": "", "endDate": "", "currentPosition": false, "description": "", "achievements": "", "technologies": "" }],
-  "education": [{ "id": "edu1", "institution": "", "degree": "", "branch": "", "cgpa": "", "startDate": "", "endDate": "" }],
-  "projects": [{ "id": "proj1", "name": "", "description": "", "technologies": "", "link": "", "duration": "", "role": "" }],
+  "experience": [{ "id": "exp1", "company": "", "title": "", "jobTitle": "", "location": "", "startDate": "", "endDate": "", "currentPosition": false, "description": "" }],
+  "education": [{ "id": "edu1", "school": "", "institution": "", "degree": "", "location": "", "startDate": "", "endDate": "", "cgpa": "", "details": "" }],
+  "projects": [{ "id": "proj1", "name": "", "technologies": "", "duration": "", "description": "" }],
   "skills": { "programming": [], "frameworks": [], "databases": [], "cloud": [], "tools": [], "soft": [], "other": [] },
   "certifications": [{ "id": "cert1", "name": "", "issuer": "", "date": "" }],
-  "publications": [], "awards": [], "languages": [], "interests": [], "volunteer": [], "references": [], "customSections": []
+  "languages": [{ "id": "lang1", "name": "", "proficiency": "" }],
+  "customSections": []
 }
-Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, leave the field empty or as an empty array.`
+Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If information is missing, leave the field empty or as an empty array.`
                 },
                 {
                   role: 'user',
@@ -185,53 +327,38 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
             })
           });
           
-          if (!response.ok) {
-            throw new Error(`Groq API Error: ${response.statusText}`);
+          if (response.ok) {
+            const data = await response.json();
+            const parsedData = JSON.parse(data.choices[0].message.content);
+            const normalized = normalizeExtractedResumeData(parsedData);
+            setResumeData(normalized);
+            return true;
           }
-          
-          const data = await response.json();
-          const parsedData = JSON.parse(data.choices[0].message.content);
-          
-          // Basic validation to ensure required top-level keys exist
-          const mergedData = { ...defaultState, ...parsedData };
-          
-          // Assign unique IDs to arrays
-          ['experience', 'education', 'projects', 'certifications'].forEach(key => {
-             if(mergedData[key] && Array.isArray(mergedData[key])) {
-                mergedData[key] = mergedData[key].map((item, idx) => ({...item, id: `${key}${Date.now()}${idx}`}));
-             }
-          });
-
-          setResumeData(mergedData);
-          return true;
         } catch (apiError) {
           console.error("Groq Extraction Failed, falling back to local heuristic:", apiError);
         }
       }
 
-      // Advanced Local Heuristic Extractor (NO AI)
+      // Advanced Local Heuristic Extractor (NO AI Fallback)
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
       let currentSection = 'summary';
-      let data = { summary: [], experience: [], education: [], skills: [], projects: [], certifications: [], awards: [], publications: [], languages: [], interests: [] };
+      let data = { summary: [], experience: [], education: [], skills: [], projects: [], certifications: [], languages: [] };
 
       const sectionMatchers = {
-        experience: ['EXPERIENCE', 'EMPLOYMENT', 'WORK HISTORY', 'CAREER'],
+        experience: ['EXPERIENCE', 'EMPLOYMENT', 'WORK HISTORY', 'CAREER', 'WORK EXPERIENCE'],
         education: ['EDUCATION', 'ACADEMIC', 'QUALIFICATIONS'],
-        skills: ['SKILLS', 'TECHNOLOGIES', 'COMPETENCIES'],
-        projects: ['PROJECTS', 'OPEN SOURCE'],
-        certifications: ['CERTIFICATIONS', 'LICENSES'],
-        awards: ['AWARDS', 'HONORS', 'ACHIEVEMENTS'],
-        publications: ['PUBLICATIONS', 'RESEARCH'],
+        skills: ['SKILLS', 'TECHNOLOGIES', 'TECHNICAL SKILLS', 'COMPETENCIES'],
+        projects: ['PROJECTS', 'KEY PROJECTS', 'ACADEMIC PROJECTS'],
+        certifications: ['CERTIFICATIONS', 'LICENSES', 'CERTIFICATES'],
         languages: ['LANGUAGES'],
-        interests: ['INTERESTS', 'HOBBIES'],
-        summary: ['SUMMARY', 'PROFILE', 'OBJECTIVE', 'ABOUT']
+        summary: ['SUMMARY', 'PROFILE', 'OBJECTIVE', 'ABOUT ME', 'EXECUTIVE SUMMARY']
       };
 
       for (const line of lines) {
         const upper = line.toUpperCase().replace(/[^A-Z ]/g, '').trim();
         let matched = false;
         for (const [sec, keywords] of Object.entries(sectionMatchers)) {
-          if (keywords.includes(upper) || (upper.length < 25 && keywords.some(k => upper.includes(k)))) {
+          if (keywords.includes(upper) || (upper.length < 30 && keywords.some(k => upper.startsWith(k)))) {
             currentSection = sec;
             matched = true;
             break;
@@ -240,19 +367,18 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
         if (!matched) data[currentSection].push(line);
       }
 
-      // Regex Parse Info
       const email = rawText.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/i)?.[0] || '';
-      const phone = rawText.match(/(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/)?.[0] || '';
+      const phone = rawText.match(/(\+\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/)?.[0] || '';
       const linkedin = rawText.match(/linkedin\.com\/in\/[a-zA-Z0-9_-]+/i)?.[0] || '';
       const github = rawText.match(/github\.com\/[a-zA-Z0-9_-]+/i)?.[0] || '';
-      const name = lines[0].replace(/[^a-zA-Z ]/g, "").slice(0, 30);
+      const name = lines[0] ? lines[0].replace(/[^a-zA-Z\s.-]/g, "").trim().slice(0, 40) : 'Extracted User';
 
-      // Parse Experience blocks (Local Chunking)
+      // Parse Experience blocks cleanly
       let expBlocks = [];
       if (data.experience.length > 0) {
         let currentJob = [];
         data.experience.forEach(line => {
-          if (line.match(/20\d{2}|19\d{2}/) && currentJob.length > 2) {
+          if (line.match(/\b(20\d{2}|19\d{2}|Present|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i) && currentJob.length > 1) {
             expBlocks.push(currentJob);
             currentJob = [line];
           } else currentJob.push(line);
@@ -261,26 +387,37 @@ Ensure dates are string format (e.g. 'Jun 2018'). If information is missing, lea
       }
       
       const finalExp = expBlocks.map((block, i) => ({
-        id: 'exp'+i, title: block[0] || '', company: block[1] || '', startDate: block[2] || '', endDate: '', description: block.slice(3).join('\n'), location: '', achievements: '', technologies: '', currentPosition: false, employmentType: ''
+        id: `exp_${i}`,
+        title: block[0] || 'Role Title',
+        jobTitle: block[0] || 'Role Title',
+        company: block[1] || 'Company Name',
+        startDate: block[2] || '',
+        endDate: '',
+        description: block.slice(2).join('\n')
       }));
 
       const allSkills = data.skills.join(', ').split(/[,•|]/).map(s => s.trim()).filter(s => s.length > 1);
-      
-      setResumeData({
-        personalInfo: { fullName: name, jobTitle: '', email, phone, location: '', summary: data.summary.join(' ').slice(0,800), portfolio: '', linkedin, github, website: '' },
-        experience: finalExp.length ? finalExp : [],
-        education: data.education.length ? [{ id: 'edu1', institution: data.education[0] || '', degree: data.education[1] || '', branch: '', cgpa: '', startDate: '', endDate: data.education[2] || '' }] : [],
-        projects: data.projects.length ? [{ id: 'proj1', name: data.projects[0] || '', description: data.projects.slice(1).join('\n'), technologies: '', link: '', duration: '', role: '' }] : [],
-        skills: { programming: allSkills.slice(0,10), frameworks: allSkills.slice(10,20), databases: [], cloud: [], tools: [], soft: [], other: [] },
-        certifications: data.certifications.length ? [{ id: 'cert1', name: data.certifications[0] || '', issuer: '', date: '' }] : [],
-        publications: [], awards: [], languages: [], interests: [], volunteer: [], references: [], customSections: []
-      });
+
+      const localParsed = {
+        personalInfo: { fullName: name, jobTitle: lines[1] || '', email, phone, location: '', summary: data.summary.join(' ').slice(0,800), portfolio: '', linkedin, github, website: '' },
+        experience: finalExp,
+        education: data.education.length ? [{ id: 'edu1', school: data.education[0] || '', institution: data.education[0] || '', degree: data.education[1] || '', startDate: '', endDate: '' }] : [],
+        projects: data.projects.length ? [{ id: 'proj1', name: data.projects[0] || 'Project', description: data.projects.slice(1).join('\n') }] : [],
+        skills: allSkills,
+        certifications: data.certifications.length ? data.certifications.map((c, i) => ({ id: `cert_${i}`, name: c })) : [],
+        languages: data.languages.length ? data.languages.map((l, i) => ({ id: `lang_${i}`, name: l })) : []
+      };
+
+      const normalizedData = normalizeExtractedResumeData(localParsed);
+      setResumeData(normalizedData);
       return true;
     } catch (e) {
-      console.error(e);
+      console.error("PDF Extraction error:", e);
       return false;
     }
-  };  const generateSummaryAI = async (skillsArray, projectsArray, type, roughNotes) => {
+  };
+
+  const generateSummaryAI = async (skillsArray, projectsArray, type, roughNotes) => {
     const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
     const skillsList = skillsArray.map(s => typeof s === 'object' ? s.name : s).join(', ');
     const projectsList = (projectsArray || []).map(p => `${p.name}: ${p.technologies || ''}`).filter(Boolean).join('; ');
