@@ -137,7 +137,11 @@ const MinimalClassicTemplate = ({ resumeData }) => {
     <div
       style={{
         width: "800px",
-        minHeight: "1131px",
+        minHeight: "1131.42857px",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
         background: "#ffffff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
         padding: marginPadding,
