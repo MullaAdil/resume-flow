@@ -14,18 +14,18 @@ const ClassicTemplate = ({ resumeData }) => {
   const primaryColor = settings.primaryColor || "#059669";
   const marginPadding =
     settings.margins === "Compact"
-      ? "1.5rem 2rem"
+      ? "1.25rem 1.75rem"
       : settings.margins === "Spacious"
-        ? "3rem 3.5rem"
-        : "2rem 2.5rem";
+        ? "2.5rem 3rem"
+        : "1.75rem 2.25rem";
 
   const divider = (
     <div
       style={{
         width: "100%",
         height: "1px",
-        background: "#e2e8f0",
-        margin: "1.5rem 0",
+        background: "#CBD5E1",
+        margin: "0.5rem 0",
       }}
     ></div>
   );
@@ -40,65 +40,61 @@ const ClassicTemplate = ({ resumeData }) => {
         padding: marginPadding,
         fontFamily: "var(--resume-font-family, inherit)",
         color: "#111",
+        boxSizing: "border-box"
       }}
     >
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+      <div style={{ textAlign: "center", marginBottom: "0.75rem" }}>
         <h1
           style={{
-            fontSize: "2.2rem",
+            fontSize: "2rem",
             fontWeight: "bold",
-            margin: "0 0 0.2rem 0",
+            margin: "0 0 0.15rem 0",
+            letterSpacing: "-0.02em"
           }}
         >
           {personalInfo.fullName}
         </h1>
-        <h2
-          style={{
-            fontSize: "1rem",
-            fontWeight: "normal",
-            margin: "0 0 1rem 0",
-            color: "#444",
-          }}
-        >
-          {personalInfo.jobTitle}
-        </h2>
+        {personalInfo.jobTitle && (
+          <h2
+            style={{
+              fontSize: "0.95rem",
+              fontWeight: "500",
+              margin: "0 0 0.5rem 0",
+              color: primaryColor,
+            }}
+          >
+            {personalInfo.jobTitle}
+          </h2>
+        )}
 
         <div
           style={{
             display: "flex",
             justifyContent: "center",
             flexWrap: "wrap",
-            gap: "1rem",
+            gap: "0.75rem",
             fontSize: "0.8rem",
-            color: "#333",
+            color: "#475569",
           }}
         >
           {personalInfo.phone && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
               <Phone size={12} /> {personalInfo.phone}
             </div>
           )}
           {personalInfo.email && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
               <Mail size={12} /> {personalInfo.email}
             </div>
           )}
           {personalInfo.location && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
               <MapPin size={12} /> {personalInfo.location}
             </div>
           )}
           {personalInfo.website && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
               <Globe size={12} /> {personalInfo.website}
             </div>
           )}
@@ -109,36 +105,39 @@ const ClassicTemplate = ({ resumeData }) => {
 
       {/* Summary */}
       {personalInfo.summary && (
-        <div>
+        <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
-              fontSize: "1rem",
+              fontSize: "0.9rem",
               fontWeight: "bold",
               textTransform: "uppercase",
-              marginBottom: "1rem",
+              marginBottom: "0.35rem",
               letterSpacing: "0.5px",
+              color: primaryColor,
+              borderBottom: `1.5px solid ${primaryColor}`,
+              paddingBottom: "0.15rem"
             }}
           >
             Summary
           </h3>
-          <p style={{ lineHeight: 1.6, fontSize: "0.85rem", color: "#333" }}>
+          <p style={{ lineHeight: 1.45, fontSize: "0.83rem", color: "#334155", margin: 0 }}>
             {personalInfo.summary}
           </p>
         </div>
       )}
 
-      {skills.length > 0 && divider}
-
-      {/* Skills */}
       {skills.length > 0 && (
-        <div>
+        <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
-              fontSize: "1rem",
+              fontSize: "0.9rem",
               fontWeight: "bold",
               textTransform: "uppercase",
-              marginBottom: "1rem",
+              marginBottom: "0.35rem",
               letterSpacing: "0.5px",
+              color: primaryColor,
+              borderBottom: `1.5px solid ${primaryColor}`,
+              paddingBottom: "0.15rem"
             }}
           >
             Skills
@@ -147,61 +146,63 @@ const ClassicTemplate = ({ resumeData }) => {
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "0.5rem",
+              gap: "0.3rem 1rem",
             }}
           >
             {skills.map((skill, index) => (
               <div
                 key={index}
                 style={{
-                  fontSize: "0.85rem",
+                  fontSize: "0.83rem",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
+                  gap: "0.4rem",
+                  color: "#334155"
                 }}
               >
-                <span style={{ color: "#666" }}>•</span> {skill}
+                <span style={{ color: primaryColor }}>•</span> {skill}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {experience.length > 0 && divider}
-
       {/* Experience */}
       {experience.length > 0 && (
-        <div>
+        <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
-              fontSize: "1rem",
+              fontSize: "0.9rem",
               fontWeight: "bold",
               textTransform: "uppercase",
-              marginBottom: "1.2rem",
+              marginBottom: "0.4rem",
               letterSpacing: "0.5px",
+              color: primaryColor,
+              borderBottom: `1.5px solid ${primaryColor}`,
+              paddingBottom: "0.15rem"
             }}
           >
             Experience
           </h3>
 
           {experience.map((exp) => (
-            <div key={exp.id} style={{ marginBottom: "1.5rem" }}>
+            <div key={exp.id} style={{ marginBottom: "0.6rem" }}>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "baseline",
-                  marginBottom: "0.2rem",
+                  marginBottom: "0.1rem",
                 }}
               >
-                <div style={{ fontWeight: "bold", fontSize: "0.95rem" }}>
+                <div style={{ fontWeight: "bold", fontSize: "0.88rem", color: "#0F172A" }}>
                   {exp.title}
                 </div>
                 <div
                   style={{
-                    fontSize: "0.85rem",
-                    color: "#555",
-                    fontWeight: "bold",
+                    fontSize: "0.8rem",
+                    color: "#64748B",
+                    fontWeight: "600",
                   }}
                 >
                   {exp.date}
@@ -209,118 +210,36 @@ const ClassicTemplate = ({ resumeData }) => {
               </div>
               <div
                 style={{
-                  fontSize: "0.9rem",
-                  color: "#444",
-                  marginBottom: "0.8rem",
+                  fontSize: "0.83rem",
+                  color: "#475569",
+                  fontWeight: "500",
+                  marginBottom: "0.25rem",
                 }}
               >
                 {exp.company}
               </div>
 
-              <div
-                style={{
-                  fontSize: "0.85rem",
-                  lineHeight: 1.6,
-                  color: "#333",
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {exp.description.split("\n").map((line, i) =>
-                  line.trim().length > 0 ? (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        marginBottom: "0.3rem",
-                      }}
-                    >
-                      <span style={{ color: "#666" }}>•</span>{" "}
-                      <span>{line}</span>
-                    </div>
-                  ) : null,
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {settings.showProjects !== false &&
-        projects &&
-        projects.length > 0 &&
-        divider}
-
-      {/* Projects */}
-      {settings.showProjects !== false && projects && projects.length > 0 && (
-        <div>
-          <h3
-            style={{
-              fontSize: "1rem",
-              fontWeight: "bold",
-              textTransform: "uppercase",
-              marginBottom: "1.2rem",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Projects
-          </h3>
-          {projects.map((proj) => (
-            <div key={proj.id} style={{ marginBottom: "1.5rem" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "baseline",
-                  marginBottom: "0.2rem",
-                }}
-              >
-                <div style={{ fontWeight: "bold", fontSize: "0.95rem" }}>
-                  {proj.name || proj.title}
-                </div>
+              {exp.description && (
                 <div
                   style={{
-                    fontSize: "0.85rem",
-                    color: "#555",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {proj.duration || proj.date}
-                </div>
-              </div>
-              {proj.technologies && (
-                <div
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#444",
-                    marginBottom: "0.8rem",
-                    fontStyle: "italic",
-                  }}
-                >
-                  {proj.technologies}
-                </div>
-              )}
-              {proj.description && (
-                <div
-                  style={{
-                    fontSize: "0.85rem",
-                    lineHeight: 1.6,
-                    color: "#333",
+                    fontSize: "0.83rem",
+                    lineHeight: 1.45,
+                    color: "#334155",
                     whiteSpace: "pre-wrap",
                   }}
                 >
-                  {proj.description.split("\n").map((line, i) =>
+                  {exp.description.split("\n").map((line, i) =>
                     line.trim().length > 0 ? (
                       <div
                         key={i}
                         style={{
                           display: "flex",
-                          gap: "0.5rem",
-                          marginBottom: "0.3rem",
+                          gap: "0.4rem",
+                          marginBottom: "0.15rem",
                         }}
                       >
-                        <span style={{ color: "#666" }}>•</span>{" "}
-                        <span>{line}</span>
+                        <span style={{ color: primaryColor }}>•</span>{" "}
+                        <span>{line.replace(/^[•\-\*]\s*/, '')}</span>
                       </div>
                     ) : null,
                   )}
@@ -331,46 +250,130 @@ const ClassicTemplate = ({ resumeData }) => {
         </div>
       )}
 
-      {education.length > 0 && divider}
-
-      {/* Education */}
-      {education.length > 0 && (
-        <div>
+      {/* Projects */}
+      {settings.showProjects !== false && projects && projects.length > 0 && (
+        <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
-              fontSize: "1rem",
+              fontSize: "0.9rem",
               fontWeight: "bold",
               textTransform: "uppercase",
-              marginBottom: "1.2rem",
+              marginBottom: "0.4rem",
               letterSpacing: "0.5px",
+              color: primaryColor,
+              borderBottom: `1.5px solid ${primaryColor}`,
+              paddingBottom: "0.15rem"
             }}
           >
-            Education
+            Projects
           </h3>
-          {education.map((edu) => (
-            <div key={edu.id} style={{ marginBottom: "1rem" }}>
+          {projects.map((proj) => (
+            <div key={proj.id} style={{ marginBottom: "0.6rem" }}>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "baseline",
-                  marginBottom: "0.2rem",
+                  marginBottom: "0.1rem",
                 }}
               >
-                <div style={{ fontWeight: "bold", fontSize: "0.95rem" }}>
+                <div style={{ fontWeight: "bold", fontSize: "0.88rem", color: "#0F172A" }}>
+                  {proj.name || proj.title}
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.8rem",
+                    color: "#64748B",
+                    fontWeight: "600",
+                  }}
+                >
+                  {proj.duration || proj.date}
+                </div>
+              </div>
+              {proj.technologies && (
+                <div
+                  style={{
+                    fontSize: "0.82rem",
+                    color: "#475569",
+                    marginBottom: "0.2rem",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {proj.technologies}
+                </div>
+              )}
+              {proj.description && (
+                <div
+                  style={{
+                    fontSize: "0.83rem",
+                    lineHeight: 1.45,
+                    color: "#334155",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {proj.description.split("\n").map((line, i) =>
+                    line.trim().length > 0 ? (
+                      <div
+                        key={i}
+                        style={{
+                          display: "flex",
+                          gap: "0.4rem",
+                          marginBottom: "0.15rem",
+                        }}
+                      >
+                        <span style={{ color: primaryColor }}>•</span>{" "}
+                        <span>{line.replace(/^[•\-\*]\s*/, '')}</span>
+                      </div>
+                    ) : null,
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Education */}
+      {education.length > 0 && (
+        <div style={{ marginBottom: "0.5rem" }}>
+          <h3
+            style={{
+              fontSize: "0.9rem",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+              marginBottom: "0.4rem",
+              letterSpacing: "0.5px",
+              color: primaryColor,
+              borderBottom: `1.5px solid ${primaryColor}`,
+              paddingBottom: "0.15rem"
+            }}
+          >
+            Education
+          </h3>
+          {education.map((edu) => (
+            <div key={edu.id} style={{ marginBottom: "0.4rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                  marginBottom: "0.1rem",
+                }}
+              >
+                <div style={{ fontWeight: "bold", fontSize: "0.88rem", color: "#0F172A" }}>
                   {edu.degree}
                 </div>
                 <div
                   style={{
-                    fontSize: "0.85rem",
-                    color: "#555",
-                    fontWeight: "bold",
+                    fontSize: "0.8rem",
+                    color: "#64748B",
+                    fontWeight: "600",
                   }}
                 >
                   {edu.date}
                 </div>
               </div>
-              <div style={{ fontSize: "0.9rem", color: "#444" }}>
+              <div style={{ fontSize: "0.83rem", color: "#475569" }}>
                 {edu.school}
               </div>
             </div>

@@ -227,21 +227,8 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     ...resumeData?.settings
   };
 
-  // Check if this is a real user resume (imported or user edited) vs fresh blank template showcase
-  const isRealUserResume = Boolean(
-    resumeData?.isImported ||
-    resumeData?.personalInfo?.fullName ||
-    resumeData?.personalInfo?.email ||
-    (resumeData?.experience && resumeData.experience.length > 0) ||
-    (resumeData?.education && resumeData.education.length > 0) ||
-    (resumeData?.projects && resumeData.projects.length > 0) ||
-    (resumeData?.skills && (Array.isArray(resumeData.skills) ? resumeData.skills.length > 0 : Object.values(resumeData.skills).flat().filter(Boolean).length > 0))
-  );
-
-  // For real user resumes: use EXACT user arrays (even if empty, e.g. 0 projects or 0 certs).
-  // Fallbacks are ONLY used for blank unedited showcase template thumbnails.
   const experienceList = (activeSettings.showExperience !== false)
-    ? (hasUserExperience ? resumeData.experience : (isRealUserResume ? [] : fallbackExperience)).map(exp => ({
+    ? (hasUserExperience ? resumeData.experience : fallbackExperience).map(exp => ({
       ...exp,
       title: exp.title || exp.jobTitle || '',
       jobTitle: exp.jobTitle || exp.title || '',
@@ -252,7 +239,7 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     : [];
 
   const educationList = (activeSettings.showEducation !== false)
-    ? (hasUserEducation ? resumeData.education : (isRealUserResume ? [] : fallbackEducation)).map(edu => ({
+    ? (hasUserEducation ? resumeData.education : fallbackEducation).map(edu => ({
       ...edu,
       school: edu.school || edu.institution || '',
       institution: edu.institution || edu.school || '',
@@ -261,43 +248,43 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     : [];
 
   const projectsList = (activeSettings.showProjects !== false)
-    ? (hasUserProjects ? resumeData.projects : (isRealUserResume ? [] : fallbackProjects))
+    ? (hasUserProjects ? resumeData.projects : fallbackProjects)
     : [];
 
   const certificationsList = (activeSettings.showCertifications !== false)
-    ? (hasUserCertifications ? resumeData.certifications : (isRealUserResume ? [] : fallbackCertifications))
+    ? (hasUserCertifications ? resumeData.certifications : fallbackCertifications)
     : [];
 
   const languagesList = (activeSettings.showLanguages !== false)
-    ? (hasUserLanguages ? resumeData.languages : (isRealUserResume ? [] : fallbackLanguages))
+    ? (hasUserLanguages ? resumeData.languages : fallbackLanguages)
     : [];
 
   const skillsList = (activeSettings.showSkills !== false)
     ? (isAslam
-      ? (hasUserSkills ? aslamUserSkills : (isRealUserResume ? [] : dummySkills))
+      ? (hasUserSkills ? aslamUserSkills : dummySkills)
       : (templateId === 'boxedmodern' || templateId === 'letscode')
-        ? (hasUserSkills ? userSkills : (isRealUserResume ? [] : dummySkills))
-        : (hasUserSkills ? userSkills.map(s => typeof s === 'object' ? s.name : s) : (isRealUserResume ? [] : dummySkills.map(s => typeof s === 'object' ? s.name : s))))
+        ? (hasUserSkills ? userSkills : dummySkills)
+        : (hasUserSkills ? userSkills.map(s => typeof s === 'object' ? s.name : s) : dummySkills.map(s => typeof s === 'object' ? s.name : s)))
     : [];
 
   const mergedData = {
     ...resumeData,
     personalInfo: {
-      fullName: p.fullName || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || (isRealUserResume ? '' : d.fullName),
-      firstName: p.firstName || (p.fullName ? p.fullName.split(' ')[0] : '') || (isRealUserResume ? '' : d.firstName),
-      lastName: p.lastName || (p.fullName ? p.fullName.split(' ').slice(1).join(' ') : '') || (isRealUserResume ? '' : d.lastName),
-      jobTitle: p.jobTitle || (isRealUserResume ? '' : d.jobTitle) || '',
-      email: p.email || (isRealUserResume ? '' : d.email) || '',
-      phone: p.phone || (isRealUserResume ? '' : d.phone) || '',
-      location: p.location || (isRealUserResume ? '' : d.location) || '',
-      linkedin: p.linkedin || (isRealUserResume ? '' : d.linkedin) || '',
-      github: p.github || (isRealUserResume ? '' : d.github) || '',
-      website: p.website || (isRealUserResume ? '' : d.website) || '',
-      portfolio: p.portfolio || (isRealUserResume ? '' : d.portfolio) || '',
-      summary: (activeSettings.showSummary !== false) ? (p.summary || (isRealUserResume ? '' : d.summary) || '') : '',
-      address: p.address || (isRealUserResume ? '' : d.address) || '',
-      city: p.city || (isRealUserResume ? '' : d.city) || '',
-      country: p.country || (isRealUserResume ? '' : d.country) || '',
+      fullName: p.fullName || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || d.fullName,
+      firstName: p.firstName || (p.fullName ? p.fullName.split(' ')[0] : '') || d.firstName,
+      lastName: p.lastName || (p.fullName ? p.fullName.split(' ').slice(1).join(' ') : '') || d.lastName,
+      jobTitle: p.jobTitle || d.jobTitle || '',
+      email: p.email || d.email || '',
+      phone: p.phone || d.phone || '',
+      location: p.location || d.location || '',
+      linkedin: p.linkedin || d.linkedin || '',
+      github: p.github || d.github || '',
+      website: p.website || d.website || '',
+      portfolio: p.portfolio || d.portfolio || '',
+      summary: (activeSettings.showSummary !== false) ? (p.summary || d.summary || '') : '',
+      address: p.address || d.address || '',
+      city: p.city || d.city || '',
+      country: p.country || d.country || '',
     },
     experience: experienceList,
     education: educationList,
