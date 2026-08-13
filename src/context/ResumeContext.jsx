@@ -122,83 +122,102 @@ export const ResumeProvider = ({ children }) => {
     return { ...prev, skills: { ...prev.skills, [category]: skills } };
   });
 
+  const cleanExtractedString = (str) => {
+    if (!str || typeof str !== 'string') return '';
+    let clean = str.trim();
+    // Strip common field prefix labels like "Full Name:", "Job Title:", "Email:", "Company:", "School:"
+    clean = clean.replace(/^(full name|name|job title|role|title|email|phone|mobile|location|address|company|organization|school|institution|degree|summary|profile|description)\s*:\s*/i, '');
+    // Strip page number noise like "Page 1 of 2", "Page 1"
+    clean = clean.replace(/\bPage\s+\d+(\s+of\s+\d+)?\b/gi, '');
+    return clean.trim();
+  };
+
   const normalizeExtractedResumeData = (parsed) => {
     const merged = { ...defaultState, ...(parsed || {}) };
     
     // Personal Info
     const p = merged.personalInfo || {};
     merged.personalInfo = {
-      fullName: p.fullName || p.name || (p.firstName ? `${p.firstName} ${p.lastName || ''}`.trim() : ''),
-      jobTitle: p.jobTitle || p.title || p.role || '',
-      email: p.email || '',
-      phone: p.phone || p.mobile || '',
-      location: p.location || p.address || p.city || '',
-      summary: p.summary || p.profile || p.about || '',
-      portfolio: p.portfolio || p.website || p.github || '',
-      linkedin: p.linkedin || '',
-      github: p.github || '',
-      website: p.website || ''
+      fullName: cleanExtractedString(p.fullName || p.name || (p.firstName ? `${p.firstName} ${p.lastName || ''}`.trim() : '')),
+      jobTitle: cleanExtractedString(p.jobTitle || p.title || p.role || ''),
+      email: cleanExtractedString(p.email || ''),
+      phone: cleanExtractedString(p.phone || p.mobile || ''),
+      location: cleanExtractedString(p.location || p.address || p.city || ''),
+      summary: cleanExtractedString(p.summary || p.profile || p.about || ''),
+      portfolio: cleanExtractedString(p.portfolio || p.website || p.github || ''),
+      linkedin: cleanExtractedString(p.linkedin || ''),
+      github: cleanExtractedString(p.github || ''),
+      website: cleanExtractedString(p.website || '')
     };
 
     // Experience
     if (Array.isArray(merged.experience)) {
-      merged.experience = merged.experience.map((exp, idx) => {
-        const title = exp.title || exp.jobTitle || exp.position || exp.role || '';
-        const company = exp.company || exp.organization || exp.employer || '';
-        return {
-          id: exp.id || `exp_${Date.now()}_${idx}`,
-          title,
-          jobTitle: title,
-          company,
-          location: exp.location || '',
-          startDate: exp.startDate || exp.date?.split('-')?.[0]?.trim() || '',
-          endDate: exp.endDate || exp.date?.split('-')?.[1]?.trim() || '',
-          currentPosition: exp.currentPosition || exp.endDate?.toLowerCase()?.includes('present') || false,
-          description: exp.description || exp.achievements || exp.details || '',
-          technologies: exp.technologies || ''
-        };
-      });
+      merged.experience = merged.experience
+        .filter(exp => exp && (exp.company || exp.title || exp.jobTitle || exp.description))
+        .map((exp, idx) => {
+          const title = cleanExtractedString(exp.title || exp.jobTitle || exp.position || exp.role || '');
+          const company = cleanExtractedString(exp.company || exp.organization || exp.employer || '');
+          const desc = cleanExtractedString(exp.description || exp.achievements || exp.details || '');
+          return {
+            id: exp.id || `exp_${Date.now()}_${idx}`,
+            title,
+            jobTitle: title,
+            company,
+            location: cleanExtractedString(exp.location || ''),
+            startDate: cleanExtractedString(exp.startDate || exp.date?.split('-')?.[0]?.trim() || ''),
+            endDate: cleanExtractedString(exp.endDate || exp.date?.split('-')?.[1]?.trim() || ''),
+            currentPosition: exp.currentPosition || exp.endDate?.toLowerCase()?.includes('present') || false,
+            description: desc,
+            technologies: cleanExtractedString(exp.technologies || '')
+          };
+        });
     } else {
       merged.experience = [];
     }
 
     // Education
     if (Array.isArray(merged.education)) {
-      merged.education = merged.education.map((edu, idx) => {
-        const inst = edu.school || edu.institution || edu.university || edu.college || '';
-        return {
-          id: edu.id || `edu_${Date.now()}_${idx}`,
-          school: inst,
-          institution: inst,
-          degree: edu.degree || edu.fieldOfStudy || edu.branch || '',
-          location: edu.location || '',
-          startDate: edu.startDate || '',
-          endDate: edu.endDate || edu.year || '',
-          cgpa: edu.cgpa || edu.gpa || '',
-          details: edu.details || edu.description || ''
-        };
-      });
+      merged.education = merged.education
+        .filter(edu => edu && (edu.school || edu.institution || edu.degree))
+        .map((edu, idx) => {
+          const inst = cleanExtractedString(edu.school || edu.institution || edu.university || edu.college || '');
+          return {
+            id: edu.id || `edu_${Date.now()}_${idx}`,
+            school: inst,
+            institution: inst,
+            degree: cleanExtractedString(edu.degree || edu.fieldOfStudy || edu.branch || ''),
+            location: cleanExtractedString(edu.location || ''),
+            startDate: cleanExtractedString(edu.startDate || ''),
+            endDate: cleanExtractedString(edu.endDate || edu.year || ''),
+            cgpa: cleanExtractedString(edu.cgpa || edu.gpa || ''),
+            details: cleanExtractedString(edu.details || edu.description || '')
+          };
+        });
     } else {
       merged.education = [];
     }
 
     // Projects
     if (Array.isArray(merged.projects)) {
-      merged.projects = merged.projects.map((proj, idx) => ({
-        id: proj.id || `proj_${Date.now()}_${idx}`,
-        name: proj.name || proj.title || '',
-        technologies: proj.technologies || proj.techStack || '',
-        duration: proj.duration || proj.date || '',
-        description: proj.description || proj.details || ''
-      }));
+      merged.projects = merged.projects
+        .filter(proj => proj && (proj.name || proj.title || proj.description))
+        .map((proj, idx) => ({
+          id: proj.id || `proj_${Date.now()}_${idx}`,
+          name: cleanExtractedString(proj.name || proj.title || ''),
+          technologies: cleanExtractedString(proj.technologies || proj.techStack || ''),
+          duration: cleanExtractedString(proj.duration || proj.date || ''),
+          description: cleanExtractedString(proj.description || proj.details || '')
+        }));
     } else {
       merged.projects = [];
     }
 
     // Skills
     const rawSkills = merged.skills;
+    const cleanSkill = (s) => cleanExtractedString(typeof s === 'object' ? s.name || s.value || '' : String(s));
+
     if (Array.isArray(rawSkills)) {
-      const stringList = rawSkills.map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+      const stringList = rawSkills.map(cleanSkill).filter(Boolean);
       merged.skills = {
         programming: stringList.slice(0, 8),
         frameworks: stringList.slice(8, 16),
@@ -210,13 +229,13 @@ export const ResumeProvider = ({ children }) => {
       };
     } else if (rawSkills && typeof rawSkills === 'object') {
       merged.skills = {
-        programming: (rawSkills.programming || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
-        frameworks: (rawSkills.frameworks || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
-        databases: (rawSkills.databases || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
-        cloud: (rawSkills.cloud || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
-        tools: (rawSkills.tools || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
-        soft: (rawSkills.soft || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean),
-        other: (rawSkills.other || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean)
+        programming: (rawSkills.programming || []).map(cleanSkill).filter(Boolean),
+        frameworks: (rawSkills.frameworks || []).map(cleanSkill).filter(Boolean),
+        databases: (rawSkills.databases || []).map(cleanSkill).filter(Boolean),
+        cloud: (rawSkills.cloud || []).map(cleanSkill).filter(Boolean),
+        tools: (rawSkills.tools || []).map(cleanSkill).filter(Boolean),
+        soft: (rawSkills.soft || []).map(cleanSkill).filter(Boolean),
+        other: (rawSkills.other || []).map(cleanSkill).filter(Boolean)
       };
     } else {
       merged.skills = defaultState.skills;
@@ -224,23 +243,27 @@ export const ResumeProvider = ({ children }) => {
 
     // Certifications
     if (Array.isArray(merged.certifications)) {
-      merged.certifications = merged.certifications.map((c, idx) => ({
-        id: c.id || `cert_${Date.now()}_${idx}`,
-        name: c.name || c.title || '',
-        issuer: c.issuer || c.organization || '',
-        date: c.date || c.year || ''
-      }));
+      merged.certifications = merged.certifications
+        .filter(c => c && (c.name || c.title))
+        .map((c, idx) => ({
+          id: c.id || `cert_${Date.now()}_${idx}`,
+          name: cleanExtractedString(c.name || c.title || ''),
+          issuer: cleanExtractedString(c.issuer || c.organization || ''),
+          date: cleanExtractedString(c.date || c.year || '')
+        }));
     } else {
       merged.certifications = [];
     }
 
     // Languages
     if (Array.isArray(merged.languages)) {
-      merged.languages = merged.languages.map((l, idx) => ({
-        id: l.id || `lang_${Date.now()}_${idx}`,
-        name: typeof l === 'object' ? l.name || '' : String(l),
-        proficiency: typeof l === 'object' ? l.proficiency || 'Proficient' : 'Proficient'
-      }));
+      merged.languages = merged.languages
+        .filter(l => l && (typeof l === 'string' ? l.trim() : l.name))
+        .map((l, idx) => ({
+          id: l.id || `lang_${Date.now()}_${idx}`,
+          name: cleanExtractedString(typeof l === 'object' ? l.name || '' : String(l)),
+          proficiency: typeof l === 'object' ? cleanExtractedString(l.proficiency || 'Proficient') : 'Proficient'
+        }));
     } else {
       merged.languages = [];
     }

@@ -267,14 +267,14 @@ export default function LandingPage() {
               gap: '3.5rem',
               alignItems: 'center'
             }}>
-              {/* Left Column */}
-              <div>
+              {/* Left Column — Full Width Hero */}
+              <div style={{ gridColumn: '1 / -1', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
                 <div style={{ marginBottom: '1.25rem', fontSize: '0.875rem', fontWeight: 700, color: 'var(--primary)', letterSpacing: '0.02em' }}>
                   {'{ Resume Builder }'}
                 </div>
 
                 <h1 style={{
-                  fontSize: '3.2rem',
+                  fontSize: '3.5rem',
                   lineHeight: 1.12,
                   letterSpacing: '-0.04em',
                   marginBottom: '1.25rem',
@@ -284,20 +284,21 @@ export default function LandingPage() {
                 </h1>
 
                 <p style={{
-                  fontSize: '1.125rem',
+                  fontSize: '1.2rem',
                   color: 'var(--text-muted)',
                   lineHeight: 1.6,
                   marginBottom: '2.25rem',
-                  maxWidth: '560px'
+                  maxWidth: '680px',
+                  margin: '0 auto 2.25rem auto'
                 }}>
-                  High-precision resume builder with real-time live preview, executive templates, and vector PDF export.
+                  High-precision resume builder with executive templates, AI section generation, and vector PDF export.
                 </p>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => navigate('/choose')}
                     className="aura-btn-primary"
-                    style={{ padding: '0.85rem 1.8rem', fontSize: '1rem' }}
+                    style={{ padding: '0.9rem 2rem', fontSize: '1.05rem' }}
                   >
                     <span>Build Resume Now</span>
                     <ArrowRight size={18} />
@@ -306,7 +307,7 @@ export default function LandingPage() {
                   <button
                     onClick={() => navigate('/templates')}
                     className="aura-btn-secondary"
-                    style={{ padding: '0.85rem 1.6rem', fontSize: '1rem' }}
+                    style={{ padding: '0.9rem 1.8rem', fontSize: '1.05rem' }}
                   >
                     <Layout size={18} />
                     <span>Explore Templates</span>
@@ -317,6 +318,7 @@ export default function LandingPage() {
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '2.5rem',
                   marginTop: '3.5rem',
                   paddingTop: '2rem',
@@ -337,11 +339,6 @@ export default function LandingPage() {
                     <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)', fontWeight: 600 }}>Vector PDF Export</div>
                   </div>
                 </div>
-              </div>
-
-              {/* Right Column Sandbox */}
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <HeroSandbox />
               </div>
             </div>
           </div>

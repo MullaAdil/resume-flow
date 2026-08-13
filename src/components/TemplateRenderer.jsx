@@ -343,7 +343,8 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
       data-font-size={activeSettings.fontSize || 'Medium'}
       style={{
         width: '800px',
-        minHeight: '1131.43px',
+        minHeight: '100%',
+        height: 'auto',
         position: 'relative',
         boxSizing: 'border-box',
         backgroundColor: '#FFFFFF',
