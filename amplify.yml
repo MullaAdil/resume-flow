@@ -5,10 +5,11 @@ frontend:
       commands:
         - nvm use 20 || nvm install 20 || true
         - node -v
-        - npm install
+        - npm install --legacy-peer-deps
     build:
       commands:
-        - touch .env.production
+        - touch .env .env.production
+        - env | grep VITE_ >> .env || true
         - env | grep VITE_ >> .env.production || true
         - npm run build
   artifacts:
@@ -18,3 +19,4 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+
