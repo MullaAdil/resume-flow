@@ -1,13 +1,11 @@
 /**
  * Universal AI Vision Template Cloner & Resume OCR Engine
  * Works dynamically for ANY uploaded resume template screenshot or photo:
- * 1. Client-Side OCR (Tesseract) extracts raw text, line coordinates (bounding boxes), and confidence.
+ * 1. Client-Side OCR / Visual layout extraction extracts raw text and spatial orientation.
  * 2. Spatial bounding-box analyzer determines layout archetype (Lilac Block, Top Split Header, Left Dark Sidebar, 2-Col Split, Single Column).
  * 3. Intelligent entity parser extracts candidate name (largest top font), role, contact, experiences, education, and skills.
  * 4. Canvas pixel scanner extracts exact palette (accent color, background, sidebar color).
  */
-
-import { createWorker } from 'tesseract.js';
 
 const STORAGE_KEY = 'lumen_custom_templates';
 
@@ -188,20 +186,23 @@ export async function extractDominantColorsFromImage(dataUrl) {
  */
 export async function performOcrOnImage(dataUrl) {
   try {
-    const worker = await createWorker('eng');
-    const ret = await worker.recognize(dataUrl);
-    await worker.terminate();
+    if (typeof window !== 'undefined' && window.Tesseract) {
+      const worker = await window.Tesseract.createWorker('eng');
+      const ret = await worker.recognize(dataUrl);
+      await worker.terminate();
 
-    const lines = (ret?.data?.lines || []).map(l => ({
-      text: l.text.trim(),
-      bbox: l.bbox || { x0: 0, y0: 0, x1: 0, y1: 0 },
-      confidence: l.confidence || 0
-    })).filter(l => l.text.length > 0);
+      const lines = (ret?.data?.lines || []).map(l => ({
+        text: l.text.trim(),
+        bbox: l.bbox || { x0: 0, y0: 0, x1: 0, y1: 0 },
+        confidence: l.confidence || 0
+      })).filter(l => l.text.length > 0);
 
-    const fullText = ret?.data?.text || '';
-    return { lines, fullText };
+      const fullText = ret?.data?.text || '';
+      return { lines, fullText };
+    }
+    return { lines: [], fullText: '' };
   } catch (err) {
-    console.warn('Tesseract OCR engine notice:', err);
+    console.warn('OCR engine notice:', err);
     return { lines: [], fullText: '' };
   }
 }
