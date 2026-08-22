@@ -8,9 +8,7 @@ frontend:
         - npm install --legacy-peer-deps
     build:
       commands:
-        - touch .env .env.production
-        - env | grep VITE_ >> .env || true
-        - env | grep VITE_ >> .env.production || true
+        - node -e "const fs=require('fs');const envs=Object.entries(process.env).filter(([k])=>k.startsWith('VITE_')).map(([k,v])=>\`\${k}=\${v}\`).join('\n');fs.writeFileSync('.env', envs);fs.writeFileSync('.env.production', envs);"
         - npm run build
   artifacts:
     baseDirectory: dist
