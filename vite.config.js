@@ -10,7 +10,8 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_GROQ_API_KEY': JSON.stringify(env.VITE_GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || '')
     },
     build: {
-      target: 'es2020'
+      target: 'es2020',
+      chunkSizeWarningLimit: 4000
     },
     server: {
       host: '0.0.0.0',
