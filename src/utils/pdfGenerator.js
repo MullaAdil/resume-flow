@@ -77,16 +77,21 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
   // Exact A4 height at 800px width: 800 * (297 / 210) = 1131.42857px
   const A4_PX_HEIGHT = 1131.42857;
 
-  // Measure initial clone content height
-  let rawContentHeight = Math.max(A4_PX_HEIGHT, clone.scrollHeight, clone.offsetHeight);
+  // Clear any artificial minHeight on root clone to measure true content height
+  clone.style.minHeight = 'auto';
 
-  // Auto-fit check: if content exceeds 1 single A4 page height,
-  // apply proportional scaling so 100% of data fits cleanly onto 1 single A4 page without removing any content.
-  if (rawContentHeight > A4_PX_HEIGHT) {
+  // Measure initial clone content height
+  let measuredContentHeight = Math.max(clone.scrollHeight, clone.offsetHeight);
+  let rawContentHeight = measuredContentHeight;
+
+  // If content is within 1.2x of 1 A4 page (up to ~1350px), auto-fit smoothly to 1 single crisp page:
+  if (rawContentHeight > A4_PX_HEIGHT && rawContentHeight <= A4_PX_HEIGHT * 1.22) {
     const scaleFactor = A4_PX_HEIGHT / rawContentHeight;
     clone.style.transform = `scale(${scaleFactor})`;
     clone.style.transformOrigin = 'top left';
-    // Wrap clone in a parent to constrain height exactly to A4
+    clone.style.width = `${Math.round(800 / scaleFactor)}px`;
+    
+    // Wrap clone in a parent to constrain height exactly to 1 A4 page
     const parentHolder = document.createElement('div');
     parentHolder.style.position = 'absolute';
     parentHolder.style.left = '-10000px';
@@ -97,15 +102,12 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
     parentHolder.appendChild(clone);
     document.body.appendChild(parentHolder);
     rawContentHeight = A4_PX_HEIGHT;
-  }
-
-  // Smart Pagination for Multi-Page Resumes (>1260px):
-  // Inspect block elements and inject breaks before elements that would be cut through the middle by an A4 page boundary.
-  if (rawContentHeight > A4_PX_HEIGHT) {
+  } else if (rawContentHeight > A4_PX_HEIGHT * 1.22) {
+    // True multi-page resume (>1380px)
+    // Inspect block elements and inject smart breaks to avoid cutting through lines
     const breakableSelector = 'h1, h2, h3, h4, p, li, tr, .experience-item, .education-item, .project-item, .section-block, .bullet-point, [data-section]';
     const breakableNodes = Array.from(clone.querySelectorAll(breakableSelector));
     
-    // Sort nodes by top position
     const cloneRect = clone.getBoundingClientRect();
     const sortedNodes = breakableNodes
       .map(node => ({
@@ -123,7 +125,6 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
     for (let page = 1; page < pageCount; page++) {
       const pageBoundaryY = page * A4_PX_HEIGHT;
       
-      // Find an element straddling the pageBoundaryY
       const straddlingItem = sortedNodes.find(item => {
         const itemTop = item.top + currentOffsetY;
         const itemBottom = item.bottom + currentOffsetY;
@@ -132,7 +133,7 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
 
       if (straddlingItem) {
         const itemTop = straddlingItem.top + currentOffsetY;
-        const pushDistance = pageBoundaryY - itemTop + 12; // Gap to push element to top of next page
+        const pushDistance = pageBoundaryY - itemTop + 12;
         
         if (pushDistance > 0 && pushDistance < A4_PX_HEIGHT * 0.45) {
           const spacer = document.createElement('div');
@@ -147,8 +148,10 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
       }
     }
 
-    // Re-measure height after injecting spacers
     rawContentHeight = Math.max(A4_PX_HEIGHT, clone.scrollHeight, clone.offsetHeight);
+  } else {
+    // Fits on 1 page comfortably
+    rawContentHeight = A4_PX_HEIGHT;
   }
 
   clone.style.height = `${rawContentHeight}px`;
@@ -233,12 +236,17 @@ export const downloadPDF = async (elementId, filename = 'resume.pdf') => {
     const sliceHeightPx = Math.round(A4_PX_HEIGHT * canvasScale);
 
     for (let page = 0; page < totalPages; page++) {
+      const sourceY = page * sliceHeightPx;
+      const currentSliceHeight = Math.min(sliceHeightPx, canvasTotalHeight - sourceY);
+
+      // Skip empty or tiny phantom trailing slice
+      if (page > 0 && currentSliceHeight < 25 * canvasScale) {
+        continue;
+      }
+
       if (page > 0) {
         pdf.addPage('a4', 'portrait');
       }
-
-      const sourceY = page * sliceHeightPx;
-      const currentSliceHeight = Math.min(sliceHeightPx, canvasTotalHeight - sourceY);
 
       const pageCanvas = document.createElement('canvas');
       pageCanvas.width = canvasWidth;

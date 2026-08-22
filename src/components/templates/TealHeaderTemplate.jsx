@@ -1,105 +1,48 @@
 import React from "react";
-
 import { Mail, Phone, MapPin, Globe, Calendar } from "lucide-react";
 
-const localDummyData = {
-  personalInfo: {
-    fullName: "Dhiraj Rajput",
-    jobTitle: "UI/UX Designer",
-    email: "dhiraj@goresume.io",
-    phone: "+918527122712",
-    location: "Bangalore , India",
-    linkedin: "LinkedIn",
-    github: "Github",
-    summary:
-      "Creative UI/UX Designer with 3+ years of experience in designing intuitive and beautiful digital interfaces. Skilled in user research, wireframing, prototyping, and collaborating with developers to deliver clean, modern web and mobile applications.",
-  },
-  experience: [
-    {
-      id: "teal-exp-1",
-      title: "UI/UX Designer",
-      company: "TCS Ltd.",
-      date: "July 2022 - Present",
-      location: "Bangalore",
-      description:
-        "Led the redesign of a major enterprise dashboard, resulting in a 35% increase in user engagement.\nCollaborated with product managers to define user requirements and develop strategic wireframes.",
-    },
-    {
-      id: "teal-exp-2",
-      title: "UX Intern",
-      company: "Cognizant Technology Solutions",
-      date: "January 2021 - June 2022",
-      location: "Bangalore",
-      description:
-        "Conducted 15+ user testing sessions to identify critical interface friction points, improving conversion rates by 12%.",
-    },
-  ],
-  education: [
-    {
-      id: "teal-edu-1",
-      degree: "Master of Science in Design",
-      school: "IDC School of Design, IIT Bombay",
-      date: "July 2019 - May 2021",
-      location: "Mumbai",
-      details: "Specialization in Interaction Design",
-    },
-    {
-      id: "teal-edu-2",
-      degree: "Bachelor of Design",
-      school: "NID Ahmedabad",
-      date: "July 2015 - May 2019",
-      location: "Ahmedabad",
-      details: "Specialization in Communication Design",
-    },
-  ],
-  skills: [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "Python",
-    "GraphQL",
-    "AWS",
-    "Docker",
-  ],
-  languages: [
-    { name: "Hindi", proficiency: "Native" },
-    { name: "English", proficiency: "Highly Proficient" },
-  ],
-  hobbies: [
-    "Photography & Videography",
-    "Fitness & Gym",
-    "Podcast Listening",
-    "Travelling",
-    "Reading Self-Development Books",
-  ],
-};
-
 const TealHeaderTemplate = ({ resumeData }) => {
-  const hasUserData =
-    resumeData?.personalInfo?.fullName &&
-    resumeData.personalInfo.fullName.trim().length > 0;
+  const p = resumeData?.personalInfo || {};
 
-  const activeData = hasUserData ? resumeData : localDummyData;
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    certifications,
-    languages,
-    interests,
-    customSections,
-    projects,
-  } = activeData;
+  const personalInfo = {
+    fullName: (p.fullName && p.fullName.trim()) || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || '',
+    jobTitle: (p.jobTitle && p.jobTitle.trim()) || '',
+    email: (p.email && p.email.trim()) || '',
+    phone: (p.phone && p.phone.trim()) || '',
+    location: (p.location && p.location.trim()) || '',
+    linkedin: (p.linkedin && p.linkedin.trim()) || '',
+    github: (p.github && p.github.trim()) || '',
+    website: (p.website && p.website.trim()) || '',
+    summary: (p.summary && p.summary.trim()) || '',
+  };
+
+  const experience = (Array.isArray(resumeData?.experience) && resumeData.experience.length > 0 && resumeData.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? resumeData.experience
+    : [];
+
+  const education = (Array.isArray(resumeData?.education) && resumeData.education.length > 0 && resumeData.education.some(e => e && (e.school || e.degree)))
+    ? resumeData.education
+    : [];
+
+  const projects = (Array.isArray(resumeData?.projects) && resumeData.projects.length > 0 && resumeData.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? resumeData.projects
+    : [];
+
+  const certifications = (Array.isArray(resumeData?.certifications) && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c && (c.name || c.title)))
+    ? resumeData.certifications
+    : [];
+
+  const languages = (Array.isArray(resumeData?.languages) && resumeData.languages.length > 0 && resumeData.languages.some(l => l && (typeof l === 'string' ? l.trim() : l.name)))
+    ? resumeData.languages
+    : [];
+
+  const interests = (Array.isArray(resumeData?.interests) && resumeData.interests.length > 0)
+    ? resumeData.interests
+    : [];
+
+  const customSections = Array.isArray(resumeData?.customSections) ? resumeData.customSections : [];
   const settings = resumeData?.settings || {};
   const primaryColor = settings.primaryColor || "#007E6F";
-  const marginPadding =
-    settings.margins === "Compact"
-      ? "1.5rem 2rem"
-      : settings.margins === "Spacious"
-        ? "3rem 3.5rem"
-        : "2rem 2.5rem";
 
   const divider = (
     <div
@@ -112,29 +55,26 @@ const TealHeaderTemplate = ({ resumeData }) => {
     ></div>
   );
 
-  const skillsList = Array.isArray(skills) ? skills : [];
-
   const getSkillsArray = () => {
-    if (skillsList.length > 0) return skillsList;
-    if (resumeData?.skills) {
-      if (Array.isArray(resumeData.skills))
-        return resumeData.skills.filter(Boolean);
-      return Object.values(resumeData.skills).flat().filter(Boolean);
-    }
-    return localDummyData.skills;
+    const raw = resumeData?.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw === 'object') return Object.values(raw).flat().filter(Boolean);
+    return [];
   };
   const activeSkills = getSkillsArray();
 
   const activeHobbies =
     interests && interests.length > 0
-      ? interests.map((i) => i.name || i)
-      : resumeData?.hobbies || localDummyData.hobbies;
+      ? interests.map((i) => (typeof i === 'object' ? i.name : i))
+      : (Array.isArray(resumeData?.hobbies) ? resumeData.hobbies : []);
 
-  // Helper to format locations nicely with space before comma
   const formatLocation = (loc) => {
     if (!loc) return "";
     return loc.replace(/,/, " ,");
   };
+
+  const hasContacts = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin || personalInfo.github || personalInfo.website;
 
   return (
     <div
@@ -149,121 +89,140 @@ const TealHeaderTemplate = ({ resumeData }) => {
         fontSize: "13px",
         display: "flex",
         flexDirection: "column",
+        boxSizing: "border-box",
       }}
     >
       {/* Teal Header Banner */}
-      <div
-        style={{
-          background: primaryColor,
-          color: "#FFFFFF",
-          padding: "2rem 2.5rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "0.35rem",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "28px",
-            fontWeight: "bold",
-            color: "#FFFFFF",
-            margin: 0,
-            textTransform: "uppercase",
-            letterSpacing: "1px",
-          }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <h2
-            style={{
-              fontSize: "12px",
-              fontWeight: "bold",
-              color: "#E2F1E8",
-              margin: "0.1rem 0 0.5rem 0",
-              textTransform: "uppercase",
-              letterSpacing: "2px",
-            }}
-          >
-            {personalInfo.jobTitle}
-          </h2>
-        )}
-
-        {/* Contact info row in Header */}
+      {(personalInfo.fullName || hasContacts) && (
         <div
           style={{
+            background: primaryColor,
+            color: "#FFFFFF",
+            padding: "2rem 2.5rem",
             display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: "1rem",
-            fontSize: "11.5px",
-            color: "#E2F1E8",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.35rem",
           }}
         >
-          {personalInfo.phone && (
-            <span
+          {personalInfo.fullName && (
+            <h1
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
+                fontSize: "28px",
+                fontWeight: "bold",
                 color: "#FFFFFF",
+                margin: 0,
+                textTransform: "uppercase",
+                letterSpacing: "1px",
               }}
             >
-              <Phone size={12} color="#E2F1E8" /> {personalInfo.phone}
-            </span>
+              {personalInfo.fullName}
+            </h1>
           )}
-          {personalInfo.email && (
-            <span
+          {personalInfo.jobTitle && (
+            <h2
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#FFFFFF",
+                fontSize: "12px",
+                fontWeight: "bold",
+                color: "#E2F1E8",
+                margin: "0.1rem 0 0.5rem 0",
+                textTransform: "uppercase",
+                letterSpacing: "2px",
               }}
             >
-              <Mail size={12} color="#E2F1E8" /> {personalInfo.email}
-            </span>
+              {personalInfo.jobTitle}
+            </h2>
           )}
-          {personalInfo.location && (
-            <span
+
+          {/* Contact info row in Header */}
+          {hasContacts && (
+            <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#FFFFFF",
+                justifyContent: "center",
+                flexWrap: "wrap",
+                gap: "1rem",
+                fontSize: "11.5px",
+                color: "#E2F1E8",
               }}
             >
-              <MapPin size={12} color="#E2F1E8" />{" "}
-              {formatLocation(personalInfo.location)}
-            </span>
-          )}
-          {personalInfo.linkedin && (
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#FFFFFF",
-              }}
-            >
-              <Globe size={12} color="#E2F1E8" /> {personalInfo.linkedin}
-            </span>
-          )}
-          {personalInfo.github && (
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#FFFFFF",
-              }}
-            >
-              <Globe size={12} color="#E2F1E8" /> {personalInfo.github}
-            </span>
+              {personalInfo.phone && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Phone size={12} color="#E2F1E8" /> {personalInfo.phone}
+                </span>
+              )}
+              {personalInfo.email && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Mail size={12} color="#E2F1E8" /> {personalInfo.email}
+                </span>
+              )}
+              {personalInfo.location && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <MapPin size={12} color="#E2F1E8" />{" "}
+                  {formatLocation(personalInfo.location)}
+                </span>
+              )}
+              {personalInfo.linkedin && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Globe size={12} color="#E2F1E8" /> {personalInfo.linkedin}
+                </span>
+              )}
+              {personalInfo.github && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Globe size={12} color="#E2F1E8" /> {personalInfo.github}
+                </span>
+              )}
+              {personalInfo.website && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Globe size={12} color="#E2F1E8" /> {personalInfo.website}
+                </span>
+              )}
+            </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Main Body */}
       <div style={{ padding: "2rem 2.5rem", flex: 1 }}>
@@ -371,7 +330,7 @@ const TealHeaderTemplate = ({ resumeData }) => {
                         color: "#000000",
                       }}
                     >
-                      {exp.title}
+                      {exp.title || exp.jobTitle}
                     </div>
                     <div
                       style={{
@@ -487,16 +446,18 @@ const TealHeaderTemplate = ({ resumeData }) => {
                         {proj.technologies}
                       </span>
                     )}
-                    <span
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.2rem",
-                      }}
-                    >
-                      <Calendar size={11} color="#007E6F" />
-                      {proj.duration || proj.date}
-                    </span>
+                    {(proj.duration || proj.date) && (
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.2rem",
+                        }}
+                      >
+                        <Calendar size={11} color="#007E6F" />
+                        {proj.duration || proj.date}
+                      </span>
+                    )}
                   </div>
                   {proj.description && (
                     <ul
@@ -560,7 +521,7 @@ const TealHeaderTemplate = ({ resumeData }) => {
                         color: "#000000",
                       }}
                     >
-                      {edu.degree || "Degree"}
+                      {edu.degree || edu.fieldOfStudy || ""}
                     </div>
                     <div
                       style={{
@@ -676,7 +637,7 @@ const TealHeaderTemplate = ({ resumeData }) => {
                         color: "#000000",
                       }}
                     >
-                      {cert.name}
+                      {cert.name || cert.title}
                     </div>
                     <div
                       style={{
@@ -699,16 +660,18 @@ const TealHeaderTemplate = ({ resumeData }) => {
                           {cert.issuer}
                         </span>
                       )}
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.2rem",
-                        }}
-                      >
-                        <Calendar size={11} color="#007E6F" />
-                        {cert.date}
-                      </span>
+                      {cert.date && (
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.2rem",
+                          }}
+                        >
+                          <Calendar size={11} color="#007E6F" />
+                          {cert.date}
+                        </span>
+                      )}
                     </div>
                     {cert.details && (
                       <ul
@@ -776,11 +739,13 @@ const TealHeaderTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "normal", color: "#000000" }}>
-                      {lang.name}
+                      {typeof lang === 'object' ? lang.name : String(lang)}
                     </span>
-                    <span style={{ color: "#000000", fontWeight: "normal" }}>
-                      {lang.proficiency || "Conversational"}
-                    </span>
+                    {typeof lang === 'object' && lang.proficiency && (
+                      <span style={{ color: "#000000", fontWeight: "normal" }}>
+                        {lang.proficiency}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -836,7 +801,7 @@ const TealHeaderTemplate = ({ resumeData }) => {
               }}
             >
               {customSections
-                .filter((sec) => sec.title)
+                .filter((sec) => sec && sec.title)
                 .map((sec, idx) => (
                   <div key={sec.id || idx} style={{ marginBottom: "0.8rem" }}>
                     <h3

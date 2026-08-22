@@ -13,10 +13,18 @@ import PhotoModernTemplate from './templates/PhotoModernTemplate';
 import TealHeaderTemplate from './templates/TealHeaderTemplate';
 import BoxedModernTemplate from './templates/BoxedModernTemplate';
 import JanetTemplate from './templates/JanetTemplate';
-import AslamTemplate, { localDummyData as aslamDummyData } from './templates/AslamTemplate';
+import AslamTemplate from './templates/AslamTemplate';
 import LetsCodeTemplate from './templates/LetsCodeTemplate';
+import StandOutTemplate from './templates/StandOutTemplate';
+import MaverickTemplate from './templates/MaverickTemplate';
+import CustomFramedTemplate from './templates/CustomFramedTemplate';
+import KaiCarterTemplate from './templates/KaiCarterTemplate';
+import MagneticTemplate from './templates/MagneticTemplate';
+import SuperbTemplate from './templates/SuperbTemplate';
+import VertexTemplate from './templates/VertexTemplate';
+import PinkHeaderTemplate from './templates/PinkHeaderTemplate';
 
-// Sample data that matches the field names ALL templates actually read
+// Sample data for gallery/showcase previews ONLY
 export const dummyData = {
   personalInfo: {
     fullName: 'John Doe',
@@ -40,6 +48,7 @@ export const dummyData = {
       company: 'Tech Solutions Inc.',
       startDate: 'Jun 2024',
       endDate: 'Present',
+      date: 'Jun 2024 - Present',
       location: 'San Francisco, CA',
       description: '• Developed modern web applications using React and Node.js.\n• Built reusable components, optimized performance, and integrated REST APIs for data-driven features.',
     },
@@ -50,6 +59,7 @@ export const dummyData = {
       company: 'Innovatech Labs',
       startDate: 'Jan 2022',
       endDate: 'May 2024',
+      date: 'Jan 2022 - May 2024',
       location: 'San Jose, CA',
       description: '• Worked on full stack product development with JavaScript, Express, and PostgreSQL.\n• Collaborated in agile teams to deliver customer-focused solutions and automation tools.',
     }
@@ -57,52 +67,30 @@ export const dummyData = {
   education: [
     {
       id: 'edu1',
-      school: 'University of California',
-      institution: 'University of California',
+      school: 'University of California, Berkeley',
+      institution: 'University of California, Berkeley',
       degree: 'B.S. in Computer Science',
-      startDate: '',
-      endDate: 'Jun 2020',
+      startDate: '2016',
+      endDate: '2020',
+      date: '2016 - 2020',
       location: 'Berkeley, CA',
     }
   ],
   projects: [
     {
       id: 'proj1',
-      name: 'E-Commerce Platform - Full Stack Web Application',
+      name: 'E-Commerce Platform',
       technologies: 'React | Node.js | MongoDB | Docker',
-      duration: '',
-      description: '• Designed and developed a full-stack e-commerce application from scratch with secure user authentication (login, register, session management)\n• Built backend architecture following MVC pattern with REST API endpoints for create, read, update, and delete operations\n• Implemented database with normalized schema for efficient data storage and retrieval across multiple user accounts\n• Wrote automated end-to-end test suite using Selenium WebDriver to simulate real user interactions including form submissions, navigation, and authentication flows\n• Containerized the entire application using Docker ensuring consistent deployment across different environments with zero configuration issues\n• Identified and resolved a hardcoded credential vulnerability during development — applied OWASP Top 10 security principles to harden the application',
-    },
-    {
-      id: 'proj2',
-      name: 'Smart Home Dashboard - Capstone Project',
-      technologies: 'Python | React | IoT Sensors | WebSockets',
-      duration: '',
-      description: '• Designed and built a real-time smart home monitoring system as final year capstone project, integrating hardware and software components end to end\n• Assembled hardware circuit with temperature sensors connected to microcontroller for detecting environmental changes simultaneously\n• Developed Python backend to receive and process live sensor data via WebSockets, updating dashboard status in real time\n• Documented full system architecture including circuit diagrams, data flow, and test results for academic submission',
-    },
-    {
-      id: 'proj3',
-      name: 'Customer Churn Predictor - Machine Learning',
-      technologies: 'Python | Scikit-learn | Pandas | Flask',
-      duration: '',
-      description: '• Built a binary classification model using Random Forest and XGBoost algorithms, achieving 92%+ accuracy on held-out test data\n• Engineered full data preprocessing pipeline — missing value imputation, feature scaling, one-hot encoding — to convert raw data into model-ready features\n• Deployed real-time prediction interface using Flask for live customer risk assessment',
-    },
-    {
-      id: 'proj4',
-      name: 'Sales Data Analysis - Enterprise Database',
-      technologies: 'PostgreSQL | Advanced SQL | PowerBI',
-      duration: '',
-      description: '• Conducted end-to-end business data analysis on enterprise sample database simulating a real retail company dataset\n• Analysed revenue performance, customer lifetime value, product profitability, store efficiency, and time-based sales trends across the full dataset\n• Wrote advanced SQL queries using multi-table joins, correlated subqueries, CTEs, and window functions for ranking, cumulative totals, and segmentation\n• Derived actionable insights including top revenue-generating products, high-value customer segments, underperforming regions, and peak sales periods',
+      duration: '2023',
+      date: '2023',
+      description: '• Designed and developed a full-stack e-commerce application with secure authentication.\n• Built backend architecture following MVC pattern with REST API endpoints.\n• Containerized the entire application using Docker ensuring zero configuration issues.',
     }
   ],
   skills: {
     programming: ['React', 'Node.js', 'JavaScript', 'TypeScript', 'REST APIs', 'SQL', 'AWS', 'Docker']
   },
   certifications: [
-    { id: 'cert1', name: 'AWS Certified Solutions Architect - Associate', issuer: 'AWS', date: '' },
-    { id: 'cert2', name: 'Google Cloud Professional Cloud Developer', issuer: 'Google Cloud', date: '' },
-    { id: 'cert3', name: 'Cisco - Networking & Python Essentials', issuer: 'Cisco Networking Academy', date: '' },
-    { id: 'cert4', name: 'Microsoft Fundamentals', issuer: 'Coursera', date: '' }
+    { id: 'cert1', name: 'AWS Certified Solutions Architect', issuer: 'AWS', date: '2023' }
   ],
   languages: [
     { id: 'lang1', name: 'English', proficiency: 'Native' }
@@ -110,12 +98,11 @@ export const dummyData = {
 };
 
 const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propData, isPreview = false }) => {
-  const resumeData = rawResumeData || propData;
-  const isAslam = templateId === 'aslam';
-  const currentDummy = isAslam ? aslamDummyData : dummyData;
+  const incomingData = rawResumeData || propData;
+  const isGalleryPreview = isPreview && (!incomingData || (!incomingData.personalInfo?.fullName && (!incomingData.experience || incomingData.experience.length === 0)));
+  const resumeData = isGalleryPreview ? dummyData : (incomingData || {});
 
   const p = resumeData?.personalInfo || {};
-  const d = currentDummy.personalInfo || {};
 
   const getSkillsArray = (s) => {
     if (!s) return [];
@@ -123,47 +110,6 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     return Object.values(s).flat().map(item => typeof item === 'object' ? item?.name || '' : item).filter(Boolean);
   };
 
-  const renderSupplementalSections = (data) => {
-    if (!data) return null;
-    const { certifications = [], languages = [], projects = [], education = [], experience = [], settings = {} } = data;
-    const primary = settings?.primaryColor || '#1e40af';
-    const bullets = (text) => (
-      <div style={{ fontSize: '0.85rem', color: '#334155', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{text.split('\n').map((line, i) => (
-        line.trim().length > 0 ? <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.3rem' }}><span style={{ color: primary }}>•</span> <span>{line.trim().replace(/^[•\-\*]\s*/, '')}</span></div> : null
-      ))}</div>
-    );
-
-    return (
-      <div style={{ marginTop: '1rem' }}>
-        {certifications && certifications.length > 0 && (
-          <div style={{ marginBottom: '0.75rem' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 'bold', color: primary }}>Certifications</h3>
-            <ul style={{ marginTop: '0.3rem' }}>{certifications.map(c => <li key={c.id || c.name} style={{ color: '#334155' }}>{c.name} {c.issuer ? `— ${c.issuer}` : ''} {c.date ? `(${c.date})` : ''}</li>)}</ul>
-          </div>
-        )}
-        {languages && languages.length > 0 && (
-          <div style={{ marginBottom: '0.75rem' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 'bold', color: primary }}>Languages</h3>
-            <ul style={{ marginTop: '0.3rem' }}>{languages.map(l => <li key={l.id || l.name} style={{ color: '#334155' }}>{l.name} {l.proficiency ? `— ${l.proficiency}` : ''}</li>)}</ul>
-          </div>
-        )}
-        {projects && projects.length > 0 && (
-          <div style={{ marginBottom: '0.75rem' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 'bold', color: primary }}>Projects</h3>
-            {projects.map(p => (
-              <div key={p.id || p.name} style={{ marginBottom: '0.4rem' }}>
-                <div style={{ fontWeight: 'bold', color: '#111' }}>{p.name || p.title}</div>
-                {p.description && bullets(p.description)}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // For the aslam template, convert the builder's categorized skills object
-  // into the {name, value} format that matches the screenshot's sorted order.
   const categoryLabels = {
     programming: 'Programming Languages',
     frameworks: 'Backend & Development',
@@ -173,15 +119,11 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     soft: 'Soft Skills',
     other: 'Other Skills'
   };
-  // Define the display order to match the screenshot
   const categoryOrder = ['programming', 'cloud', 'frameworks', 'databases', 'tools', 'soft', 'other'];
 
   const getAslamSkills = (s) => {
     if (!s) return [];
-    // If skills are already an array of {name, value} objects (e.g. from import), keep them as-is
     if (Array.isArray(s)) return s.filter(Boolean);
-    // Convert the builder's {programming: [...], databases: [...]} format 
-    // into [{name: 'Programming Languages', value: 'SAP ABAP, Python'}, ...]
     const result = [];
     for (const key of categoryOrder) {
       const items = s[key];
@@ -195,24 +137,12 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     return result;
   };
 
-  const userSkills = getSkillsArray(resumeData?.skills);
-  const aslamUserSkills = isAslam ? getAslamSkills(resumeData?.skills) : [];
-  const dummySkills = isAslam ? (aslamDummyData.skills || []) : getSkillsArray(dummyData?.skills);
-  const hasUserSkills = isAslam ? aslamUserSkills.length > 0 : userSkills.length > 0;
-
-  // For lists: if the user has added ANY item to a list, we show the user's list.
-  // Otherwise, we show the dummy list.
-  const hasUserExperience = resumeData?.experience && resumeData.experience.length > 0 && resumeData.experience.some(e => e.company || e.title || e.jobTitle);
-  const hasUserEducation = resumeData?.education && resumeData.education.length > 0 && resumeData.education.some(e => e.school || e.institution || e.degree);
-  const hasUserProjects = resumeData?.projects && resumeData.projects.length > 0 && resumeData.projects.some(e => e.name || e.description);
-  const hasUserCertifications = resumeData?.certifications && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c.name);
-  const hasUserLanguages = resumeData?.languages && resumeData.languages.length > 0 && resumeData.languages.some(l => l.name);
-
-  const fallbackExperience = isAslam ? (aslamDummyData.experience || []) : dummyData.experience;
-  const fallbackEducation = isAslam ? (aslamDummyData.education || []) : dummyData.education;
-  const fallbackProjects = isAslam ? (aslamDummyData.projects || []) : dummyData.projects;
-  const fallbackCertifications = isAslam ? (aslamDummyData.certifications || []) : dummyData.certifications;
-  const fallbackLanguages = isAslam ? (aslamDummyData.languages || []) : dummyData.languages;
+  const isAslam = templateId === 'aslam';
+  const rawExperience = Array.isArray(resumeData?.experience) ? resumeData.experience : [];
+  const rawEducation = Array.isArray(resumeData?.education) ? resumeData.education : [];
+  const rawProjects = Array.isArray(resumeData?.projects) ? resumeData.projects : [];
+  const rawCertifications = Array.isArray(resumeData?.certifications) ? resumeData.certifications : [];
+  const rawLanguages = Array.isArray(resumeData?.languages) ? resumeData.languages : [];
 
   const activeSettings = {
     showSummary: true,
@@ -227,64 +157,88 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     ...resumeData?.settings
   };
 
-  const experienceList = (activeSettings.showExperience !== false)
-    ? (hasUserExperience ? resumeData.experience : fallbackExperience).map(exp => ({
+  const validExperience = rawExperience
+    .filter(e => e && (e.company || e.title || e.jobTitle || e.description))
+    .map(exp => ({
       ...exp,
       title: exp.title || exp.jobTitle || '',
       jobTitle: exp.jobTitle || exp.title || '',
       school: exp.school || exp.institution || '',
       institution: exp.institution || exp.school || '',
-      date: (exp.startDate || exp.endDate) ? `${exp.startDate || ''} - ${exp.endDate || ''}`.replace(/^ - | - $/g, '') : exp.date || '',
-    }))
-    : [];
+      date: (exp.startDate || exp.endDate) ? `${exp.startDate || ''}${exp.endDate ? ' - ' + exp.endDate : ''}` : exp.date || '',
+    }));
 
-  const educationList = (activeSettings.showEducation !== false)
-    ? (hasUserEducation ? resumeData.education : fallbackEducation).map(edu => ({
+  const validEducation = rawEducation
+    .filter(e => e && (e.school || e.institution || e.degree))
+    .map(edu => ({
       ...edu,
       school: edu.school || edu.institution || '',
       institution: edu.institution || edu.school || '',
-      date: (edu.startDate || edu.endDate) ? `${edu.startDate || ''} - ${edu.endDate || ''}`.replace(/^ - | - $/g, '') : edu.date || '',
-    }))
-    : [];
+      date: (edu.startDate || edu.endDate) ? `${edu.startDate || ''}${edu.endDate ? ' - ' + edu.endDate : ''}` : edu.date || '',
+    }));
 
-  const projectsList = (activeSettings.showProjects !== false)
-    ? (hasUserProjects ? resumeData.projects : fallbackProjects)
-    : [];
+  const validProjects = rawProjects
+    .filter(p => p && (p.name || p.title || p.description))
+    .map(proj => ({
+      ...proj,
+      name: proj.name || proj.title || '',
+      date: proj.duration || proj.date || '',
+      duration: proj.duration || proj.date || ''
+    }));
 
-  const certificationsList = (activeSettings.showCertifications !== false)
-    ? (hasUserCertifications ? resumeData.certifications : fallbackCertifications)
-    : [];
+  const validCertifications = rawCertifications
+    .filter(c => c && (c.name || c.title))
+    .map(c => ({
+      ...c,
+      name: c.name || c.title || ''
+    }));
 
-  const languagesList = (activeSettings.showLanguages !== false)
-    ? (hasUserLanguages ? resumeData.languages : fallbackLanguages)
-    : [];
+  const validLanguages = rawLanguages
+    .filter(l => l && (typeof l === 'string' ? l.trim() : l.name))
+    .map(l => ({
+      ...l,
+      name: typeof l === 'object' ? l.name || '' : String(l),
+      proficiency: typeof l === 'object' ? l.proficiency || '' : ''
+    }));
 
-  const skillsList = (activeSettings.showSkills !== false)
-    ? (isAslam
-      ? (hasUserSkills ? aslamUserSkills : dummySkills)
-      : (templateId === 'boxedmodern' || templateId === 'letscode')
-        ? (hasUserSkills ? userSkills : dummySkills)
-        : (hasUserSkills ? userSkills.map(s => typeof s === 'object' ? s.name : s) : dummySkills.map(s => typeof s === 'object' ? s.name : s)))
-    : [];
+  const userSkills = getSkillsArray(resumeData?.skills);
+  const aslamUserSkills = isAslam ? getAslamSkills(resumeData?.skills) : [];
+
+  const experienceList = (activeSettings.showExperience !== false) ? validExperience : [];
+  const educationList = (activeSettings.showEducation !== false) ? validEducation : [];
+  const projectsList = (activeSettings.showProjects !== false) ? validProjects : [];
+  const certificationsList = (activeSettings.showCertifications !== false) ? validCertifications : [];
+  const languagesList = (activeSettings.showLanguages !== false) ? validLanguages : [];
+
+  let skillsList = [];
+  if (activeSettings.showSkills !== false) {
+    if (isAslam) {
+      skillsList = aslamUserSkills;
+    } else if (templateId === 'boxedmodern' || templateId === 'letscode') {
+      skillsList = userSkills;
+    } else {
+      skillsList = userSkills.map(s => typeof s === 'object' ? s.name : s).filter(Boolean);
+    }
+  }
 
   const mergedData = {
     ...resumeData,
     personalInfo: {
-      fullName: p.fullName || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || d.fullName,
-      firstName: p.firstName || (p.fullName ? p.fullName.split(' ')[0] : '') || d.firstName,
-      lastName: p.lastName || (p.fullName ? p.fullName.split(' ').slice(1).join(' ') : '') || d.lastName,
-      jobTitle: p.jobTitle || d.jobTitle || '',
-      email: p.email || d.email || '',
-      phone: p.phone || d.phone || '',
-      location: p.location || d.location || '',
-      linkedin: p.linkedin || d.linkedin || '',
-      github: p.github || d.github || '',
-      website: p.website || d.website || '',
-      portfolio: p.portfolio || d.portfolio || '',
-      summary: (activeSettings.showSummary !== false) ? (p.summary || d.summary || '') : '',
-      address: p.address || d.address || '',
-      city: p.city || d.city || '',
-      country: p.country || d.country || '',
+      fullName: (p.fullName && p.fullName.trim()) || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || '',
+      firstName: p.firstName || (p.fullName ? p.fullName.split(' ')[0] : '') || '',
+      lastName: p.lastName || (p.fullName ? p.fullName.split(' ').slice(1).join(' ') : '') || '',
+      jobTitle: (p.jobTitle && p.jobTitle.trim()) || '',
+      email: (p.email && p.email.trim()) || '',
+      phone: (p.phone && p.phone.trim()) || '',
+      location: (p.location && p.location.trim()) || '',
+      linkedin: (p.linkedin && p.linkedin.trim()) || '',
+      github: (p.github && p.github.trim()) || '',
+      website: (p.website && p.website.trim()) || '',
+      portfolio: (p.portfolio && p.portfolio.trim()) || '',
+      summary: (activeSettings.showSummary !== false && p.summary && p.summary.trim()) ? p.summary.trim() : '',
+      address: p.address || '',
+      city: p.city || '',
+      country: p.country || '',
     },
     experience: experienceList,
     education: educationList,
@@ -293,13 +247,13 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     certifications: certificationsList,
     languages: languagesList,
     customSections: (activeSettings.showCustomSections !== false)
-      ? (resumeData?.customSections || []).filter(cs => activeSettings[`show_custom_${cs.id}`] !== false)
+      ? (resumeData?.customSections || []).filter(cs => cs && cs.title && activeSettings[`show_custom_${cs.id}`] !== false)
       : [],
     settings: activeSettings
   };
 
   // Choose the template component
-  let TemplateComponent = VisionaryTemplate;
+  let TemplateComponent = MultiColorTemplate;
   switch (templateId) {
     case 'visionary': TemplateComponent = VisionaryTemplate; break;
     case 'artistic': TemplateComponent = ArtisticTemplate; break;
@@ -316,6 +270,15 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
     case 'janet': TemplateComponent = JanetTemplate; break;
     case 'aslam': TemplateComponent = AslamTemplate; break;
     case 'letscode': TemplateComponent = LetsCodeTemplate; break;
+    case 'standout': TemplateComponent = StandOutTemplate; break;
+    case 'maverick': TemplateComponent = MaverickTemplate; break;
+    case 'customframed':
+    case 'ai_custom': TemplateComponent = CustomFramedTemplate; break;
+    case 'kaicarter': TemplateComponent = KaiCarterTemplate; break;
+    case 'magnetic': TemplateComponent = MagneticTemplate; break;
+    case 'superb': TemplateComponent = SuperbTemplate; break;
+    case 'vertex': TemplateComponent = VertexTemplate; break;
+    case 'pinkheader': TemplateComponent = PinkHeaderTemplate; break;
     case 'multicolor':
     default: TemplateComponent = MultiColorTemplate; break;
   }
@@ -400,4 +363,5 @@ const TemplateRenderer = ({ templateId, resumeData: rawResumeData, data: propDat
 };
 
 export default React.memo(TemplateRenderer);
+
 

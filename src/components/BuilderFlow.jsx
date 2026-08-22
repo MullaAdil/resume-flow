@@ -7,7 +7,7 @@ import { useResume, defaultState } from '../context/ResumeContext';
 import { useNavigate } from 'react-router-dom';
 import LivePreview from './LivePreview';
 import AuraHeader from './AuraHeader';
-import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Zap, Cloud, Database, CheckCircle, FileText, Palette, RotateCcw, Sliders, Layout } from 'lucide-react';
+import { Plus, Trash2, Search, X, Hexagon, ChevronLeft, ChevronRight, Check, Download, Zap, Cloud, Database, CheckCircle, FileText, Palette, RotateCcw, Sliders, Layout, Sparkles } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../context/AuthContext';
 
@@ -61,7 +61,7 @@ const ScoreCircularProgress = ({ targetScore }) => {
     if (end === 0) return;
     const duration = 1000;
     const stepTime = Math.abs(Math.floor(duration / end));
-    
+
     const timer = setInterval(() => {
       start += 1;
       setScore(start);
@@ -69,7 +69,7 @@ const ScoreCircularProgress = ({ targetScore }) => {
         clearInterval(timer);
       }
     }, stepTime);
-    
+
     return () => clearInterval(timer);
   }, [targetScore]);
 
@@ -82,11 +82,11 @@ const ScoreCircularProgress = ({ targetScore }) => {
     <div style={{ position: 'relative', width: '70px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       <svg width="70" height="70" style={{ transform: 'rotate(-90deg)' }}>
         <circle cx="35" cy="35" r={radius} fill="transparent" stroke="#E2E8F0" strokeWidth={strokeWidth} />
-        <motion.circle 
-          cx="35" cy="35" r={radius} 
-          fill="transparent" 
-          stroke="#FF5C00" 
-          strokeWidth={strokeWidth} 
+        <motion.circle
+          cx="35" cy="35" r={radius}
+          fill="transparent"
+          stroke="#FF5C00"
+          strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           animate={{ strokeDashoffset }}
           transition={{ type: 'spring', stiffness: 60, damping: 15 }}
@@ -173,9 +173,9 @@ const TemplateCardItem = React.memo(({ tpl, isSelected, onSelect, resumeData }) 
 
 const BuilderFlow = () => {
   const navigate = useNavigate();
-  const { 
+  const {
     resumeData, setResumeData,
-    updatePersonalInfo, 
+    updatePersonalInfo,
     addExperience, updateExperience, removeExperience,
     addEducation, updateEducation, removeEducation,
     addSkill, removeSkill, addItem, updateItem, removeItem,
@@ -185,7 +185,10 @@ const BuilderFlow = () => {
     updateSection,
     generateSummaryAI,
     generateProjectDescriptionAI,
-    resetResume
+    resetResume,
+    loadSampleData,
+    clearAllData,
+    clearSection
   } = useResume();
   const { user } = useAuth();
 
@@ -207,7 +210,7 @@ const BuilderFlow = () => {
     updateSettings('primaryColor', preset.primary);
     updateSettings('secondaryColor', preset.hover);
   };
-  
+
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [activeExpIndex, setActiveExpIndex] = useState(0);
   const [activeEduIndex, setActiveEduIndex] = useState(0);
@@ -274,7 +277,7 @@ const BuilderFlow = () => {
 
     try {
       localStorage.setItem('sync_user_key', syncUserKey.trim());
-      
+
       await apiClient.resumes.save(
         syncUserKey.trim().toLowerCase(),
         syncResumeName.trim(),
@@ -347,7 +350,7 @@ const BuilderFlow = () => {
   // Delete a saved resume
   const handleDeleteCloudResume = async (resumeId) => {
     if (!window.confirm("Are you sure you want to delete this resume from the cloud? This cannot be undone.")) return;
-    
+
     setIsLoadingSync(true);
     setSyncError('');
     setSyncMessage('');
@@ -435,7 +438,7 @@ const BuilderFlow = () => {
     };
     handleResize();
     window.addEventListener('resize', handleResize);
-    
+
     let observer;
     if (previewContainerRef.current && typeof ResizeObserver !== 'undefined') {
       observer = new ResizeObserver(handleResize);
@@ -462,7 +465,7 @@ const BuilderFlow = () => {
     setPersonalValidationError('');
     if (activeStepIndex < steps.length - 1) setActiveStepIndex(prev => prev + 1);
   };
-  
+
   const handleBack = () => {
     setPersonalValidationError('');
     if (activeStepIndex > 0) setActiveStepIndex(prev => prev - 1);
@@ -561,7 +564,7 @@ const BuilderFlow = () => {
       setNewSkillByCategory(prev => ({ ...prev, [categoryKey]: '' }));
     }
   };
-  
+
   const handleRemoveSkillFromCategory = (categoryKey, index) => {
     const skills = [...(resumeData.skills?.[categoryKey] || [])];
     skills.splice(index, 1);
@@ -596,11 +599,11 @@ const BuilderFlow = () => {
         ...(resumeData.skills?.databases || [])
       ].map(s => typeof s === 'object' ? s.name : s);
       const skillsList = skillsNames.slice(0, 4).join(', ') || 'strategic planning and execution';
-      
+
       const fallbackSummary = resumeData.profileType === 'student'
         ? `Motivated and detail-oriented student with a strong foundation in ${skillsList}. Eager to leverage academic background to contribute effectively to a dynamic team.`
         : `Results-driven ${jobTitle} with a proven track record of success at ${company}. Skilled in ${skillsList}, with a strong commitment to delivering high-quality results.`;
-      
+
       updatePersonalInfo('summary', fallbackSummary);
     } finally {
       setIsGeneratingAI(false);
@@ -644,10 +647,10 @@ const BuilderFlow = () => {
   const generateAuditReport = () => {
     const jobTitle = resumeData.personalInfo?.jobTitle || resumeData.experience?.[0]?.title || '';
     const titleLower = jobTitle.toLowerCase();
-    
+
     let roleName = "General Professional";
     let targetSkills = ["Strategic Planning", "Project Management", "Data Analysis", "Communication", "Leadership"];
-    
+
     if (titleLower.includes('engineer') || titleLower.includes('developer') || titleLower.includes('tech') || titleLower.includes('ai') || titleLower.includes('science')) {
       roleName = "AI Engineer / Software Developer";
       targetSkills = ["Python", "Git", "Docker", "AWS", "CI/CD", "TensorFlow", "API Design", "Agile"];
@@ -658,20 +661,20 @@ const BuilderFlow = () => {
       roleName = "UI/UX Designer";
       targetSkills = ["Figma", "User Research", "Wireframing", "Prototyping", "Design Systems", "Usability Testing", "Adobe Suite"];
     }
-    
+
     // User skills list across all categories
     const userSkillsArr = getFlatSkillsList(resumeData.skills).map(s => s.toLowerCase());
-    
+
     const matchedSkills = targetSkills.filter(ts => userSkillsArr.some(us => us.includes(ts.toLowerCase())));
     const missingSkills = targetSkills.filter(ts => !userSkillsArr.some(us => us.includes(ts.toLowerCase())));
-    
+
     // Check for metrics/numbers in experience descriptions
     let hasMetrics = false;
     if (resumeData.experience && resumeData.experience.length > 0) {
       const allDescriptions = resumeData.experience.map(e => e.description || '').join(' ');
       hasMetrics = /[\d%+$]/.test(allDescriptions);
     }
-    
+
     // Calculate benchmark score
     let baseScore = 50;
     if (resumeData.personalInfo?.summary) baseScore += 10;
@@ -679,7 +682,7 @@ const BuilderFlow = () => {
     if (resumeData.experience?.length > 0) baseScore += 10;
     if (hasMetrics) baseScore += 10;
     baseScore += Math.min(matchedSkills.length * 5, 20); // up to +20 for matching skills
-    
+
     let matchRating = 'Needs Attention';
     let ratingColor = '#EF4444';
     let ratingBg = '#FEE2E2';
@@ -692,7 +695,7 @@ const BuilderFlow = () => {
       ratingColor = '#D97706';
       ratingBg = '#FEF3C7';
     }
-    
+
     return {
       roleName,
       benchmarkScore: baseScore,
@@ -709,7 +712,7 @@ const BuilderFlow = () => {
     setIsAuditing(true);
     setShowAIAudit(true);
     setAuditLoadingText('Reading resume structure...');
-    
+
     setTimeout(() => {
       setAuditLoadingText('Matching skills against 10,000+ top resumes online...');
       setTimeout(() => {
@@ -742,7 +745,7 @@ const BuilderFlow = () => {
     const score = calculateResumeScore();
     let text = 'Excellent work!';
     let nextStepId = '';
-    
+
     if (!resumeData.personalInfo?.summary) {
       text = '+20% Add professional summary';
       nextStepId = 'summary';
@@ -755,7 +758,7 @@ const BuilderFlow = () => {
     } else {
       text = 'Excellent work! (100% complete)';
     }
-    
+
     return { score, text, nextStepId };
   };
 
@@ -793,13 +796,13 @@ const BuilderFlow = () => {
   };
 
   // ── Shared input style ──
-  const inputStyle = { 
-    padding: '0.85rem 1.15rem', 
-    borderRadius: '8px', 
-    border: '1px solid var(--border-color)', 
-    background: '#FFFFFF', 
-    outline: 'none', 
-    fontSize: '0.95rem', 
+  const inputStyle = {
+    padding: '0.85rem 1.15rem',
+    borderRadius: '8px',
+    border: '1px solid var(--border-color)',
+    background: '#FFFFFF',
+    outline: 'none',
+    fontSize: '0.95rem',
     color: 'var(--text-main)',
     transition: 'all 0.15s ease',
     boxShadow: 'var(--shadow-xs)',
@@ -807,13 +810,13 @@ const BuilderFlow = () => {
     width: '100%',
     minWidth: 0
   };
-  const labelStyle = { 
-    fontSize: '0.85rem', 
-    fontWeight: 700, 
-    color: 'var(--text-main)', 
-    textTransform: 'uppercase', 
-    letterSpacing: '0.04em', 
-    marginBottom: '0.4rem' 
+  const labelStyle = {
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    color: 'var(--text-main)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+    marginBottom: '0.4rem'
   };
 
   // ── Render the edit form for the current step ──
@@ -821,7 +824,7 @@ const BuilderFlow = () => {
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%', paddingBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button 
+          <button
             type="button"
             onClick={() => setShowAIAudit(false)}
             style={{ background: 'none', border: 'none', color: '#18181B', fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -852,13 +855,13 @@ const BuilderFlow = () => {
           auditReport && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* Benchmark Score Card */}
-              <div style={{ 
-                background: '#FFFFFF', 
-                border: '1px solid #E2E8F0', 
-                borderRadius: '12px', 
-                padding: '1.5rem', 
-                display: 'flex', 
-                alignItems: 'center', 
+              <div style={{
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
                 gap: '1.5rem',
                 boxShadow: '0 4px 15px -3px rgba(0,0,0,0.05)'
               }}>
@@ -909,15 +912,15 @@ const BuilderFlow = () => {
               {/* Content Impact */}
               <div>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1E293B', marginBottom: '0.5rem' }}>Content Impact Check</h4>
-                <div style={{ 
-                  padding: '0.75rem 1rem', 
-                  background: auditReport.hasMetrics ? 'rgba(209, 250, 229, 0.45)' : 'rgba(254, 226, 226, 0.45)', 
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  background: auditReport.hasMetrics ? 'rgba(209, 250, 229, 0.45)' : 'rgba(254, 226, 226, 0.45)',
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
-                  border: `1px solid ${auditReport.hasMetrics ? '#A7F3D0' : '#FECACA'}`, 
-                  borderRadius: '10px', 
-                  fontSize: '0.85rem', 
-                  color: auditReport.hasMetrics ? '#065F46' : '#9F1239' 
+                  border: `1px solid ${auditReport.hasMetrics ? '#A7F3D0' : '#FECACA'}`,
+                  borderRadius: '10px',
+                  fontSize: '0.85rem',
+                  color: auditReport.hasMetrics ? '#065F46' : '#9F1239'
                 }}>
                   {auditReport.hasMetrics ? (
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
@@ -938,19 +941,19 @@ const BuilderFlow = () => {
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1E293B', marginBottom: '0.5rem' }}>AI Action Checklist</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                   {auditReport.missingSkills.length > 0 && (
-                    <button 
+                    <button
                       type="button"
                       onClick={() => {
                         setShowAIAudit(false);
                         navigateToStep('skills');
                       }}
-                      style={{ 
-                        textAlign: 'left', width: '100%', padding: '0.75rem 1.1rem', 
-                        border: '1px solid #E2E8F0', borderRadius: '10px', 
-                        background: 'rgba(255, 255, 255, 0.75)', 
+                      style={{
+                        textAlign: 'left', width: '100%', padding: '0.75rem 1.1rem',
+                        border: '1px solid #E2E8F0', borderRadius: '10px',
+                        background: 'rgba(255, 255, 255, 0.75)',
                         backdropFilter: 'blur(6px)',
                         WebkitBackdropFilter: 'blur(6px)',
-                        color: '#1E293B', fontSize: '0.85rem', fontWeight: 600, 
+                        color: '#1E293B', fontSize: '0.85rem', fontWeight: 600,
                         cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                         transition: 'all 0.15s ease'
                       }}
@@ -962,19 +965,19 @@ const BuilderFlow = () => {
                     </button>
                   )}
                   {!auditReport.hasMetrics && (
-                    <button 
+                    <button
                       type="button"
                       onClick={() => {
                         setShowAIAudit(false);
                         navigateToStep('experience');
                       }}
-                      style={{ 
-                        textAlign: 'left', width: '100%', padding: '0.75rem 1.1rem', 
-                        border: '1px solid #E2E8F0', borderRadius: '10px', 
-                        background: 'rgba(255, 255, 255, 0.75)', 
+                      style={{
+                        textAlign: 'left', width: '100%', padding: '0.75rem 1.1rem',
+                        border: '1px solid #E2E8F0', borderRadius: '10px',
+                        background: 'rgba(255, 255, 255, 0.75)',
                         backdropFilter: 'blur(6px)',
                         WebkitBackdropFilter: 'blur(6px)',
-                        color: '#1E293B', fontSize: '0.85rem', fontWeight: 600, 
+                        color: '#1E293B', fontSize: '0.85rem', fontWeight: 600,
                         cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                         transition: 'all 0.15s ease'
                       }}
@@ -986,19 +989,19 @@ const BuilderFlow = () => {
                     </button>
                   )}
                   {!resumeData.personalInfo?.summary && (
-                    <button 
+                    <button
                       type="button"
                       onClick={() => {
                         setShowAIAudit(false);
                         navigateToStep('summary');
                       }}
-                      style={{ 
-                        textAlign: 'left', width: '100%', padding: '0.75rem 1.1rem', 
-                        border: '1px solid #E2E8F0', borderRadius: '10px', 
-                        background: 'rgba(255, 255, 255, 0.75)', 
+                      style={{
+                        textAlign: 'left', width: '100%', padding: '0.75rem 1.1rem',
+                        border: '1px solid #E2E8F0', borderRadius: '10px',
+                        background: 'rgba(255, 255, 255, 0.75)',
                         backdropFilter: 'blur(6px)',
                         WebkitBackdropFilter: 'blur(6px)',
-                        color: '#1E293B', fontSize: '0.85rem', fontWeight: 600, 
+                        color: '#1E293B', fontSize: '0.85rem', fontWeight: 600,
                         cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                         transition: 'all 0.15s ease'
                       }}
@@ -1026,43 +1029,71 @@ const BuilderFlow = () => {
 
   const renderEditForm = () => (
     <AnimatePresence mode="wait">
-      <motion.div 
-        key={activeStep.id} 
-        initial={{ opacity: 1 }} 
-        animate={{ opacity: 1 }} 
+      <motion.div
+        key={activeStep.id}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 1 }}
         transition={{ duration: 0 }}
       >
-        
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <h1 style={{ fontSize: '2.2rem', fontWeight: 800, margin: 0, color: '#111827' }}>{activeStep.title}</h1>
             <p style={{ color: '#1F2937', margin: '6px 0 0 0', fontSize: '1.15rem', fontWeight: 500 }}>{activeStep.subtitle}</p>
           </div>
-          <button
-            type="button"
-            onClick={handleStartAIAudit}
-            style={{
-              padding: '0.45rem 1rem',
-              background: 'var(--primary)',
-              border: 'none',
-              borderRadius: '24px',
-              color: '#FFFFFF',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'none'
-            }}
-          >
-            <CheckCircle size={12} /> Audit Resume
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(`Clear all data in ${activeStep.title}?`)) {
+                  clearSection(activeStep.id);
+                }
+              }}
+              style={{
+                padding: '0.45rem 0.85rem',
+                background: '#F8FAFC',
+                border: '1px solid #CBD5E1',
+                borderRadius: '24px',
+                color: '#64748B',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#1E293B'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#64748B'; }}
+            >
+              <Trash2 size={12} /> Clear Section
+            </button>
+            <button
+              type="button"
+              onClick={handleStartAIAudit}
+              style={{
+                padding: '0.45rem 1rem',
+                background: 'var(--primary)',
+                border: 'none',
+                borderRadius: '24px',
+                color: '#FFFFFF',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'none'
+              }}
+            >
+              <CheckCircle size={12} /> Audit Resume
+            </button>
+          </div>
         </div>
-        
+
         <div style={{ paddingBottom: '2rem' }}>
-          
+
           {/* ── Personal ── */}
           {activeStep.id === 'personal' && (
             <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -1083,43 +1114,79 @@ const BuilderFlow = () => {
 
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Full Name <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>Full Name <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
+                    {resumeData.personalInfo.fullName && (
+                      <button type="button" onClick={() => updatePersonalInfo('fullName', '')} style={{ background: 'transparent', border: 'none', color: '#94A3B8', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} onMouseOver={e => e.currentTarget.style.color = '#475569'} onMouseOut={e => e.currentTarget.style.color = '#94A3B8'}>
+                        <Trash2 size={11} /> Clear
+                      </button>
+                    )}
+                  </div>
                   <div style={{ position: 'relative' }}>
-                    <input 
-                      style={{ 
-                        ...inputStyle, 
-                        width: '100%', 
+                    <input
+                      style={{
+                        ...inputStyle,
+                        width: '100%',
+                        paddingRight: resumeData.personalInfo.fullName ? '2.5rem' : '1.15rem',
                         borderBottom: '2px solid #18181B',
                         borderColor: (!resumeData.personalInfo.fullName && personalValidationError) ? '#EF4444' : 'var(--border-color)'
-                      }} 
-                      value={resumeData.personalInfo.fullName || ''} 
+                      }}
+                      value={resumeData.personalInfo.fullName || ''}
                       onChange={(e) => {
                         updatePersonalInfo('fullName', e.target.value);
                         if (e.target.value) setPersonalValidationError('');
-                      }} 
+                      }}
                     />
-                    {isValidName(resumeData.personalInfo.fullName) && (
-                      <Check size={16} color="#10B981" style={{ position: 'absolute', right: '12px', top: '14px' }} />
+                    {resumeData.personalInfo.fullName && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('fullName', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Clear name"
+                      >
+                        <X size={12} />
+                      </button>
                     )}
                   </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', position: 'relative' }} ref={jobRoleDropdownRef}>
-                  <label style={labelStyle}>Job Title <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
-                  <input 
-                    style={{
-                      ...inputStyle,
-                      borderColor: (!resumeData.personalInfo.jobTitle && personalValidationError) ? '#EF4444' : 'var(--border-color)'
-                    }} 
-                    value={resumeData.personalInfo.jobTitle || ''} 
-                    placeholder="e.g. Frontend Engineer"
-                    onFocus={() => setShowJobRoleDropdown(true)}
-                    onChange={(e) => {
-                      const newRole = e.target.value;
-                      updatePersonalInfo('jobTitle', newRole);
-                      if (newRole) setPersonalValidationError('');
-                    }} 
-                  />
-                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>Job Title <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
+                    {resumeData.personalInfo.jobTitle && (
+                      <button type="button" onClick={() => updatePersonalInfo('jobTitle', '')} style={{ background: 'transparent', border: 'none', color: '#94A3B8', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} onMouseOver={e => e.currentTarget.style.color = '#475569'} onMouseOut={e => e.currentTarget.style.color = '#94A3B8'}>
+                        <Trash2 size={11} /> Clear
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      style={{
+                        ...inputStyle,
+                        width: '100%',
+                        paddingRight: resumeData.personalInfo.jobTitle ? '2.5rem' : '1.15rem',
+                        borderColor: (!resumeData.personalInfo.jobTitle && personalValidationError) ? '#EF4444' : 'var(--border-color)'
+                      }}
+                      value={resumeData.personalInfo.jobTitle || ''}
+                      placeholder="e.g. Frontend Engineer"
+                      onFocus={() => setShowJobRoleDropdown(true)}
+                      onChange={(e) => {
+                        const newRole = e.target.value;
+                        updatePersonalInfo('jobTitle', newRole);
+                        if (newRole) setPersonalValidationError('');
+                      }}
+                    />
+                    {resumeData.personalInfo.jobTitle && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('jobTitle', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Clear job title"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
+
                   {/* Custom Dropdown */}
                   {showJobRoleDropdown && (
                     <div style={{
@@ -1137,8 +1204,8 @@ const BuilderFlow = () => {
                       marginTop: '0.25rem',
                       padding: '4px'
                     }}>
-                      {WORLDWIDE_JOB_ROLES.filter(role => 
-                        !resumeData.personalInfo.jobTitle || 
+                      {WORLDWIDE_JOB_ROLES.filter(role =>
+                        !resumeData.personalInfo.jobTitle ||
                         role.toLowerCase().includes(resumeData.personalInfo.jobTitle.toLowerCase())
                       ).map(role => (
                         <div
@@ -1163,17 +1230,17 @@ const BuilderFlow = () => {
                           {role}
                         </div>
                       ))}
-                      {WORLDWIDE_JOB_ROLES.filter(role => 
-                        !resumeData.personalInfo.jobTitle || 
+                      {WORLDWIDE_JOB_ROLES.filter(role =>
+                        !resumeData.personalInfo.jobTitle ||
                         role.toLowerCase().includes(resumeData.personalInfo.jobTitle.toLowerCase())
                       ).length === 0 && (
-                        <div style={{ padding: '0.65rem 1rem', fontSize: '0.95rem', color: '#64748B', fontStyle: 'italic' }}>
-                          No matching roles found
-                        </div>
-                      )}
+                          <div style={{ padding: '0.65rem 1rem', fontSize: '0.95rem', color: '#64748B', fontStyle: 'italic' }}>
+                            No matching roles found
+                          </div>
+                        )}
                     </div>
                   )}
-                  
+
                   {/* Skill Recommendations based on Job Title */}
                   {(() => {
                     const suggestedSkills = getTechsForRole(resumeData.personalInfo.jobTitle);
@@ -1237,53 +1304,183 @@ const BuilderFlow = () => {
               </div>
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Email <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>Email <span style={{ color: '#EF4444', fontWeight: 600, fontSize: '0.85rem', marginLeft: '3px' }}>*</span></label>
+                    {resumeData.personalInfo.email && (
+                      <button type="button" onClick={() => updatePersonalInfo('email', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <Trash2 size={11} /> Clear
+                      </button>
+                    )}
+                  </div>
                   <div style={{ position: 'relative' }}>
-                    <input 
+                    <input
                       style={{
                         ...inputStyle,
                         width: '100%',
+                        paddingRight: resumeData.personalInfo.email ? '2.5rem' : '1.15rem',
                         borderColor: (!resumeData.personalInfo.email && personalValidationError) ? '#EF4444' : 'var(--border-color)'
-                      }} 
-                      value={resumeData.personalInfo.email || ''} 
+                      }}
+                      value={resumeData.personalInfo.email || ''}
                       onChange={(e) => {
                         updatePersonalInfo('email', e.target.value);
                         if (e.target.value) setPersonalValidationError('');
-                      }} 
+                      }}
                     />
-                    {isValidEmail(resumeData.personalInfo.email) && (
-                      <Check size={16} color="#10B981" style={{ position: 'absolute', right: '12px', top: '14px' }} />
+                    {resumeData.personalInfo.email && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('email', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Clear email"
+                      >
+                        <X size={12} />
+                      </button>
                     )}
                   </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Phone</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>Phone</label>
+                    {resumeData.personalInfo.phone && (
+                      <button type="button" onClick={() => updatePersonalInfo('phone', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete phone from template">
+                        <Trash2 size={11} /> Delete
+                      </button>
+                    )}
+                  </div>
                   <div style={{ position: 'relative' }}>
-                    <input style={{ ...inputStyle, width: '100%' }} value={resumeData.personalInfo.phone || ''} onChange={(e) => updatePersonalInfo('phone', e.target.value)} />
-                    {isValidPhone(resumeData.personalInfo.phone) && (
-                      <Check size={16} color="#10B981" style={{ position: 'absolute', right: '12px', top: '14px' }} />
+                    <input
+                      style={{ ...inputStyle, width: '100%', paddingRight: resumeData.personalInfo.phone ? '2.5rem' : '1.15rem' }}
+                      value={resumeData.personalInfo.phone || ''}
+                      placeholder="+1 (555) 000-0000"
+                      onChange={(e) => updatePersonalInfo('phone', e.target.value)}
+                    />
+                    {resumeData.personalInfo.phone && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('phone', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Delete phone from template"
+                      >
+                        <X size={12} />
+                      </button>
                     )}
                   </div>
                 </div>
               </div>
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Location</label>
-                  <input style={inputStyle} value={resumeData.personalInfo.location || ''} placeholder="e.g. San Francisco, CA" onChange={(e) => updatePersonalInfo('location', e.target.value)} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>Location</label>
+                    {resumeData.personalInfo.location && (
+                      <button type="button" onClick={() => updatePersonalInfo('location', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete location from template">
+                        <Trash2 size={11} /> Delete
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      style={{ ...inputStyle, width: '100%', paddingRight: resumeData.personalInfo.location ? '2.5rem' : '1.15rem' }}
+                      value={resumeData.personalInfo.location || ''}
+                      placeholder="e.g. San Francisco, CA"
+                      onChange={(e) => updatePersonalInfo('location', e.target.value)}
+                    />
+                    {resumeData.personalInfo.location && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('location', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Delete location from template"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>LinkedIn</label>
-                  <input style={inputStyle} value={resumeData.personalInfo.linkedin || ''} placeholder="linkedin.com/in/..." onChange={(e) => updatePersonalInfo('linkedin', e.target.value)} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>LinkedIn</label>
+                    {resumeData.personalInfo.linkedin && (
+                      <button type="button" onClick={() => updatePersonalInfo('linkedin', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete LinkedIn from template">
+                        <Trash2 size={11} /> Delete
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      style={{ ...inputStyle, width: '100%', paddingRight: resumeData.personalInfo.linkedin ? '2.5rem' : '1.15rem' }}
+                      value={resumeData.personalInfo.linkedin || ''}
+                      placeholder="linkedin.com/in/..."
+                      onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
+                    />
+                    {resumeData.personalInfo.linkedin && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('linkedin', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Delete LinkedIn from template"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="input-row" style={{ display: 'flex', gap: '1.5rem' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>GitHub</label>
-                  <input style={inputStyle} value={resumeData.personalInfo.github || ''} placeholder="github.com/..." onChange={(e) => updatePersonalInfo('github', e.target.value)} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>GitHub</label>
+                    {resumeData.personalInfo.github && (
+                      <button type="button" onClick={() => updatePersonalInfo('github', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete GitHub from template">
+                        <Trash2 size={11} /> Delete
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      style={{ ...inputStyle, width: '100%', paddingRight: resumeData.personalInfo.github ? '2.5rem' : '1.15rem' }}
+                      value={resumeData.personalInfo.github || ''}
+                      placeholder="github.com/..."
+                      onChange={(e) => updatePersonalInfo('github', e.target.value)}
+                    />
+                    {resumeData.personalInfo.github && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('github', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Delete GitHub from template"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={labelStyle}>Website / Portfolio</label>
-                  <input style={inputStyle} value={resumeData.personalInfo.website || ''} placeholder="e.g. portfolio.com" onChange={(e) => updatePersonalInfo('website', e.target.value)} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={labelStyle}>Website / Portfolio</label>
+                    {resumeData.personalInfo.website && (
+                      <button type="button" onClick={() => updatePersonalInfo('website', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete Website from template">
+                        <Trash2 size={11} /> Delete
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      style={{ ...inputStyle, width: '100%', paddingRight: resumeData.personalInfo.website ? '2.5rem' : '1.15rem' }}
+                      value={resumeData.personalInfo.website || ''}
+                      placeholder="e.g. portfolio.com"
+                      onChange={(e) => updatePersonalInfo('website', e.target.value)}
+                    />
+                    {resumeData.personalInfo.website && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('website', '')}
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }}
+                        title="Delete Website from template"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1351,37 +1548,48 @@ const BuilderFlow = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label style={labelStyle}>Professional Summary</label>
-                  <button 
-                    onClick={handlePrewrittenPhrases}
-                    style={{ background: 'transparent', border: 'none', color: '#18181B', fontWeight: 600, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
-                  >
-                    <Plus size={14} /> Pre-written phrases
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    {resumeData.personalInfo?.summary && (
+                      <button
+                        type="button"
+                        onClick={() => updatePersonalInfo('summary', '')}
+                        style={{ background: 'transparent', border: 'none', color: '#EF4444', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                      >
+                        <Trash2 size={13} /> Clear
+                      </button>
+                    )}
+                    <button
+                      onClick={handlePrewrittenPhrases}
+                      style={{ background: 'transparent', border: 'none', color: '#18181B', fontWeight: 600, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                    >
+                      <Plus size={14} /> Pre-written phrases
+                    </button>
+                  </div>
                 </div>
-                <textarea 
-                  style={{ minHeight: '200px', borderRadius: '4px', padding: '1rem', border: 'none', background: '#F1F5F9', outline: 'none', fontSize: '1.15rem', color: '#111827', resize: 'vertical' }} 
+                <textarea
+                  style={{ minHeight: '200px', borderRadius: '4px', padding: '1rem', border: 'none', background: '#F1F5F9', outline: 'none', fontSize: '1.15rem', color: '#111827', resize: 'vertical' }}
                   placeholder="e.g. Curious science teacher with 8+ years of experience..."
-                  value={resumeData.personalInfo?.summary || ''} 
-                  onChange={(e) => updatePersonalInfo('summary', e.target.value)} 
+                  value={resumeData.personalInfo?.summary || ''}
+                  onChange={(e) => updatePersonalInfo('summary', e.target.value)}
                 />
               </div>
-              <button 
+              <button
                 onClick={handleAIRewrite}
                 disabled={isGeneratingAI}
-                style={{ 
+                style={{
                   background: 'rgba(5, 150, 105, 0.08)',
-                  color: 'var(--primary)', 
-                  border: '1.5px solid rgba(5, 150, 105, 0.3)', 
-                  padding: '0.75rem 1.5rem', 
-                  borderRadius: '8px', 
-                  fontWeight: 800, 
+                  color: 'var(--primary)',
+                  border: '1.5px solid rgba(5, 150, 105, 0.3)',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '8px',
+                  fontWeight: 800,
                   fontSize: '1.1rem', // big text
                   fontFamily: 'inherit',
-                  cursor: isGeneratingAI ? 'not-allowed' : 'pointer', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  gap: '0.5rem', 
+                  cursor: isGeneratingAI ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
                   marginTop: '0.5rem',
                   alignSelf: 'flex-start', // compact width
                   opacity: isGeneratingAI ? 0.7 : 1,
@@ -1411,9 +1619,9 @@ const BuilderFlow = () => {
                     const isExpanded = index === activeExpIndex;
                     if (!isExpanded) {
                       return (
-                        <div 
-                          key={exp.id || index} 
-                          onClick={() => setActiveExpIndex(index)} 
+                        <div
+                          key={exp.id || index}
+                          onClick={() => setActiveExpIndex(index)}
                           className="premium-card" data-tag="exp_collapsed" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 1.5rem', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.9)' }}
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
@@ -1425,14 +1633,14 @@ const BuilderFlow = () => {
                             </span>
                           </div>
                           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <button 
+                            <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); setActiveExpIndex(index); }}
                               style={{ padding: '4px 10px', fontSize: '0.8rem', fontWeight: 600, border: '1px solid #E2E8F0', borderRadius: '4px', background: '#FFFFFF', color: '#18181B', cursor: 'pointer' }}
                             >
                               Edit
                             </button>
-                            <button 
+                            <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); removeExperience(index); }}
                               className="premium-btn-delete"
@@ -1445,12 +1653,36 @@ const BuilderFlow = () => {
                     }
 
                     return (
-                      <div 
-                        key={exp.id || index} 
+                      <div
+                        key={exp.id || index}
                         className="premium-card" data-tag="exp" style={{ position: 'relative' }}
                       >
-                        <button onClick={() => removeExperience(index)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-                          <Trash2 size={16} />
+                        <button 
+                          type="button"
+                          onClick={() => removeExperience(index)} 
+                          style={{
+                            position: 'absolute',
+                            top: '1rem',
+                            right: '1rem',
+                            background: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
+                            color: '#64748B',
+                            padding: '4px 9px',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            zIndex: 10,
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#1E293B'; }}
+                          onMouseOut={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#64748B'; }}
+                          title="Delete this role from template"
+                        >
+                          <Trash2 size={13} /> Delete Role
                         </button>
                         <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem', marginTop: '0.5rem' }}>
                           <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1464,15 +1696,59 @@ const BuilderFlow = () => {
                         </div>
                         <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                           <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={labelStyle}>Start & End Date</label>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <label style={labelStyle}>Start & End Date</label>
+                              {(exp.startDate || exp.endDate || exp.date) && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    updateExperience(index, 'startDate', '');
+                                    updateExperience(index, 'endDate', '');
+                                    updateExperience(index, 'date', '');
+                                  }}
+                                  style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
+                                  title="Delete dates from template"
+                                >
+                                  <Trash2 size={11} /> Delete Dates
+                                </button>
+                              )}
+                            </div>
                             <div style={{ display: 'flex', gap: '0.5rem', width: '100%', minWidth: 0 }}>
-                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={exp.startDate || ''} onChange={(e) => updateExperience(index, 'startDate', e.target.value)} />
-                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={exp.endDate || ''} onChange={(e) => updateExperience(index, 'endDate', e.target.value)} />
+                              <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                                <input style={{ ...inputStyle, width: '100%', minWidth: 0, paddingRight: exp.startDate ? '2rem' : '1.15rem' }} placeholder="MM / YYYY" value={exp.startDate || ''} onChange={(e) => updateExperience(index, 'startDate', e.target.value)} />
+                                {exp.startDate && (
+                                  <button type="button" onClick={() => updateExperience(index, 'startDate', '')} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }} title="Clear start date">
+                                    <X size={10} />
+                                  </button>
+                                )}
+                              </div>
+                              <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                                <input style={{ ...inputStyle, width: '100%', minWidth: 0, paddingRight: exp.endDate ? '2rem' : '1.15rem' }} placeholder="MM / YYYY" value={exp.endDate || ''} onChange={(e) => updateExperience(index, 'endDate', e.target.value)} />
+                                {exp.endDate && (
+                                  <button type="button" onClick={() => updateExperience(index, 'endDate', '')} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }} title="Clear end date">
+                                    <X size={10} />
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={labelStyle}>City, State</label>
-                            <input style={inputStyle} value={exp.location || ''} onChange={(e) => updateExperience(index, 'location', e.target.value)} />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <label style={labelStyle}>City, State</label>
+                              {exp.location && (
+                                <button type="button" onClick={() => updateExperience(index, 'location', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete city from template">
+                                  <Trash2 size={11} /> Delete
+                                </button>
+                              )}
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                              <input style={{ ...inputStyle, width: '100%', paddingRight: exp.location ? '2rem' : '1.15rem' }} value={exp.location || ''} onChange={(e) => updateExperience(index, 'location', e.target.value)} />
+                              {exp.location && (
+                                <button type="button" onClick={() => updateExperience(index, 'location', '')} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }} title="Clear location">
+                                  <X size={10} />
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1504,9 +1780,9 @@ const BuilderFlow = () => {
                     const isExpanded = index === activeEduIndex;
                     if (!isExpanded) {
                       return (
-                        <div 
-                          key={edu.id || index} 
-                          onClick={() => setActiveEduIndex(index)} 
+                        <div
+                          key={edu.id || index}
+                          onClick={() => setActiveEduIndex(index)}
                           className="premium-card" data-tag="exp_collapsed" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 1.5rem', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.9)' }}
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
@@ -1518,14 +1794,14 @@ const BuilderFlow = () => {
                             </span>
                           </div>
                           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <button 
+                            <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); setActiveEduIndex(index); }}
                               style={{ padding: '4px 10px', fontSize: '0.8rem', fontWeight: 700, border: '1.5px solid #18181B', borderRadius: '4px', background: '#FFFFFF', cursor: 'pointer' }}
                             >
                               Edit
                             </button>
-                            <button 
+                            <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); removeEducation(index); }}
                               className="premium-btn-delete"
@@ -1538,12 +1814,36 @@ const BuilderFlow = () => {
                     }
 
                     return (
-                      <div 
-                        key={edu.id || index} 
+                      <div
+                        key={edu.id || index}
                         className="premium-card" data-tag="education" style={{ position: 'relative' }}
                       >
-                        <button onClick={() => removeEducation(index)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-                          <Trash2 size={16} />
+                        <button 
+                          type="button"
+                          onClick={() => removeEducation(index)} 
+                          style={{
+                            position: 'absolute',
+                            top: '1rem',
+                            right: '1rem',
+                            background: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
+                            color: '#64748B',
+                            padding: '4px 9px',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            zIndex: 10,
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#1E293B'; }}
+                          onMouseOut={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#64748B'; }}
+                          title="Delete this degree from template"
+                        >
+                          <Trash2 size={13} /> Delete Degree
                         </button>
                         <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem', marginTop: '0.5rem' }}>
                           <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1557,15 +1857,59 @@ const BuilderFlow = () => {
                         </div>
                         <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                           <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={labelStyle}>Start & End Date</label>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <label style={labelStyle}>Start & End Date</label>
+                              {(edu.startDate || edu.endDate || edu.date) && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    updateEducation(index, 'startDate', '');
+                                    updateEducation(index, 'endDate', '');
+                                    updateEducation(index, 'date', '');
+                                  }}
+                                  style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
+                                  title="Delete dates from template"
+                                >
+                                  <Trash2 size={11} /> Delete Dates
+                                </button>
+                              )}
+                            </div>
                             <div style={{ display: 'flex', gap: '0.5rem', width: '100%', minWidth: 0 }}>
-                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={edu.startDate || ''} onChange={(e) => updateEducation(index, 'startDate', e.target.value)} />
-                              <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} placeholder="MM / YYYY" value={edu.endDate || ''} onChange={(e) => updateEducation(index, 'endDate', e.target.value)} />
+                              <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                                <input style={{ ...inputStyle, width: '100%', minWidth: 0, paddingRight: edu.startDate ? '2rem' : '1.15rem' }} placeholder="MM / YYYY" value={edu.startDate || ''} onChange={(e) => updateEducation(index, 'startDate', e.target.value)} />
+                                {edu.startDate && (
+                                  <button type="button" onClick={() => updateEducation(index, 'startDate', '')} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }} title="Clear start date">
+                                    <X size={10} />
+                                  </button>
+                                )}
+                              </div>
+                              <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                                <input style={{ ...inputStyle, width: '100%', minWidth: 0, paddingRight: edu.endDate ? '2rem' : '1.15rem' }} placeholder="MM / YYYY" value={edu.endDate || ''} onChange={(e) => updateEducation(index, 'endDate', e.target.value)} />
+                                {edu.endDate && (
+                                  <button type="button" onClick={() => updateEducation(index, 'endDate', '')} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }} title="Clear end date">
+                                    <X size={10} />
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div style={{ flex: '1 1 240px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={labelStyle}>City</label>
-                            <input style={inputStyle} value={edu.location || ''} onChange={(e) => updateEducation(index, 'location', e.target.value)} />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <label style={labelStyle}>City</label>
+                              {edu.location && (
+                                <button type="button" onClick={() => updateEducation(index, 'location', '')} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete city from template">
+                                  <Trash2 size={11} /> Delete
+                                </button>
+                              )}
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                              <input style={{ ...inputStyle, width: '100%', paddingRight: edu.location ? '2rem' : '1.15rem' }} value={edu.location || ''} onChange={(e) => updateEducation(index, 'location', e.target.value)} />
+                              {edu.location && (
+                                <button type="button" onClick={() => updateEducation(index, 'location', '')} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }} title="Clear city">
+                                  <X size={10} />
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1592,12 +1936,12 @@ const BuilderFlow = () => {
                   {resumeData.projects.map((proj, index) => {
                     const isExpanded = index === activeProjIndex;
                     const suggestedTechs = getSuggestedTechs(proj.name);
-                    
+
                     if (!isExpanded) {
                       return (
-                        <div 
-                          key={proj.id || index} 
-                          onClick={() => setActiveProjIndex(index)} 
+                        <div
+                          key={proj.id || index}
+                          onClick={() => setActiveProjIndex(index)}
                           className="premium-card" data-tag="exp_collapsed" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 1.5rem', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.9)' }}
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
@@ -1609,14 +1953,14 @@ const BuilderFlow = () => {
                             </span>
                           </div>
                           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <button 
+                            <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); setActiveProjIndex(index); }}
                               style={{ padding: '4px 10px', fontSize: '0.8rem', fontWeight: 700, border: '1.5px solid #18181B', borderRadius: '4px', background: '#FFFFFF', cursor: 'pointer' }}
                             >
                               Edit
                             </button>
-                            <button 
+                            <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); removeItem('projects', proj.id); }}
                               className="premium-btn-delete"
@@ -1629,12 +1973,36 @@ const BuilderFlow = () => {
                     }
 
                     return (
-                      <div 
-                        key={proj.id || index} 
+                      <div
+                        key={proj.id || index}
                         className="premium-card" data-tag="project" style={{ position: 'relative' }}
                       >
-                        <button onClick={() => removeItem('projects', proj.id)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-                          <Trash2 size={16} />
+                        <button 
+                          type="button"
+                          onClick={() => removeItem('projects', proj.id)} 
+                          style={{
+                            position: 'absolute',
+                            top: '1rem',
+                            right: '1rem',
+                            background: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
+                            color: '#64748B',
+                            padding: '4px 9px',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            zIndex: 10,
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#1E293B'; }}
+                          onMouseOut={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#64748B'; }}
+                          title="Delete this project from template"
+                        >
+                          <Trash2 size={13} /> Delete Project
                         </button>
                         <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', marginTop: '0.5rem' }}>
                           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1642,8 +2010,22 @@ const BuilderFlow = () => {
                             <input style={inputStyle} value={proj.name || ''} onChange={(e) => updateItem('projects', proj.id, { name: e.target.value })} />
                           </div>
                           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={labelStyle}>Duration</label>
-                            <input style={inputStyle} value={proj.duration || ''} onChange={(e) => updateItem('projects', proj.id, { duration: e.target.value })} />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <label style={labelStyle}>Duration / Dates</label>
+                              {(proj.duration || proj.date) && (
+                                <button type="button" onClick={() => updateItem('projects', proj.id, { duration: '', date: '' })} style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }} title="Delete duration from template">
+                                  <Trash2 size={11} /> Delete
+                                </button>
+                              )}
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                              <input style={{ ...inputStyle, width: '100%', paddingRight: (proj.duration || proj.date) ? '2rem' : '1.15rem' }} value={proj.duration || proj.date || ''} onChange={(e) => updateItem('projects', proj.id, { duration: e.target.value, date: e.target.value })} />
+                              {(proj.duration || proj.date) && (
+                                <button type="button" onClick={() => updateItem('projects', proj.id, { duration: '', date: '' })} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', cursor: 'pointer', padding: 0 }} title="Clear duration">
+                                  <X size={10} />
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -1737,7 +2119,7 @@ const BuilderFlow = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <label style={labelStyle}>Description / Bullet Points</label>
-                            <button 
+                            <button
                               onClick={async () => {
                                 if (!proj.name || !proj.technologies) {
                                   return;
@@ -1753,9 +2135,9 @@ const BuilderFlow = () => {
                                 }
                               }}
                               disabled={isGeneratingAI}
-                              style={{ 
-                                background: 'transparent', border: 'none', color: '#059669', 
-                                fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: isGeneratingAI ? 'wait' : 'pointer' 
+                              style={{
+                                background: 'transparent', border: 'none', color: '#059669',
+                                fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: isGeneratingAI ? 'wait' : 'pointer'
                               }}
                             >
                               <Zap size={14} /> Generate Impact Bullets
@@ -1789,13 +2171,27 @@ const BuilderFlow = () => {
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     {/* Category heading */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                      <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#1E293B' }}>
-                        {label}
-                      </h4>
-                      <span style={{ fontSize: '0.75rem', color: '#475569', fontWeight: 500 }}>
-                        ({categorySkills.length})
-                      </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#1E293B' }}>
+                          {label}
+                        </h4>
+                        <span style={{ fontSize: '0.75rem', color: '#475569', fontWeight: 500 }}>
+                          ({categorySkills.length})
+                        </span>
+                      </div>
+                      {categorySkills.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedSkills = { ...(resumeData.skills || {}), [key]: [] };
+                            updateSection('skills', updatedSkills);
+                          }}
+                          style={{ background: 'transparent', border: 'none', color: '#EF4444', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
+                        >
+                          <Trash2 size={12} /> Clear
+                        </button>
+                      )}
                     </div>
 
                     <CreatableSelect
@@ -1810,11 +2206,11 @@ const BuilderFlow = () => {
                         const updatedSkills = { ...resumeData.skills };
                         const prevSkills = resumeData.skills?.[key] || [];
                         const newSkillsValues = newValues ? newValues.map(v => v.value) : [];
-                        
-                        const addedSkillName = newSkillsValues.find(val => 
+
+                        const addedSkillName = newSkillsValues.find(val =>
                           !prevSkills.some(s => (typeof s === 'object' ? s.name : s) === val)
                         );
-                        
+
                         if (addedSkillName) {
                           let targetCat = key;
                           const techLower = addedSkillName.toLowerCase();
@@ -1824,7 +2220,7 @@ const BuilderFlow = () => {
                               break;
                             }
                           }
-                          
+
                           if (targetCat !== key) {
                             const targetCatList = resumeData.skills?.[targetCat] || [];
                             if (!targetCatList.some(s => (typeof s === 'object' ? s.name : s).toLowerCase() === techLower)) {
@@ -1846,7 +2242,7 @@ const BuilderFlow = () => {
                             return existing || { name: v.value, level: 80 };
                           }) : [];
                         }
-                        
+
                         updateSection('skills', updatedSkills);
                       }}
                       menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
@@ -1903,8 +2299,32 @@ const BuilderFlow = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {resumeData.certifications?.map((cert) => (
                 <div key={cert.id} className="premium-card" data-tag="active_block" style={{ position: 'relative' }}>
-                  <button onClick={() => removeItem('certifications', cert.id)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-                    <Trash2 size={16} />
+                  <button
+                    type="button"
+                    onClick={() => removeItem('certifications', cert.id)}
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      color: '#64748B',
+                      padding: '4px 9px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      zIndex: 10,
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseOver={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#1E293B'; }}
+                    onMouseOut={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#64748B'; }}
+                    title="Delete this certification from template"
+                  >
+                    <Trash2 size={13} /> Delete
                   </button>
                   <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
                     <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1927,8 +2347,32 @@ const BuilderFlow = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {resumeData.languages?.map((lang) => (
                 <div key={lang.id} className="premium-card" data-tag="active_block" style={{ position: 'relative' }}>
-                  <button onClick={() => removeItem('languages', lang.id)} className="premium-btn-delete" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-                    <Trash2 size={16} />
+                  <button
+                    type="button"
+                    onClick={() => removeItem('languages', lang.id)}
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      background: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      color: '#64748B',
+                      padding: '4px 9px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      zIndex: 10,
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseOver={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#1E293B'; }}
+                    onMouseOut={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#64748B'; }}
+                    title="Delete this language from template"
+                  >
+                    <Trash2 size={13} /> Delete
                   </button>
                   <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -1951,18 +2395,18 @@ const BuilderFlow = () => {
                       <span style={{ fontSize: '0.75rem', color: '#334155', fontWeight: 500 }}>Confidence Level</span>
                       <span style={{ fontSize: '0.75rem', color: '#18181B', fontWeight: 600 }}>{lang.level || 80}%</span>
                     </div>
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="100" 
-                      value={lang.level || 80} 
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={lang.level || 80}
                       onChange={(e) => {
                         const levelVal = parseInt(e.target.value);
-                        updateItem('languages', lang.id, { 
+                        updateItem('languages', lang.id, {
                           level: levelVal,
                           proficiency: levelVal >= 90 ? 'Native' : levelVal >= 75 ? 'Fluent' : levelVal >= 50 ? 'Conversational' : 'Basic'
                         });
-                      }} 
+                      }}
                       style={{ width: '100%', height: '5px', background: '#E2E8F0', borderRadius: '3px', outline: 'none', accentColor: '#1E293B', cursor: 'pointer' }}
                     />
                   </div>
@@ -2087,9 +2531,9 @@ const BuilderFlow = () => {
           {/* Custom Accent Color Picker */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid #E2E8F0' }}>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Custom Accent Hex Color:</span>
-            <input 
-              type="color" 
-              value={resumeData.settings?.primaryColor || '#6366F1'} 
+            <input
+              type="color"
+              value={resumeData.settings?.primaryColor || '#6366F1'}
               onChange={(e) => {
                 updateSettings('primaryColor', e.target.value);
                 updateSettings('secondaryColor', e.target.value);
@@ -2118,7 +2562,7 @@ const BuilderFlow = () => {
           <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <label style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Font Family</label>
-              <select 
+              <select
                 value={resumeData.settings?.fontFamily || 'Inter'}
                 onChange={(e) => updateSettings('fontFamily', e.target.value)}
                 style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1.5px solid #CBD5E1', background: '#FFFFFF', outline: 'none', fontSize: '0.95rem', color: '#1E293B', fontWeight: 500 }}
@@ -2214,9 +2658,9 @@ const BuilderFlow = () => {
               const isChecked = resumeData.settings?.[sec.key] !== false;
               return (
                 <label key={sec.key} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.5rem 0.75rem', borderRadius: '8px', background: '#F8FAFC', border: '1px solid #E2E8F0', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600, color: '#334155' }}>
-                  <input 
-                    type="checkbox" 
-                    checked={isChecked} 
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
                     onChange={(e) => updateSettings(sec.key, e.target.checked)}
                     style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
                   />
@@ -2316,7 +2760,7 @@ const BuilderFlow = () => {
   );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
@@ -2461,8 +2905,8 @@ const BuilderFlow = () => {
           transition: all 0.15s ease;
         }
         .premium-btn-delete:hover {
-          background: #FEF2F2;
-          color: #EF4444;
+          background: #F1F5F9;
+          color: #1E293B;
         }
 
         /* Pill chips */
@@ -2481,9 +2925,9 @@ const BuilderFlow = () => {
           transition: all 0.15s ease;
         }
         .premium-pill:hover {
-          border-color: #FCA5A5;
-          background: #FEF2F2;
-          color: #EF4444;
+          border-color: #CBD5E1;
+          background: #F1F5F9;
+          color: #1E293B;
         }
 
         /* Paper stack card for login / forms outside studio */
@@ -2520,7 +2964,7 @@ const BuilderFlow = () => {
       <header style={{ height: '64px', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', position: 'relative', zIndex: 20 }}>
         {/* Left: Home & Start Fresh */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button 
+          <button
             onClick={() => setShowExitConfirm(true)}
             className="studio-back-btn"
           >
@@ -2545,38 +2989,90 @@ const BuilderFlow = () => {
               gap: '4px',
               transition: 'all 0.15s ease'
             }}
-            onMouseOver={(e) => { e.currentTarget.style.background = '#FEF2F2'; e.currentTarget.style.borderColor = '#FCA5A5'; e.currentTarget.style.color = '#EF4444'; }}
+            onMouseOver={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.borderColor = '#94A3B8'; e.currentTarget.style.color = '#1E293B'; }}
             onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.color = '#475569'; }}
           >
             <RotateCcw size={13} /> Start Fresh
           </button>
+
+          <button
+            type="button"
+            onClick={loadSampleData}
+            title="Pre-fill template with rich sample data"
+            style={{
+              background: 'var(--primary-light)',
+              border: '1px solid var(--primary-border)',
+              borderRadius: '8px',
+              padding: '5px 11px',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              color: 'var(--primary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#FFFFFF'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'var(--primary-light)'; e.currentTarget.style.color = 'var(--primary)'; }}
+          >
+            <FileText size={13} /> Load Sample
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm("Are you sure you want to clear all resume blocks to blank?")) {
+                clearAllData();
+              }
+            }}
+            title="Clear all fields and blocks to start blank"
+            style={{
+              background: 'transparent',
+              border: '1px solid #CBD5E1',
+              borderRadius: '8px',
+              padding: '5px 11px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              color: '#64748B',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.borderColor = '#94A3B8'; e.currentTarget.style.color = '#1E293B'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.color = '#64748B'; }}
+          >
+            <Trash2 size={13} /> Clear All
+          </button>
         </div>
 
         {/* Center: 3-Way Mode Switcher (Content / Customize / Templates) */}
-        <div style={{ 
-          position: 'absolute', 
-          left: '50%', 
-          transform: 'translateX(-50%)', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.75rem', 
-          zIndex: 25 
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          zIndex: 25
         }}>
           <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: '24px', padding: '4px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <button 
-              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+            <button
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'edit' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'edit' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }}
               onClick={() => setLeftPaneMode('edit')}
             >
               Content
             </button>
-            <button 
-              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+            <button
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'customize' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'customize' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }}
               onClick={() => setLeftPaneMode('customize')}
             >
               Customize
             </button>
-            <button 
-              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'templates' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'templates' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }} 
+            <button
+              style={{ padding: '6px 18px', borderRadius: '20px', border: 'none', background: leftPaneMode === 'templates' ? 'var(--primary)' : 'transparent', color: leftPaneMode === 'templates' ? '#FFFFFF' : '#64748B', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.15s ease' }}
               onClick={() => setLeftPaneMode('templates')}
             >
               Templates
@@ -2641,7 +3137,7 @@ const BuilderFlow = () => {
             )}
           </div>
 
-          <button 
+          <button
             onClick={handleOpenDownloadModal}
             style={{
               padding: '0.5rem 1.25rem',
@@ -2668,33 +3164,33 @@ const BuilderFlow = () => {
 
       {/* Main Split Layout: Editor takes ~62% space for maximum clarity */}
       <div className={'builder-layout mobile-tab-' + mobileTab} style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        
+
         {/* Left Pane — Editing Form (Expanded Width ~62%) */}
-        <div className="editor-container builder-sidebar" style={{ 
-          flex: '1.4 1 0%', 
+        <div className="editor-container builder-sidebar" style={{
+          flex: '1.4 1 0%',
           minWidth: 0,
-          borderRight: '1.5px solid #E2E8F0', 
-          display: 'flex', 
-          flexDirection: 'column', 
+          borderRight: '1.5px solid #E2E8F0',
+          display: 'flex',
+          flexDirection: 'column',
           background: 'var(--bg-color)',
           backgroundImage: 'linear-gradient(rgba(226, 232, 240, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(226, 232, 240, 0.4) 1px, transparent 1px)',
           backgroundSize: '24px 24px',
-          position: 'relative', 
+          position: 'relative',
           overflow: 'hidden',
           boxShadow: '6px 0 25px rgba(15, 23, 42, 0.04)',
           zIndex: 5
         }}>
-          
+
           {/* Abstract Gradient Mesh Background (Home Page Colors) */}
           <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '450px', height: '450px', background: 'radial-gradient(circle, rgba(67, 56, 202, 0.12) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: '-5%', right: '10%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', top: '30%', left: '-10%', width: '350px', height: '350px', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.06) 0%, rgba(255,255,255,0) 65%)', filter: 'blur(40px)', zIndex: 0, pointerEvents: 'none' }} />
-          
+
           <div style={{ flex: 1, overflowY: 'auto', padding: '2rem 2.5rem 100px 2.5rem', position: 'relative', zIndex: 10 }}>
-            {leftPaneMode === 'edit' 
-              ? (showAIAudit ? renderAIAuditPanel() : renderEditForm()) 
-              : leftPaneMode === 'templates' 
-                ? renderTemplatesPanel() 
+            {leftPaneMode === 'edit'
+              ? (showAIAudit ? renderAIAuditPanel() : renderEditForm())
+              : leftPaneMode === 'templates'
+                ? renderTemplatesPanel()
                 : renderCustomizePanel()}
           </div>
 
@@ -2765,14 +3261,14 @@ const BuilderFlow = () => {
               position: 'relative',
               flexShrink: 0
             }}>
-              <div 
+              <div
                 ref={previewContentRef}
-                style={{ 
-                  width: '800px', 
+                style={{
+                  width: '800px',
                   minHeight: '1131px',
                   height: 'auto',
                   transform: `scale(${previewScale})`,
-                  transformOrigin: 'top left', 
+                  transformOrigin: 'top left',
                   background: '#FFFFFF',
                   boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.1)',
                   position: 'relative'
@@ -2782,13 +3278,13 @@ const BuilderFlow = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Dynamic Page Counter Indicator */}
           {(() => {
             const calculatedTotalPages = Math.max(1, Math.ceil((contentHeight || 1131) / 1131.42857));
             return (
               <div style={{ position: 'sticky', bottom: '1.5rem', marginTop: '-3rem', zIndex: 10, background: '#0F172A', color: '#FFF', padding: '6px 18px', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 4px 14px rgba(15,23,42,0.2)' }}>
-                <span style={{ opacity: 0.7 }}><ChevronLeft size={16} /></span> 
+                <span style={{ opacity: 0.7 }}><ChevronLeft size={16} /></span>
                 <span>A4 Document Size: <strong style={{ color: '#38BDF8' }}>{calculatedTotalPages} {calculatedTotalPages === 1 ? 'Page' : 'Pages'}</strong></span>
                 <span style={{ opacity: 0.7 }}><ChevronRight size={16} /></span>
               </div>
@@ -2821,7 +3317,7 @@ const BuilderFlow = () => {
               transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
               style={{
-                background: '#FFFFFF', 
+                background: '#FFFFFF',
                 border: '1px solid var(--border-color)',
                 borderRadius: '24px',
                 padding: '2.5rem',
@@ -2918,34 +3414,33 @@ const BuilderFlow = () => {
                   color: 'var(--text-muted)',
                   cursor: 'pointer',
                   padding: '6px',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  borderRadius: '8px'
                 }}
               >
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleConfirmDownloadPDF} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <form onSubmit={handlePDFDownloadSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div>
-                <label className="aura-label" style={{ fontWeight: 700, marginBottom: '0.45rem', display: 'block' }}>
-                  Draft Title
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
+                  File Name
                 </label>
-                <input
-                  type="text"
-                  className="aura-input"
-                  value={downloadDraftTitle}
-                  onChange={(e) => setDownloadDraftTitle(e.target.value)}
-                  placeholder="e.g. Senior Developer Resume - Aug 2026"
-                  required
-                  autoFocus
-                  style={{ height: '48px', fontSize: '0.95rem' }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    value={pdfFilename}
+                    onChange={(e) => setPdfFilename(e.target.value)}
+                    placeholder="e.g. John_Doe_Resume"
+                    className="aura-input"
+                    style={{ width: '100%', paddingRight: '3.5rem', fontWeight: 600 }}
+                    autoFocus
+                  />
+                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, pointerEvents: 'none' }}>
+                    .pdf
+                  </span>
+                </div>
               </div>
-
-
 
               <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button

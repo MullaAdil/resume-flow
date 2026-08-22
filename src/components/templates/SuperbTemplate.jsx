@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Mail,
   Phone,
@@ -11,24 +10,40 @@ import {
 } from "lucide-react";
 
 const SuperbTemplate = ({ resumeData }) => {
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    projects,
-    settings = {},
-  } = resumeData;
-  const marginPadding =
-    settings.margins === "Compact"
-      ? "1.5rem 2rem"
-      : settings.margins === "Spacious"
-        ? "3rem 3.5rem"
-        : "2rem 2.5rem";
+  const data = resumeData || {};
+  const personalInfo = data.personalInfo || {};
+  const settings = data.settings || {};
 
-  const headerBg = "#1f2937"; // Slate/Charcoal
-  const contactBg = "#14b8a6"; // Teal
-  const accentColor = settings.primaryColor || "#f43f5e"; // Coral
+  const headerBg = "#1f2937";
+  const contactBg = "#14b8a6";
+  const accentColor = settings.primaryColor || "#f43f5e";
+
+  const experience = (Array.isArray(data.experience) && data.experience.length > 0 && data.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? data.experience
+    : [];
+
+  const education = (Array.isArray(data.education) && data.education.length > 0 && data.education.some(e => e && (e.school || e.degree)))
+    ? data.education
+    : [];
+
+  const projects = (Array.isArray(data.projects) && data.projects.length > 0 && data.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? data.projects
+    : [];
+
+  const getSkillsArray = () => {
+    const raw = data.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) {
+      return raw.map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+    }
+    if (typeof raw === 'object') {
+      return Object.values(raw).flat().map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+    }
+    return [];
+  };
+  const activeSkills = getSkillsArray();
+
+  const hasContacts = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin || personalInfo.github;
 
   return (
     <div
@@ -41,87 +56,97 @@ const SuperbTemplate = ({ resumeData }) => {
         color: "#333",
         display: "flex",
         flexDirection: "column",
+        boxSizing: "border-box",
       }}
     >
       {/* Top Header Block */}
-      <div
-        style={{
-          background: headerBg,
-          color: "white",
-          padding: "3rem 4rem 2rem 4rem",
-        }}
-      >
-        <h1
+      {(personalInfo.fullName || personalInfo.jobTitle || (settings.showSummary !== false && personalInfo.summary)) && (
+        <div
           style={{
-            fontSize: "2.5rem",
-            fontWeight: "normal",
-            margin: "0 0 0.5rem 0",
+            background: headerBg,
+            color: "white",
+            padding: "3rem 4rem 2rem 4rem",
           }}
         >
-          {personalInfo.fullName}
-        </h1>
-        <h2
-          style={{
-            fontSize: "1rem",
-            fontWeight: "bold",
-            margin: "0 0 1.5rem 0",
-            opacity: 0.9,
-          }}
-        >
-          {personalInfo.jobTitle}
-        </h2>
+          {personalInfo.fullName && (
+            <h1
+              style={{
+                fontSize: "2.5rem",
+                fontWeight: "normal",
+                margin: "0 0 0.5rem 0",
+              }}
+            >
+              {personalInfo.fullName}
+            </h1>
+          )}
+          {personalInfo.jobTitle && (
+            <h2
+              style={{
+                fontSize: "1rem",
+                fontWeight: "bold",
+                margin: "0 0 1.5rem 0",
+                opacity: 0.9,
+              }}
+            >
+              {personalInfo.jobTitle}
+            </h2>
+          )}
 
-        {personalInfo.summary && (
-          <p
-            style={{
-              lineHeight: 1.5,
-              fontSize: "0.85rem",
-              opacity: 0.85,
-              margin: 0,
-            }}
-          >
-            {personalInfo.summary}
-          </p>
-        )}
-      </div>
+          {settings.showSummary !== false && personalInfo.summary && (
+            <p
+              style={{
+                lineHeight: 1.5,
+                fontSize: "0.85rem",
+                opacity: 0.85,
+                margin: 0,
+              }}
+            >
+              {personalInfo.summary}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Contact Bar */}
-      <div
-        style={{
-          background: contactBg,
-          padding: "1rem 4rem",
-          display: "flex",
-          justifyContent: "center",
-          gap: "2rem",
-          color: "white",
-          fontSize: "0.85rem",
-        }}
-      >
-        {personalInfo.email && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Mail size={14} /> {personalInfo.email}
-          </div>
-        )}
-        {personalInfo.phone && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Phone size={14} /> {personalInfo.phone}
-          </div>
-        )}
-        {personalInfo.location && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <MapPin size={14} /> {personalInfo.location}
-          </div>
-        )}
-        {personalInfo.website && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Globe size={14} /> {personalInfo.website}
-          </div>
-        )}
-      </div>
+      {hasContacts && (
+        <div
+          style={{
+            background: contactBg,
+            padding: "1rem 4rem",
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            gap: "2rem",
+            color: "white",
+            fontSize: "0.85rem",
+          }}
+        >
+          {personalInfo.email && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Mail size={14} /> {personalInfo.email}
+            </div>
+          )}
+          {personalInfo.phone && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Phone size={14} /> {personalInfo.phone}
+            </div>
+          )}
+          {personalInfo.location && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <MapPin size={14} /> {personalInfo.location}
+            </div>
+          )}
+          {(personalInfo.website || personalInfo.linkedin || personalInfo.github) && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <Globe size={14} /> {personalInfo.website || personalInfo.linkedin || personalInfo.github}
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{ padding: "3rem 4rem" }}>
         {/* Education */}
-        {education.length > 0 && (
+        {settings.showEducation !== false && education.length > 0 && (
           <div style={{ marginBottom: "2.5rem" }}>
             <h3
               style={{
@@ -152,8 +177,8 @@ const SuperbTemplate = ({ resumeData }) => {
               </div>
               Education
             </h3>
-            {education.map((edu) => (
-              <div key={edu.id} style={{ marginBottom: "1rem" }}>
+            {education.map((edu, idx) => (
+              <div key={edu.id || idx} style={{ marginBottom: "1rem" }}>
                 <div
                   style={{
                     fontWeight: "bold",
@@ -161,7 +186,7 @@ const SuperbTemplate = ({ resumeData }) => {
                     color: "#111",
                   }}
                 >
-                  {edu.school}
+                  {edu.school || edu.institution}
                 </div>
                 <div
                   style={{
@@ -171,17 +196,19 @@ const SuperbTemplate = ({ resumeData }) => {
                   }}
                 >
                   <div style={{ fontSize: "0.85rem", color: "#333" }}>
-                    {edu.degree}
+                    {edu.degree || edu.fieldOfStudy || ''}
                   </div>
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      color: accentColor,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {edu.date}
-                  </span>
+                  {(edu.date || edu.startDate || edu.endDate) && (
+                    <span
+                      style={{
+                        fontSize: "0.85rem",
+                        color: accentColor,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {edu.date || (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : edu.startDate || edu.endDate)}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
@@ -189,7 +216,7 @@ const SuperbTemplate = ({ resumeData }) => {
         )}
 
         {/* Experience */}
-        {experience.length > 0 && (
+        {settings.showExperience !== false && experience.length > 0 && (
           <div style={{ marginBottom: "2.5rem" }}>
             <h3
               style={{
@@ -221,8 +248,8 @@ const SuperbTemplate = ({ resumeData }) => {
               Experience
             </h3>
 
-            {experience.map((exp) => (
-              <div key={exp.id} style={{ marginBottom: "1.5rem" }}>
+            {experience.map((exp, idx) => (
+              <div key={exp.id || idx} style={{ marginBottom: "1.5rem" }}>
                 <div
                   style={{
                     fontWeight: "bold",
@@ -242,50 +269,54 @@ const SuperbTemplate = ({ resumeData }) => {
                   }}
                 >
                   <div style={{ fontSize: "0.85rem", color: "#111" }}>
-                    {exp.title}
+                    {exp.title || exp.jobTitle}
                   </div>
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      color: accentColor,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {exp.date}
-                  </span>
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#334155",
-                    lineHeight: 1.5,
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {exp.description.split("\n").map((line, i) =>
-                    line.trim().length > 0 ? (
-                      <div
-                        key={i}
-                        style={{
-                          display: "flex",
-                          gap: "0.5rem",
-                          marginBottom: "0.3rem",
-                        }}
-                      >
-                        <span style={{ color: accentColor }}>•</span>{" "}
-                        <span>{line}</span>
-                      </div>
-                    ) : null,
+                  {(exp.date || exp.startDate || exp.endDate) && (
+                    <span
+                      style={{
+                        fontSize: "0.85rem",
+                        color: accentColor,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {exp.date || (exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : exp.startDate || exp.endDate)}
+                    </span>
                   )}
                 </div>
+
+                {exp.description && (
+                  <div
+                    style={{
+                      fontSize: "0.85rem",
+                      color: "#334155",
+                      lineHeight: 1.5,
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {exp.description.split("\n").map((line, i) =>
+                      line.trim().length > 0 ? (
+                        <div
+                          key={i}
+                          style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                            marginBottom: "0.3rem",
+                          }}
+                        >
+                          <span style={{ color: accentColor }}>•</span>{" "}
+                          <span>{line}</span>
+                        </div>
+                      ) : null,
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
 
         {/* Projects */}
-        {settings.showProjects !== false && projects && projects.length > 0 && (
+        {settings.showProjects !== false && projects.length > 0 && (
           <div style={{ marginBottom: "2.5rem" }}>
             <h3
               style={{
@@ -316,8 +347,8 @@ const SuperbTemplate = ({ resumeData }) => {
               </div>
               Projects
             </h3>
-            {projects.map((proj) => (
-              <div key={proj.id} style={{ marginBottom: "1.5rem" }}>
+            {projects.map((proj, idx) => (
+              <div key={proj.id || idx} style={{ marginBottom: "1.5rem" }}>
                 <div
                   style={{
                     fontWeight: "bold",
@@ -339,15 +370,17 @@ const SuperbTemplate = ({ resumeData }) => {
                   <div style={{ fontSize: "0.85rem", color: "#111" }}>
                     {proj.technologies}
                   </div>
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      color: accentColor,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {proj.duration || proj.date}
-                  </span>
+                  {(proj.duration || proj.date) && (
+                    <span
+                      style={{
+                        fontSize: "0.85rem",
+                        color: accentColor,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {proj.duration || proj.date}
+                    </span>
+                  )}
                 </div>
                 {proj.description && (
                   <div
@@ -381,7 +414,7 @@ const SuperbTemplate = ({ resumeData }) => {
         )}
 
         {/* Skills */}
-        {skills.length > 0 && (
+        {settings.showSkills !== false && activeSkills.length > 0 && (
           <div style={{ marginBottom: "2.5rem" }}>
             <h3
               style={{
@@ -413,7 +446,7 @@ const SuperbTemplate = ({ resumeData }) => {
               Skills
             </h3>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-              {skills.map((skill, index) => (
+              {activeSkills.map((skill, index) => (
                 <span
                   key={index}
                   style={{

@@ -2,14 +2,10 @@ import React from "react";
 import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
 const MultiColorTemplate = ({ resumeData }) => {
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    projects,
-    settings = {},
-  } = resumeData;
+  const data = resumeData || {};
+  const personalInfo = data.personalInfo || {};
+  const settings = data.settings || {};
+
   const marginPadding =
     settings.margins === "Compact"
       ? "1.5rem 2rem"
@@ -17,8 +13,35 @@ const MultiColorTemplate = ({ resumeData }) => {
         ? "3rem 3.5rem"
         : "2rem 2.5rem";
 
-  const blueColor = settings.primaryColor || "#1e40af"; // Dark blue used for text
-  const badgeColor = "#1d4ed8"; // Blue used for badges
+  const blueColor = settings.primaryColor || "#1e40af";
+  const badgeColor = "#1d4ed8";
+
+  const experience = (Array.isArray(data.experience) && data.experience.length > 0 && data.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? data.experience
+    : [];
+
+  const education = (Array.isArray(data.education) && data.education.length > 0 && data.education.some(e => e && (e.school || e.degree)))
+    ? data.education
+    : [];
+
+  const projects = (Array.isArray(data.projects) && data.projects.length > 0 && data.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? data.projects
+    : [];
+
+  const getSkillsArray = () => {
+    const raw = data.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) {
+      return raw.map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+    }
+    if (typeof raw === 'object') {
+      return Object.values(raw).flat().map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+    }
+    return [];
+  };
+  const activeSkills = getSkillsArray();
+
+  const hasContacts = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin || personalInfo.github;
 
   return (
     <div
@@ -30,73 +53,85 @@ const MultiColorTemplate = ({ resumeData }) => {
         padding: marginPadding,
         fontFamily: "var(--resume-font-family, inherit)",
         color: "#333",
+        boxSizing: "border-box",
       }}
     >
       {/* Header */}
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h1
-          style={{
-            fontSize: "2.5rem",
-            fontWeight: "normal",
-            color: blueColor,
-            marginBottom: "0.5rem",
-          }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        <div
-          style={{
-            width: "100%",
-            height: "1px",
-            background: "#cbd5e1",
-            marginBottom: "0.5rem",
-          }}
-        ></div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "1.5rem",
-            color: "#475569",
-            fontSize: "0.85rem",
-            flexWrap: "wrap",
-            background: "#f8fafc",
-            padding: "0.5rem 0",
-          }}
-        >
-          {personalInfo.phone && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+      {(personalInfo.fullName || hasContacts) && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          {personalInfo.fullName && (
+            <h1
+              style={{
+                fontSize: "2.5rem",
+                fontWeight: "normal",
+                color: blueColor,
+                marginBottom: "0.5rem",
+              }}
             >
-              <Phone size={14} color="#64748b" /> {personalInfo.phone}
+              {personalInfo.fullName}
+            </h1>
+          )}
+          {personalInfo.jobTitle && (
+            <div style={{ fontSize: "1rem", color: "#64748b", fontWeight: 600, marginBottom: "0.5rem" }}>
+              {personalInfo.jobTitle}
             </div>
           )}
-          {personalInfo.email && (
+          <div
+            style={{
+              width: "100%",
+              height: "1px",
+              background: "#cbd5e1",
+              marginBottom: "0.5rem",
+            }}
+          ></div>
+          {hasContacts && (
             <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "1.5rem",
+                color: "#475569",
+                fontSize: "0.85rem",
+                flexWrap: "wrap",
+                background: "#f8fafc",
+                padding: "0.5rem 0",
+              }}
             >
-              <Mail size={14} color="#64748b" /> {personalInfo.email}
-            </div>
-          )}
-          {personalInfo.location && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-            >
-              <MapPin size={14} color="#64748b" /> {personalInfo.location}
-            </div>
-          )}
-          {personalInfo.website && (
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
-            >
-              <Globe size={14} color="#64748b" /> {personalInfo.website}
+              {personalInfo.phone && (
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+                >
+                  <Phone size={14} color="#64748b" /> {personalInfo.phone}
+                </div>
+              )}
+              {personalInfo.email && (
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+                >
+                  <Mail size={14} color="#64748b" /> {personalInfo.email}
+                </div>
+              )}
+              {personalInfo.location && (
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+                >
+                  <MapPin size={14} color="#64748b" /> {personalInfo.location}
+                </div>
+              )}
+              {(personalInfo.website || personalInfo.linkedin || personalInfo.github) && (
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}
+                >
+                  <Globe size={14} color="#64748b" /> {personalInfo.website || personalInfo.linkedin || personalInfo.github}
+                </div>
+              )}
             </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Summary */}
-      {personalInfo.summary && (
+      {settings.showSummary !== false && personalInfo.summary && (
         <div style={{ marginBottom: "1.5rem" }}>
           <h3
             style={{
@@ -110,14 +145,14 @@ const MultiColorTemplate = ({ resumeData }) => {
           >
             Professional Summary
           </h3>
-          <p style={{ lineHeight: 1.5, fontSize: "0.85rem", color: "#1f2937" }}>
+          <p style={{ lineHeight: 1.5, fontSize: "0.85rem", color: "#1f2937", margin: 0 }}>
             {personalInfo.summary}
           </p>
         </div>
       )}
 
       {/* Skills */}
-      {skills.length > 0 && (
+      {settings.showSkills !== false && activeSkills.length > 0 && (
         <div style={{ marginBottom: "1.5rem" }}>
           <h3
             style={{
@@ -132,7 +167,7 @@ const MultiColorTemplate = ({ resumeData }) => {
             Skills
           </h3>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            {skills.map((skill, index) => (
+            {activeSkills.map((skill, index) => (
               <span
                 key={index}
                 style={{
@@ -149,8 +184,100 @@ const MultiColorTemplate = ({ resumeData }) => {
         </div>
       )}
 
+      {/* Experience */}
+      {settings.showExperience !== false && experience.length > 0 && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          <h3
+            style={{
+              fontSize: "1.1rem",
+              fontWeight: "bold",
+              color: blueColor,
+              borderBottom: "1px solid #cbd5e1",
+              paddingBottom: "0.2rem",
+              marginBottom: "0.8rem",
+            }}
+          >
+            Experience
+          </h3>
+
+          {experience.map((exp, idx) => (
+            <div key={exp.id || idx} style={{ marginBottom: "1.5rem" }}>
+              <div
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "0.95rem",
+                  color: "#111",
+                  marginBottom: "0.1rem",
+                }}
+              >
+                {exp.company}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#333",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {exp.title || exp.jobTitle}
+                </div>
+                {(exp.date || exp.startDate || exp.endDate) && (
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: "bold",
+                      background: badgeColor,
+                      color: "white",
+                      padding: "0.1rem 0.5rem",
+                      borderRadius: "1rem",
+                    }}
+                  >
+                    {exp.date || (exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : exp.startDate || exp.endDate)}
+                  </span>
+                )}
+              </div>
+
+              {exp.description && (
+                <div
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#334155",
+                    lineHeight: 1.5,
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {exp.description.split("\n").map((line, i) =>
+                    line.trim().length > 0 ? (
+                      <div
+                        key={i}
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          marginBottom: "0.3rem",
+                        }}
+                      >
+                        <span style={{ color: blueColor }}>•</span>{" "}
+                        <span>{line}</span>
+                      </div>
+                    ) : null,
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Projects */}
-      {settings.showProjects !== false && projects && projects.length > 0 && (
+      {settings.showProjects !== false && projects.length > 0 && (
         <div style={{ marginBottom: "1.5rem" }}>
           <h3
             style={{
@@ -164,8 +291,8 @@ const MultiColorTemplate = ({ resumeData }) => {
           >
             Projects
           </h3>
-          {projects.map((proj) => (
-            <div key={proj.id} style={{ marginBottom: "1.5rem" }}>
+          {projects.map((proj, idx) => (
+            <div key={proj.id || idx} style={{ marginBottom: "1.5rem" }}>
               <div
                 style={{
                   fontWeight: "bold",
@@ -193,18 +320,20 @@ const MultiColorTemplate = ({ resumeData }) => {
                 >
                   {proj.technologies}
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: "bold",
-                    background: badgeColor,
-                    color: "white",
-                    padding: "0.1rem 0.5rem",
-                    borderRadius: "1rem",
-                  }}
-                >
-                  {proj.duration || proj.date}
-                </span>
+                {(proj.duration || proj.date) && (
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: "bold",
+                      background: badgeColor,
+                      color: "white",
+                      padding: "0.1rem 0.5rem",
+                      borderRadius: "1rem",
+                    }}
+                  >
+                    {proj.duration || proj.date}
+                  </span>
+                )}
               </div>
               {proj.description && (
                 <div
@@ -238,7 +367,7 @@ const MultiColorTemplate = ({ resumeData }) => {
       )}
 
       {/* Education */}
-      {education.length > 0 && (
+      {settings.showEducation !== false && education.length > 0 && (
         <div style={{ marginBottom: "1.5rem" }}>
           <h3
             style={{
@@ -252,8 +381,8 @@ const MultiColorTemplate = ({ resumeData }) => {
           >
             Education
           </h3>
-          {education.map((edu) => (
-            <div key={edu.id} style={{ marginBottom: "1rem" }}>
+          {education.map((edu, idx) => (
+            <div key={edu.id || idx} style={{ marginBottom: "1rem" }}>
               <div
                 style={{
                   fontWeight: "bold",
@@ -261,7 +390,7 @@ const MultiColorTemplate = ({ resumeData }) => {
                   color: "#111",
                 }}
               >
-                {edu.school}
+                {edu.school || edu.institution}
               </div>
               <div
                 style={{
@@ -271,116 +400,27 @@ const MultiColorTemplate = ({ resumeData }) => {
                 }}
               >
                 <div style={{ fontSize: "0.85rem", color: "#333" }}>
-                  {edu.degree}
+                  {edu.degree || edu.fieldOfStudy || ''}
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: "bold",
-                    background: badgeColor,
-                    color: "white",
-                    padding: "0.1rem 0.5rem",
-                    borderRadius: "1rem",
-                  }}
-                >
-                  {edu.date}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Experience */}
-      {experience.length > 0 && (
-        <div style={{ marginBottom: "1.5rem" }}>
-          <h3
-            style={{
-              fontSize: "1.1rem",
-              fontWeight: "bold",
-              color: blueColor,
-              borderBottom: "1px solid #cbd5e1",
-              paddingBottom: "0.2rem",
-              marginBottom: "0.8rem",
-            }}
-          >
-            Experience
-          </h3>
-
-          {experience.map((exp) => (
-            <div key={exp.id} style={{ marginBottom: "1.5rem" }}>
-              <div
-                style={{
-                  fontWeight: "bold",
-                  fontSize: "0.95rem",
-                  color: "#111",
-                  marginBottom: "0.1rem",
-                }}
-              >
-                {exp.company}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#333",
-                    fontStyle: "italic",
-                  }}
-                >
-                  {exp.title}
-                </div>
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: "bold",
-                    background: badgeColor,
-                    color: "white",
-                    padding: "0.1rem 0.5rem",
-                    borderRadius: "1rem",
-                  }}
-                >
-                  {exp.date}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  fontSize: "0.85rem",
-                  color: "#334155",
-                  lineHeight: 1.5,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {/* Simulated bullet points if they didn't write them */}
-                {exp.description.split("\n").map((line, i) =>
-                  line.trim().length > 0 ? (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        marginBottom: "0.3rem",
-                      }}
-                    >
-                      <span style={{ color: blueColor }}>•</span>{" "}
-                      <span>{line}</span>
-                    </div>
-                  ) : null,
+                {(edu.date || edu.startDate || edu.endDate) && (
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: "bold",
+                      background: badgeColor,
+                      color: "white",
+                      padding: "0.1rem 0.5rem",
+                      borderRadius: "1rem",
+                    }}
+                  >
+                    {edu.date || (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : edu.startDate || edu.endDate)}
+                  </span>
                 )}
               </div>
             </div>
           ))}
         </div>
       )}
-
-      {/* Custom sections are appended centrally by TemplateRenderer to avoid duplicates. */}
     </div>
   );
 };

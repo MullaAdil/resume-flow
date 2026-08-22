@@ -501,5 +501,30 @@ export const templateMockData = {
     ],
     skills: ["Supply Chain Management", "Operations Strategy", "Product Development", "M&A", "Privacy Advocacy", "Corporate Governance", "Retail Strategy", "Sustainability"],
     customSections: []
+  },
+
+  kaicarter: {
+    personalInfo: {
+      fullName: "KAI CARTER",
+      jobTitle: "GENERAL PRACTITIONER",
+      email: "kai@reallygreatsite.com",
+      phone: "123-123-1233",
+      location: "San Francisco, CA",
+      website: "www.reallygreatsite.com",
+      portfolio: "www.reallygreatsite.com",
+      summary: "Experienced and compassionate GP dedicated to delivering excellent patient care. Known for strong diagnostic skills and a patient-centered approach. Committed to promoting health and wellness through personalized treatment plans."
+    },
+    experience: [
+      { id: "1", company: "LARANA HEALTHCARE", title: "GENERAL PRACTITIONER", location: "San Francisco, CA", date: "2019 - PRESENT", description: "• Implemented evidence-based medicine for accurate diagnostics.\n• Spearheaded a community health fair, provided free screenings to over 300 residents." },
+      { id: "2", company: "TYLER STERLING", title: "FAMILY PHYSICIAN", location: "San Jose, CA", date: "2016 - 2019", description: "• Managed a diverse patient caseload.\n• Led a smoking cessation program resulting in a 35% increase in successful quit attempts." },
+      { id: "3", company: "CITY HOSPITAL", title: "MEDICAL OFFICER", location: "Oakland, CA", date: "2013 - 2016", description: "• Provided emergency medical care with a focus on trauma cases.\n• Collaborated with specialists to ensure optimal outcomes." }
+    ],
+    education: [
+      { id: "1", school: "JASPER UNIVERSITY", degree: "Dean's list, Medical Research Award", location: "Boston, MA", date: "2009 - 2013", details: "Dean's list, Medical Research Award" },
+      { id: "2", school: "BELLOWS COLLEGE", degree: "Bachelor of Science in Biology", location: "New York, NY", date: "2005 - 2009", details: "Cum Laude, Leadership Research Fellowship" }
+    ],
+    skills: ["Clinical diagnosis", "Patient-centered care", "Chronic disease management", "Electronic health records", "Health promotion"],
+    hobbies: ["Running", "Photography", "Traveling", "Cooking"],
+    customSections: []
   }
 };

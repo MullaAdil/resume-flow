@@ -1,107 +1,44 @@
 import React from "react";
 import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
-const localDummyData = {
-  personalInfo: {
-    fullName: "Natasha Dhawan",
-    jobTitle: "Research Scientist",
-    email: "dhawan@goresume.io",
-    phone: "+918527122712",
-    location: "New Delhi , India",
-    linkedin: "LinkedIn",
-    summary:
-      "An aspiring Research Scientist with a strong foundation in pharmaceutical sciences and hands-on experience in advanced analytical techniques, including NMR Spectroscopy and chromatography. Demonstrates leadership and strategic management capabilities through impactful roles in sports and academic committees. Proven ability to synthesize medicinal compounds and streamline laboratory workflows, positioning for innovative contributions to pharmaceutical research and development.",
-  },
-  experience: [
-    {
-      id: "natasha-exp-1",
-      title: "Research Scientist",
-      company: "Biocon Limited",
-      date: "06/2024 - Present",
-      location: "Bengaluru, Karnataka",
-      description:
-        "Led innovative research initiatives in molecular biology and immunology, resulting in a 25% improvement in drug candidate efficacy.\nDesigned and executed complex experimental protocols, utilizing advanced cell culture, qPCR, and flow cytometry techniques.\nAuthored and presented research findings at national conferences, enhancing organizational visibility and scientific reputation.",
-    },
-    {
-      id: "natasha-exp-2",
-      title: "Research Intern",
-      company: "Biocon Life Sciences Pvt. Ltd.",
-      date: "01/2024 - 05/2024",
-      location: "Bangalore",
-      description:
-        "Collaborated with a senior scientist to synthesize novel medicinal compound with therapeutic potential to the development of bipolar disorder treatments and supporting ongoing pharmaceutical research initiatives.\nMastered advanced analytical techniques including NMR Spectroscopy, Mass Spectrometry, IR Spectroscopy and chromatography, achieving 98% accuracy in compound identification and purity assessments.",
-    },
-  ],
-  education: [
-    {
-      id: "natasha-edu-1",
-      degree: "Ph.D. in Biotechnology",
-      school: "Indian Institute of Science (IISc)",
-      date: "07/2025 - Present",
-      location: "Bengaluru, Karnataka",
-      details:
-        "Engaging in advanced research in Biotechnology at a top-tier institution.",
-    },
-    {
-      id: "natasha-edu-2",
-      degree: "B.E. in Biotechnology",
-      school: "Birla Institute of Technology And Science (BITS)",
-      date: "07/2020 - 05/2024",
-      location: "Pilani",
-      details:
-        "Conducted hands-on experiments in microbiology, cell culture, and protein purification.",
-    },
-  ],
-  projects: [
-    {
-      id: "natasha-proj-1",
-      name: "Captain of Athletics Team",
-      duration: "08/2023 | Pilani",
-      description:
-        "Led cross-functional teams in developing and deploying scalable software solutions, improving system efficiency by 25%.\nManaged full project lifecycle from conception to delivery, ensuring on-time and within-budget completion for 5+ key initiatives.\nImplemented data-driven strategies to optimize operational workflows, resulting in a 15% reduction in processing time.",
-    },
-  ],
-  skills: [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "Python",
-    "GraphQL",
-    "AWS",
-    "Docker",
-  ],
-  languages: [
-    { name: "English", proficiency: "Highly Proficient" },
-    { name: "Hindi", proficiency: "Native Speaker" },
-  ],
-};
-
 const CenteredModernTemplate = ({ resumeData }) => {
-  const hasUserData =
-    resumeData?.personalInfo?.fullName &&
-    resumeData.personalInfo.fullName.trim().length > 0;
+  const p = resumeData?.personalInfo || {};
 
-  const activeData = hasUserData ? resumeData : localDummyData;
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    certifications,
-    languages,
-    interests,
-    projects,
-    customSections,
-  } = activeData;
+  const personalInfo = {
+    fullName: (p.fullName && p.fullName.trim()) || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || '',
+    jobTitle: (p.jobTitle && p.jobTitle.trim()) || '',
+    email: (p.email && p.email.trim()) || '',
+    phone: (p.phone && p.phone.trim()) || '',
+    location: (p.location && p.location.trim()) || '',
+    linkedin: (p.linkedin && p.linkedin.trim()) || '',
+    github: (p.github && p.github.trim()) || '',
+    website: (p.website && p.website.trim()) || '',
+    summary: (p.summary && p.summary.trim()) || '',
+  };
+
+  const experience = (Array.isArray(resumeData?.experience) && resumeData.experience.length > 0 && resumeData.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? resumeData.experience
+    : [];
+
+  const education = (Array.isArray(resumeData?.education) && resumeData.education.length > 0 && resumeData.education.some(e => e && (e.school || e.degree)))
+    ? resumeData.education
+    : [];
+
+  const projects = (Array.isArray(resumeData?.projects) && resumeData.projects.length > 0 && resumeData.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? resumeData.projects
+    : [];
+
+  const certifications = (Array.isArray(resumeData?.certifications) && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c && (c.name || c.title)))
+    ? resumeData.certifications
+    : [];
+
+  const languages = (Array.isArray(resumeData?.languages) && resumeData.languages.length > 0 && resumeData.languages.some(l => l && (typeof l === 'string' ? l.trim() : l.name)))
+    ? resumeData.languages
+    : [];
+
+  const customSections = Array.isArray(resumeData?.customSections) ? resumeData.customSections : [];
   const settings = resumeData?.settings || {};
   const primaryColor = settings.primaryColor || "#000000";
-  const marginPadding =
-    settings.margins === "Compact"
-      ? "1.5rem 2rem"
-      : settings.margins === "Spacious"
-        ? "3rem 3.5rem"
-        : "2rem 2.5rem";
 
   const divider = (
     <div
@@ -114,28 +51,21 @@ const CenteredModernTemplate = ({ resumeData }) => {
     ></div>
   );
 
-  const skillsList = Array.isArray(skills) ? skills : [];
   const getSkillsArray = () => {
-    if (skillsList.length > 0) return skillsList;
-    if (resumeData?.skills) {
-      if (Array.isArray(resumeData.skills))
-        return resumeData.skills.filter(Boolean);
-      return Object.values(resumeData.skills).flat().filter(Boolean);
-    }
-    return localDummyData.skills;
+    const raw = resumeData?.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw === 'object') return Object.values(raw).flat().filter(Boolean);
+    return [];
   };
   const activeSkills = getSkillsArray();
 
-  const activeHobbies =
-    interests && interests.length > 0
-      ? interests.map((i) => i.name || i)
-      : resumeData?.hobbies || [];
-
-  // Helper to format locations nicely with space before comma
   const formatLocation = (loc) => {
     if (!loc) return "";
     return loc.replace(/,/, " ,");
   };
+
+  const hasContacts = personalInfo.location || personalInfo.phone || personalInfo.email || personalInfo.linkedin || personalInfo.github || personalInfo.website;
 
   return (
     <div
@@ -149,92 +79,121 @@ const CenteredModernTemplate = ({ resumeData }) => {
         color: "#000000",
         lineHeight: "1.4",
         fontSize: "13px",
+        boxSizing: "border-box",
       }}
     >
       {/* Centered Header */}
-      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-        <h1
-          style={{
-            fontSize: "26px",
-            fontWeight: "bold",
-            margin: "0 0 0.2rem 0",
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-          }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <h2
-            style={{
-              fontSize: "14px",
-              fontWeight: "normal",
-              fontStyle: "italic",
-              margin: "0 0 0.6rem 0",
-              color: "#000000",
-            }}
-          >
-            {personalInfo.jobTitle}
-          </h2>
-        )}
+      {(personalInfo.fullName || hasContacts) && (
+        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+          {personalInfo.fullName && (
+            <h1
+              style={{
+                fontSize: "26px",
+                fontWeight: "bold",
+                margin: "0 0 0.2rem 0",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              }}
+            >
+              {personalInfo.fullName}
+            </h1>
+          )}
+          {personalInfo.jobTitle && (
+            <h2
+              style={{
+                fontSize: "14px",
+                fontWeight: "normal",
+                fontStyle: "italic",
+                margin: "0 0 0.6rem 0",
+                color: "#000000",
+              }}
+            >
+              {personalInfo.jobTitle}
+            </h2>
+          )}
 
-        {/* Contact Info Centered with Inline Icons */}
-        <div
-          style={{
-            display: "inline-flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "0.75rem",
-            fontSize: "11.5px",
-            color: "#000000",
-          }}
-        >
-          {personalInfo.location && (
-            <span
+          {/* Contact Info Centered with Inline Icons */}
+          {hasContacts && (
+            <div
               style={{
                 display: "inline-flex",
-                alignItems: "center",
-                gap: "0.2rem",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "0.75rem",
+                fontSize: "11.5px",
+                color: "#000000",
               }}
             >
-              <MapPin size={11} /> {formatLocation(personalInfo.location)}
-            </span>
-          )}
-          {personalInfo.phone && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.2rem",
-              }}
-            >
-              <Phone size={11} /> {personalInfo.phone}
-            </span>
-          )}
-          {personalInfo.email && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.2rem",
-              }}
-            >
-              <Mail size={11} /> {personalInfo.email}
-            </span>
-          )}
-          {personalInfo.linkedin && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.2rem",
-              }}
-            >
-              <Globe size={11} /> {personalInfo.linkedin}
-            </span>
+              {personalInfo.location && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                  }}
+                >
+                  <MapPin size={11} /> {formatLocation(personalInfo.location)}
+                </span>
+              )}
+              {personalInfo.phone && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                  }}
+                >
+                  <Phone size={11} /> {personalInfo.phone}
+                </span>
+              )}
+              {personalInfo.email && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                  }}
+                >
+                  <Mail size={11} /> {personalInfo.email}
+                </span>
+              )}
+              {personalInfo.linkedin && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                  }}
+                >
+                  <Globe size={11} /> {personalInfo.linkedin}
+                </span>
+              )}
+              {personalInfo.github && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                  }}
+                >
+                  <Globe size={11} /> {personalInfo.github}
+                </span>
+              )}
+              {personalInfo.website && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                  }}
+                >
+                  <Globe size={11} /> {personalInfo.website}
+                </span>
+              )}
+            </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Summary */}
       {settings.showSummary !== false && personalInfo.summary && (
@@ -300,7 +259,7 @@ const CenteredModernTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "bold" }}>
-                      {exp.title}
+                      {exp.title || exp.jobTitle}
                       {exp.company && (
                         <span
                           style={{ fontWeight: "normal", fontStyle: "italic" }}
@@ -381,7 +340,7 @@ const CenteredModernTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "bold" }}>
-                      {edu.degree || "Degree"}
+                      {edu.degree || edu.fieldOfStudy || ""}
                       {(edu.school || edu.institution) && (
                         <span
                           style={{ fontWeight: "normal", fontStyle: "italic" }}
@@ -417,7 +376,7 @@ const CenteredModernTemplate = ({ resumeData }) => {
           </div>
         )}
 
-      {/* Responsibilities (Projects) */}
+      {/* Projects */}
       {settings.showProjects !== false && projects && projects.length > 0 && (
         <div style={{ marginBottom: "0.8rem" }}>
           <h3
@@ -429,7 +388,7 @@ const CenteredModernTemplate = ({ resumeData }) => {
               letterSpacing: "0.5px",
             }}
           >
-            RESPONSIBILITIES
+            PROJECTS
           </h3>
           {divider}
           <div
@@ -446,12 +405,17 @@ const CenteredModernTemplate = ({ resumeData }) => {
                   }}
                 >
                   <span style={{ fontWeight: "bold", fontStyle: "italic" }}>
-                    {proj.name}
+                    {proj.name || proj.title}
                   </span>
                   <span style={{ fontSize: "11px", fontWeight: "normal" }}>
                     {proj.duration || proj.date}
                   </span>
                 </div>
+                {proj.technologies && (
+                  <div style={{ fontSize: "11px", color: "#475569", marginTop: "0.1rem" }}>
+                    {proj.technologies}
+                  </div>
+                )}
                 {proj.description && (
                   <ul
                     style={{
@@ -474,6 +438,33 @@ const CenteredModernTemplate = ({ resumeData }) => {
                     ))}
                   </ul>
                 )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Certifications */}
+      {settings.showCertifications !== false && certifications && certifications.length > 0 && (
+        <div style={{ marginBottom: "0.8rem" }}>
+          <h3
+            style={{
+              fontSize: "13px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+              margin: "0 0 0.2rem 0",
+              letterSpacing: "0.5px",
+            }}
+          >
+            CERTIFICATIONS
+          </h3>
+          {divider}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+            {certifications.map((cert, index) => (
+              <div key={cert.id || index} style={{ fontSize: "12px", color: "#000000" }}>
+                <span>• <strong>{cert.name || cert.title}</strong></span>
+                {cert.issuer ? ` — ${cert.issuer}` : ""}
+                {cert.date ? ` (${cert.date})` : ""}
               </div>
             ))}
           </div>
@@ -530,8 +521,8 @@ const CenteredModernTemplate = ({ resumeData }) => {
             <div style={{ fontSize: "12px", color: "#000000" }}>
               {languages.map((lang, index) => (
                 <span key={index}>
-                  <span style={{ fontWeight: "bold" }}>{lang.name}</span>
-                  {lang.proficiency && <span> ({lang.proficiency})</span>}
+                  <span style={{ fontWeight: "bold" }}>{typeof lang === 'object' ? lang.name : String(lang)}</span>
+                  {typeof lang === 'object' && lang.proficiency && <span> ({lang.proficiency})</span>}
                   {index < languages.length - 1 && (
                     <span style={{ margin: "0 0.5rem" }}>|</span>
                   )}
@@ -554,7 +545,7 @@ const CenteredModernTemplate = ({ resumeData }) => {
             }}
           >
             {customSections
-              .filter((sec) => sec.title)
+              .filter((sec) => sec && sec.title)
               .map((sec, idx) => (
                 <div key={sec.id || idx} style={{ marginBottom: "0.8rem" }}>
                   <h3

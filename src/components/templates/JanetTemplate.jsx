@@ -1,73 +1,42 @@
 import React from "react";
 import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
-const localDummyData = {
-  personalInfo: {
-    fullName: "Janet Kumo",
-    jobTitle: "Business Process Associate",
-    email: "kumo@goresume.io",
-    phone: "+918527122712",
-    location: "Bangalore , India",
-    linkedin: "LinkedIn",
-    summary:
-      "Highly motivated Business Process Associate with proven expertise in process optimization and payments management. Over the last few years, I have gained expert-level proficiency in process mapping, data analysis, stakeholder management, accounts payables, and accounts receivables. I am confident that I will be a valuable addition to finance operations or admin teams. I am multilingual and can contribute immensely in global businesses.",
-  },
-  experience: [
-    {
-      id: "janet-exp-1",
-      title: "Business Process Associate",
-      company: "Amazon Development Centre",
-      date: "July 2024 - Present",
-      location: "Gurugram",
-      description:
-        "Worked in payments reconciliation department managing accounts payables and accounts receivables workflows.\nCollaborated with global business teams to resolve payment exceptions and billing disputes.",
-    },
-  ],
-  education: [
-    {
-      id: "janet-edu-1",
-      degree: "Master of Commerce (M.Com)",
-      school: "University of Hyderabad",
-      date: "July 2021 - May 2023",
-      location: "Hyderabad",
-      details:
-        "Gained specialized knowledge in business administration, financial auditing, and taxation.",
-    },
-  ],
-  skills: [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "Python",
-    "GraphQL",
-    "AWS",
-    "Docker",
-  ],
-  languages: [
-    { name: "English", proficiency: "Highly Proficient" },
-    { name: "Hindi", proficiency: "Native" },
-    { name: "Japanese", proficiency: "Conversational" },
-  ],
-};
-
 const JanetTemplate = ({ resumeData }) => {
-  const hasUserData =
-    resumeData?.personalInfo?.fullName &&
-    resumeData.personalInfo.fullName.trim().length > 0;
+  const p = resumeData?.personalInfo || {};
 
-  const activeData = hasUserData ? resumeData : localDummyData;
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    certifications,
-    languages,
-    interests,
-    customSections,
-    projects,
-  } = activeData;
+  const personalInfo = {
+    fullName: (p.fullName && p.fullName.trim()) || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || '',
+    jobTitle: (p.jobTitle && p.jobTitle.trim()) || '',
+    email: (p.email && p.email.trim()) || '',
+    phone: (p.phone && p.phone.trim()) || '',
+    location: (p.location && p.location.trim()) || '',
+    linkedin: (p.linkedin && p.linkedin.trim()) || '',
+    github: (p.github && p.github.trim()) || '',
+    website: (p.website && p.website.trim()) || '',
+    summary: (p.summary && p.summary.trim()) || '',
+  };
+
+  const experience = (Array.isArray(resumeData?.experience) && resumeData.experience.length > 0 && resumeData.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? resumeData.experience
+    : [];
+
+  const education = (Array.isArray(resumeData?.education) && resumeData.education.length > 0 && resumeData.education.some(e => e && (e.school || e.degree)))
+    ? resumeData.education
+    : [];
+
+  const projects = (Array.isArray(resumeData?.projects) && resumeData.projects.length > 0 && resumeData.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? resumeData.projects
+    : [];
+
+  const certifications = (Array.isArray(resumeData?.certifications) && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c && (c.name || c.title)))
+    ? resumeData.certifications
+    : [];
+
+  const languages = (Array.isArray(resumeData?.languages) && resumeData.languages.length > 0 && resumeData.languages.some(l => l && (typeof l === 'string' ? l.trim() : l.name)))
+    ? resumeData.languages
+    : [];
+
+  const customSections = Array.isArray(resumeData?.customSections) ? resumeData.customSections : [];
   const settings = resumeData?.settings || {};
   const primaryColor = settings.primaryColor || "#0F172A";
   const marginPadding =
@@ -87,23 +56,22 @@ const JanetTemplate = ({ resumeData }) => {
       }}
     ></div>
   );
-  const skillsList = Array.isArray(skills) ? skills : [];
 
   const getSkillsArray = () => {
-    if (skillsList.length > 0) return skillsList;
-    if (resumeData?.skills) {
-      if (Array.isArray(resumeData.skills))
-        return resumeData.skills.filter(Boolean);
-      return Object.values(resumeData.skills).flat().filter(Boolean);
-    }
-    return localDummyData.skills;
+    const raw = resumeData?.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw === 'object') return Object.values(raw).flat().filter(Boolean);
+    return [];
   };
   const activeSkills = getSkillsArray();
 
-  const activeHobbies =
-    interests && interests.length > 0
-      ? interests.map((i) => i.name || i)
-      : resumeData?.hobbies || [];
+  const formatLocation = (loc) => {
+    if (!loc) return "";
+    return loc.replace(/,/, " ,");
+  };
+
+  const hasContacts = personalInfo.location || personalInfo.phone || personalInfo.email || personalInfo.linkedin || personalInfo.github || personalInfo.website;
 
   return (
     <div
@@ -114,120 +82,124 @@ const JanetTemplate = ({ resumeData }) => {
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
         padding: marginPadding,
         fontFamily: "var(--resume-font-family, inherit)",
-        color: primaryColor,
-        lineHeight: "1.5",
-        fontSize: "13px",
+        color: "#0f172a",
+        lineHeight: "1.4",
+        fontSize: "12px",
+        boxSizing: "border-box",
       }}
     >
-      {/* Centered Name and Job Title */}
-      <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
-        <h1
-          style={{
-            fontSize: "28px",
-            fontWeight: "800",
-            color: primaryColor,
-            margin: "0 0 0.15rem 0",
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-          }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <h2
-            style={{
-              fontSize: "13px",
-              fontWeight: "600",
-              color: "#64748b",
-              margin: "0 0 0.75rem 0",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-            }}
-          >
-            {personalInfo.jobTitle}
-          </h2>
-        )}
+      {/* Centered Modern Header */}
+      {(personalInfo.fullName || hasContacts) && (
+        <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
+          {personalInfo.fullName && (
+            <h1
+              style={{
+                fontSize: "26px",
+                fontWeight: "800",
+                color: primaryColor,
+                margin: "0 0 0.15rem 0",
+                letterSpacing: "-0.5px",
+              }}
+            >
+              {personalInfo.fullName}
+            </h1>
+          )}
+          {personalInfo.jobTitle && (
+            <div
+              style={{
+                fontSize: "13px",
+                fontWeight: "600",
+                color: "#64748b",
+                marginBottom: "0.5rem",
+              }}
+            >
+              {personalInfo.jobTitle}
+            </div>
+          )}
 
-        {/* Gray Rounded badge contacts */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "0.5rem",
-            marginTop: "0.2rem",
-          }}
-        >
-          {personalInfo.phone && (
-            <span
+          {/* Contact Details with Icons */}
+          {hasContacts && (
+            <div
               style={{
                 display: "inline-flex",
-                alignItems: "center",
-                gap: "0.25rem",
-                background: "#f1f5f9",
-                color: "#334155",
-                padding: "0.25rem 0.6rem",
-                borderRadius: "15px",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "0.5rem 1.25rem",
                 fontSize: "11px",
-                fontWeight: 500,
+                color: "#475569",
               }}
             >
-              <Phone size={11} color="#64748b" /> {personalInfo.phone}
-            </span>
-          )}
-          {personalInfo.email && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.25rem",
-                background: "#f1f5f9",
-                color: "#334155",
-                padding: "0.25rem 0.6rem",
-                borderRadius: "15px",
-                fontSize: "11px",
-                fontWeight: 500,
-              }}
-            >
-              <Mail size={11} color="#64748b" /> {personalInfo.email}
-            </span>
-          )}
-          {personalInfo.location && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.25rem",
-                background: "#f1f5f9",
-                color: "#334155",
-                padding: "0.25rem 0.6rem",
-                borderRadius: "15px",
-                fontSize: "11px",
-                fontWeight: 500,
-              }}
-            >
-              <MapPin size={11} color="#64748b" /> {personalInfo.location}
-            </span>
-          )}
-          {personalInfo.linkedin && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.25rem",
-                background: "#f1f5f9",
-                color: "#334155",
-                padding: "0.25rem 0.6rem",
-                borderRadius: "15px",
-                fontSize: "11px",
-                fontWeight: 500,
-              }}
-            >
-              <Globe size={11} color="#64748b" /> {personalInfo.linkedin}
-            </span>
+              {personalInfo.location && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <MapPin size={11} color="#64748b" />{" "}
+                  {formatLocation(personalInfo.location)}
+                </span>
+              )}
+              {personalInfo.phone && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Phone size={11} color="#64748b" /> {personalInfo.phone}
+                </span>
+              )}
+              {personalInfo.email && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Mail size={11} color="#64748b" /> {personalInfo.email}
+                </span>
+              )}
+              {personalInfo.linkedin && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Globe size={11} color="#64748b" /> {personalInfo.linkedin}
+                </span>
+              )}
+              {personalInfo.github && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Globe size={11} color="#64748b" /> {personalInfo.github}
+                </span>
+              )}
+              {personalInfo.website && (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Globe size={11} color="#64748b" /> {personalInfo.website}
+                </span>
+              )}
+            </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Summary */}
       {settings.showSummary !== false && personalInfo.summary && (
@@ -251,6 +223,7 @@ const JanetTemplate = ({ resumeData }) => {
               color: "#334155",
               textAlign: "justify",
               margin: 0,
+              lineHeight: "1.5",
             }}
           >
             {personalInfo.summary}
@@ -277,7 +250,11 @@ const JanetTemplate = ({ resumeData }) => {
             </h3>
             {divider}
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.9rem",
+              }}
             >
               {experience.map((exp, index) => (
                 <div key={exp.id || index}>
@@ -290,7 +267,7 @@ const JanetTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "700", color: primaryColor }}>
-                      {exp.title}
+                      {exp.title || exp.jobTitle}
                     </span>
                     <span
                       style={{
@@ -322,9 +299,9 @@ const JanetTemplate = ({ resumeData }) => {
                   {exp.description && (
                     <ul
                       style={{
-                        margin: "0.2rem 0 0 1rem",
+                        margin: "0.25rem 0 0 1rem",
                         padding: 0,
-                        fontSize: "12px",
+                        fontSize: "11.5px",
                         listStyleType: "disc",
                       }}
                     >
@@ -332,8 +309,8 @@ const JanetTemplate = ({ resumeData }) => {
                         <li
                           key={bIdx}
                           style={{
-                            marginBottom: "0.1rem",
                             color: "#334155",
+                            marginBottom: "0.15rem",
                             paddingLeft: "0.2rem",
                           }}
                         >
@@ -365,7 +342,7 @@ const JanetTemplate = ({ resumeData }) => {
           </h3>
           {divider}
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}
           >
             {projects.map((proj, index) => (
               <div key={proj.id || index}>
@@ -391,23 +368,16 @@ const JanetTemplate = ({ resumeData }) => {
                   </span>
                 </div>
                 {proj.technologies && (
-                  <div
-                    style={{
-                      fontSize: "11.5px",
-                      color: "#475569",
-                      fontWeight: "600",
-                      marginTop: "0.1rem",
-                    }}
-                  >
+                  <div style={{ fontSize: "11px", color: "#64748b", marginTop: "0.1rem" }}>
                     {proj.technologies}
                   </div>
                 )}
                 {proj.description && (
                   <ul
                     style={{
-                      margin: "0.2rem 0 0 1rem",
+                      margin: "0.25rem 0 0 1rem",
                       padding: 0,
-                      fontSize: "12px",
+                      fontSize: "11.5px",
                       listStyleType: "disc",
                     }}
                   >
@@ -415,8 +385,8 @@ const JanetTemplate = ({ resumeData }) => {
                       <li
                         key={bIdx}
                         style={{
-                          marginBottom: "0.1rem",
                           color: "#334155",
+                          marginBottom: "0.15rem",
                           paddingLeft: "0.2rem",
                         }}
                       >
@@ -425,6 +395,34 @@ const JanetTemplate = ({ resumeData }) => {
                     ))}
                   </ul>
                 )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Certifications */}
+      {settings.showCertifications !== false && certifications && certifications.length > 0 && (
+        <div style={{ marginBottom: "1.25rem" }}>
+          <h3
+            style={{
+              fontSize: "13px",
+              fontWeight: "700",
+              textTransform: "uppercase",
+              color: primaryColor,
+              margin: "0 0 0.2rem 0",
+              letterSpacing: "0.5px",
+            }}
+          >
+            Certifications
+          </h3>
+          {divider}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+            {certifications.map((cert, index) => (
+              <div key={cert.id || index} style={{ fontSize: "12px", color: "#334155" }}>
+                <span>• <strong style={{ color: primaryColor }}>{cert.name || cert.title}</strong></span>
+                {cert.issuer ? ` — ${cert.issuer}` : ""}
+                {cert.date ? ` (${cert.date})` : ""}
               </div>
             ))}
           </div>
@@ -467,7 +465,7 @@ const JanetTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "700", color: primaryColor }}>
-                      {edu.degree || "Degree"}
+                      {edu.degree || edu.fieldOfStudy || ""}
                     </span>
                     <span
                       style={{
@@ -570,8 +568,8 @@ const JanetTemplate = ({ resumeData }) => {
             >
               {languages.map((lang, index) => (
                 <span key={index} style={{ color: "#334155" }}>
-                  <strong>{lang.name}</strong>{" "}
-                  {lang.proficiency ? `(${lang.proficiency})` : ""}
+                  <strong>{typeof lang === 'object' ? lang.name : String(lang)}</strong>{" "}
+                  {typeof lang === 'object' && lang.proficiency ? `(${lang.proficiency})` : ""}
                   {index < languages.length - 1 && (
                     <span style={{ color: "#cbd5e1", marginLeft: "1rem" }}>
                       |
@@ -596,7 +594,7 @@ const JanetTemplate = ({ resumeData }) => {
             }}
           >
             {customSections
-              .filter((sec) => sec.title)
+              .filter((sec) => sec && sec.title)
               .map((sec, idx) => (
                 <div key={sec.id || idx} style={{ marginBottom: "1.25rem" }}>
                   <h3

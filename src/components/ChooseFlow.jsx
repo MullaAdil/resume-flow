@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FilePlus, FileUp, ArrowRight, Layout } from 'lucide-react';
+import { FilePlus, FileUp, ArrowRight, Layout, Sparkles } from 'lucide-react';
 import AuraHeader from './AuraHeader';
 import { useResume } from '../context/ResumeContext';
 import { templates } from './templatesList';
@@ -89,15 +89,79 @@ const ChooseFlow = () => {
               )}
             </div>
 
-            {/* Horizontal 2-Column Option Cards */}
+            {/* Horizontal 3-Column Option Cards */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '1.5rem',
               alignItems: 'stretch'
             }}>
               
-              {/* Option 1: Create New */}
+              {/* Option 1: AI Text & Notes Architect */}
+              <div
+                onClick={() => navigate('/services/text-to-resume')}
+                style={{
+                  padding: '2rem 1.75rem',
+                  borderRadius: '18px',
+                  border: '1.5px solid var(--primary-border)',
+                  backgroundColor: 'var(--primary-light)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '1.25rem',
+                  transition: 'all 0.15s ease',
+                  boxShadow: '0 4px 16px var(--primary-glow)',
+                  position: 'relative'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 26px var(--primary-glow)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px var(--primary-glow)';
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  background: 'var(--primary)',
+                  color: '#FFFFFF',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  padding: '2px 8px',
+                  borderRadius: '12px'
+                }}>
+                  ✨ AI Auto-Build
+                </div>
+
+                <div>
+                  <div style={{
+                    width: '48px', height: '48px', borderRadius: '12px',
+                    backgroundColor: '#FFFFFF', color: 'var(--primary)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '1.25rem',
+                    boxShadow: '0 2px 8px rgba(99,102,241,0.2)'
+                  }}>
+                    <Sparkles size={24} />
+                  </div>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                    AI Text & Notes Architect
+                  </h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
+                    Paste raw notes, bio, or text dump. AI formats XYZ action bullets & auto-fills template.
+                  </p>
+                </div>
+
+                <div className="aura-btn-primary" style={{ width: '100%', padding: '0.7rem 1rem', fontSize: '0.875rem' }}>
+                  <span>Auto-Build from Text</span>
+                  <ArrowRight size={16} />
+                </div>
+              </div>
+
+              {/* Option 2: Create New */}
               <div
                 onClick={() => navigate('/builder')}
                 style={{
@@ -133,21 +197,21 @@ const ChooseFlow = () => {
                   }}>
                     <FilePlus size={24} />
                   </div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
-                    Create New Resume
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                    Interactive Studio
                   </h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
-                    Start blank with our step-by-step guided editor.
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
+                    Start in the builder with step-by-step form blocks and live preview.
                   </p>
                 </div>
 
-                <div className="aura-btn-primary" style={{ width: '100%', padding: '0.7rem 1rem', fontSize: '0.875rem' }}>
-                  <span>Start from Scratch</span>
+                <div className="aura-btn-secondary" style={{ width: '100%', padding: '0.7rem 1rem', fontSize: '0.875rem' }}>
+                  <span>Open Studio</span>
                   <ArrowRight size={16} />
                 </div>
               </div>
 
-              {/* Option 2: Import PDF / Word */}
+              {/* Option 3: Import PDF / Word */}
               <div
                 onClick={() => navigate('/import')}
                 style={{
@@ -183,11 +247,11 @@ const ChooseFlow = () => {
                   }}>
                     <FileUp size={24} />
                   </div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
-                    Import Existing Resume
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.35rem 0' }}>
+                    Upload Old Resume
                   </h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
-                    Upload PDF or Word file — auto-extract sections into builder.
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
+                    Upload PDF or Word file — multi-column text extraction into builder.
                   </p>
                 </div>
 

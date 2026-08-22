@@ -1,97 +1,5 @@
 import React from "react";
 
-import { Mail, Phone, MapPin, Globe } from "lucide-react";
-
-export const localDummyData = {
-  personalInfo: {
-    fullName: "JOHN DOE",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco, CA",
-    linkedin: "linkedin.com/in/johndoe",
-    github: "github.com/johndoe",
-    jobTitle: "Software Engineer",
-  },
-  skills: [
-    { name: "Programming Languages", value: "Python, JavaScript, Java" },
-    {
-      name: "Core Computer Science",
-      value:
-        "Data Structures & Algorithms, Object-Oriented Programming (OOP), Computer Networking",
-    },
-    {
-      name: "Backend & Development",
-      value: "Node.js, REST API Development, MVC Architecture",
-    },
-    { name: "Databases", value: "PostgreSQL, MongoDB, Redis" },
-    {
-      name: "Tools & Technologies",
-      value: "Git, GitHub, Docker, VS Code, AWS, CI/CD",
-    },
-  ],
-  projects: [
-    {
-      id: "dummy-proj-1",
-      name: "E-Commerce Platform - Full Stack Web Application",
-      technologies: "React | Node.js | MongoDB | Docker",
-      description:
-        "Designed and developed a full-stack e-commerce application from scratch with secure user authentication (login, register, session management)\nBuilt backend architecture following MVC pattern with REST API endpoints for create, read, update, and delete operations\nImplemented database with normalized schema for efficient data storage and retrieval across multiple user accounts\nWrote automated end-to-end test suite using Selenium WebDriver to simulate real user interactions including form submissions, navigation, and authentication flows\nContainerized the entire application using Docker ensuring consistent deployment across different environments with zero configuration issues\nIdentified and resolved a hardcoded credential vulnerability during development — applied OWASP Top 10 security principles to harden the application",
-    },
-    {
-      id: "dummy-proj-2",
-      name: "Smart Home Dashboard - Capstone Project",
-      technologies: "Python | React | IoT Sensors | WebSockets",
-      description:
-        "Designed and built a real-time smart home monitoring system as final year capstone project, integrating hardware and software components end to end\nAssembled hardware circuit with temperature sensors connected to microcontroller for detecting environmental changes simultaneously\nDeveloped Python backend to receive and process live sensor data via WebSockets, updating dashboard status in real time\nDocumented full system architecture including circuit diagrams, data flow, and test results for academic submission",
-    },
-    {
-      id: "dummy-proj-3",
-      name: "Customer Churn Predictor - Machine Learning",
-      technologies: "Python | Scikit-learn | Pandas | Flask",
-      description:
-        "Built a binary classification model using Random Forest and XGBoost algorithms, achieving 92%+ accuracy on held-out test data\nEngineered full data preprocessing pipeline — missing value imputation, feature scaling, one-hot encoding — to convert raw data into model-ready features\nDeployed real-time prediction interface using Flask for live customer risk assessment",
-    },
-    {
-      id: "dummy-proj-4",
-      name: "Sales Data Analysis - Enterprise Database",
-      technologies: "PostgreSQL | Advanced SQL | PowerBI",
-      description:
-        "Conducted end-to-end business data analysis on enterprise sample database simulating a real retail company dataset\nAnalysed revenue performance, customer lifetime value, product profitability, store efficiency, and time-based sales trends across the full dataset\nWrote advanced SQL queries using multi-table joins, correlated subqueries, CTEs, and window functions for ranking, cumulative totals, and segmentation\nDerived actionable insights including top revenue-generating products, high-value customer segments, underperforming regions, and peak sales periods",
-    },
-  ],
-  certifications: [
-    {
-      id: "dummy-cert-1",
-      name: "AWS Certified Solutions Architect - Associate",
-    },
-    {
-      id: "dummy-cert-2",
-      name: "Google Cloud Professional Cloud Developer",
-    },
-    {
-      id: "dummy-cert-3",
-      name: "Cisco - Networking & Python Essentials (Cisco Networking Academy)",
-    },
-    { id: "dummy-cert-4", name: "Microsoft Fundamentals - Coursera" },
-  ],
-  education: [
-    {
-      id: "dummy-edu-1",
-      degree: "B.S. - Computer Science",
-      school: "University of California, Berkeley",
-      date: "Aug 2018 - May 2022",
-      location: "",
-    },
-    {
-      id: "dummy-edu-2",
-      degree: "High School Diploma - STEM Focus",
-      school: "Lincoln High School, San Francisco",
-      date: "Aug 2014 - May 2018",
-      location: "",
-    },
-  ],
-};
-
 const parseMarkdownBold = (text) => {
   if (!text) return "";
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -108,29 +16,44 @@ const parseMarkdownBold = (text) => {
 };
 
 const AslamTemplate = ({ resumeData }) => {
-  const hasUserData =
-    resumeData?.personalInfo?.fullName &&
-    resumeData.personalInfo.fullName.trim().length > 0;
-  const activeData = hasUserData ? resumeData : localDummyData;
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    certifications,
-    languages,
-    projects,
-    customSections,
-  } = activeData;
+  const p = resumeData?.personalInfo || {};
+
+  const personalInfo = {
+    fullName: (p.fullName && p.fullName.trim()) || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || '',
+    jobTitle: (p.jobTitle && p.jobTitle.trim()) || '',
+    email: (p.email && p.email.trim()) || '',
+    phone: (p.phone && p.phone.trim()) || '',
+    location: (p.location && p.location.trim()) || '',
+    linkedin: (p.linkedin && p.linkedin.trim()) || '',
+    github: (p.github && p.github.trim()) || '',
+    website: (p.website && p.website.trim()) || '',
+    summary: (p.summary && p.summary.trim()) || '',
+  };
+
+  const experience = (Array.isArray(resumeData?.experience) && resumeData.experience.length > 0 && resumeData.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? resumeData.experience
+    : [];
+
+  const education = (Array.isArray(resumeData?.education) && resumeData.education.length > 0 && resumeData.education.some(e => e && (e.school || e.institution || e.degree)))
+    ? resumeData.education
+    : [];
+
+  const projects = (Array.isArray(resumeData?.projects) && resumeData.projects.length > 0 && resumeData.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? resumeData.projects
+    : [];
+
+  const certifications = (Array.isArray(resumeData?.certifications) && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c && (c.name || c.title)))
+    ? resumeData.certifications
+    : [];
+
+  const languages = (Array.isArray(resumeData?.languages) && resumeData.languages.length > 0 && resumeData.languages.some(l => l && (typeof l === 'string' ? l.trim() : l.name)))
+    ? resumeData.languages
+    : [];
+
+  const customSections = Array.isArray(resumeData?.customSections) ? resumeData.customSections : [];
   const settings = resumeData?.settings || {};
 
   const primaryColor = settings.primaryColor || "#1E3A8A";
-  const marginPadding =
-    settings.margins === "Compact"
-      ? "1.5rem 2rem"
-      : settings.margins === "Spacious"
-        ? "3rem 3.5rem"
-        : "2rem 2.5rem"; // Dark Blue
   const divider = (
     <div
       style={{
@@ -142,32 +65,52 @@ const AslamTemplate = ({ resumeData }) => {
     ></div>
   );
 
-  // Format skills nicely without confidence levels
+  // Format skills nicely
   const getSkillsList = () => {
-    const rawSkills = Array.isArray(skills) ? skills : [];
-    return rawSkills.map((sk, index) => {
-      if (typeof sk === "object") {
-        const skillName = sk.name || "";
-        if (skillName.includes(":")) {
-          const parts = skillName.split(":");
-          const name = parts[0].trim();
-          const value = parts.slice(1).join(":").trim();
-          return { name, value };
+    const rawSkills = resumeData?.skills;
+    if (!rawSkills) return [];
+    if (Array.isArray(rawSkills)) {
+      return rawSkills.map((sk, index) => {
+        if (typeof sk === "object" && sk !== null) {
+          const skillName = sk.name || "";
+          if (skillName.includes(":")) {
+            const parts = skillName.split(":");
+            return { name: parts[0].trim(), value: parts.slice(1).join(":").trim() };
+          }
+          return { name: skillName, value: sk.value || "" };
         }
-        return { name: skillName, value: sk.value || "" };
-      }
-      if (typeof sk === "string") {
-        if (sk.includes(":")) {
-          const parts = sk.split(":");
-          return {
-            name: parts[0].trim(),
-            value: parts.slice(1).join(":").trim(),
-          };
+        if (typeof sk === "string") {
+          if (sk.includes(":")) {
+            const parts = sk.split(":");
+            return { name: parts[0].trim(), value: parts.slice(1).join(":").trim() };
+          }
+          return { name: sk, value: "" };
         }
-        return { name: sk, value: "" };
+        return { name: `Skills`, value: String(sk) };
+      }).filter(s => s.name || s.value);
+    }
+    if (typeof rawSkills === "object") {
+      const result = [];
+      const categoryLabels = {
+        programming: 'Programming Languages',
+        frameworks: 'Backend & Development',
+        databases: 'Databases',
+        cloud: 'Core Computer Science',
+        tools: 'Tools & Technologies',
+        soft: 'Soft Skills',
+        other: 'Other Skills'
+      };
+      for (const [cat, items] of Object.entries(rawSkills)) {
+        if (Array.isArray(items) && items.length > 0) {
+          const names = items.map(it => typeof it === 'object' ? it.name : it).filter(Boolean);
+          if (names.length > 0) {
+            result.push({ name: categoryLabels[cat] || cat, value: names.join(', ') });
+          }
+        }
       }
-      return { name: `Skill Group ${index + 1}`, value: String(sk) };
-    });
+      return result;
+    }
+    return [];
   };
   const activeSkills = getSkillsList();
 
@@ -224,6 +167,9 @@ const AslamTemplate = ({ resumeData }) => {
   if (personalInfo.location) {
     contactItems.push(<span key="location">{personalInfo.location}</span>);
   }
+  if (personalInfo.website) {
+    contactItems.push(<span key="website">{personalInfo.website}</span>);
+  }
 
   return (
     <div
@@ -240,45 +186,56 @@ const AslamTemplate = ({ resumeData }) => {
       }}
     >
       {/* Centered Blue Header Name */}
-      <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
-        <h1
-          style={{
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: primaryColor,
-            margin: "0 0 0.2rem 0",
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-          }}
-        >
-          {personalInfo.fullName}
-        </h1>
+      {(personalInfo.fullName || contactItems.length > 0) && (
+        <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
+          {personalInfo.fullName && (
+            <h1
+              style={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                color: primaryColor,
+                margin: "0 0 0.2rem 0",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              }}
+            >
+              {personalInfo.fullName}
+            </h1>
+          )}
+          {personalInfo.jobTitle && (
+            <div style={{ fontSize: "12px", color: "#475569", fontWeight: "600", marginBottom: "0.3rem" }}>
+              {personalInfo.jobTitle}
+            </div>
+          )}
 
-        {/* Contact details separated by pipes */}
-        <div
-          style={{
-            display: "inline-flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            fontSize: "11px",
-            color: "#000000",
-          }}
-        >
-          {contactItems.reduce((acc, item, idx) => {
-            if (idx === 0) return [item];
-            return [
-              ...acc,
-              <span
-                key={`sep-${idx}`}
-                style={{ color: "#94a3b8", margin: "0 0.4rem" }}
-              >
-                |
-              </span>,
-              item,
-            ];
-          }, [])}
+          {/* Contact details separated by pipes */}
+          {contactItems.length > 0 && (
+            <div
+              style={{
+                display: "inline-flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                fontSize: "11px",
+                color: "#000000",
+              }}
+            >
+              {contactItems.reduce((acc, item, idx) => {
+                if (idx === 0) return [item];
+                return [
+                  ...acc,
+                  <span
+                    key={`sep-${idx}`}
+                    style={{ color: "#94a3b8", margin: "0 0.4rem" }}
+                  >
+                    |
+                  </span>,
+                  item,
+                ];
+              }, [])}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* Summary */}
       {settings.showSummary !== false && personalInfo.summary && (
@@ -385,7 +342,7 @@ const AslamTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "bold", color: "#000000" }}>
-                      {exp.title}
+                      {exp.title || exp.jobTitle}
                     </span>
                     <span
                       style={{
@@ -475,7 +432,7 @@ const AslamTemplate = ({ resumeData }) => {
                   }}
                 >
                   <span style={{ fontWeight: "bold", color: "#000000" }}>
-                    {proj.name}
+                    {proj.name || proj.title}
                   </span>
                   {proj.technologies && (
                     <span
@@ -560,7 +517,9 @@ const AslamTemplate = ({ resumeData }) => {
                   }}
                 >
                   <span style={{ marginRight: "0.35rem" }}>•</span>
-                  {parseMarkdownBold(cert.name)}
+                  {parseMarkdownBold(cert.name || cert.title)}
+                  {cert.issuer ? ` — ${cert.issuer}` : ""}
+                  {cert.date ? ` (${cert.date})` : ""}
                 </div>
               ))}
             </div>
@@ -602,7 +561,7 @@ const AslamTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "bold", color: "#000000" }}>
-                      {edu.degree || "Degree"}
+                      {edu.degree || edu.fieldOfStudy || ""}
                     </span>
                     <span
                       style={{
@@ -659,8 +618,8 @@ const AslamTemplate = ({ resumeData }) => {
             <div style={{ fontSize: "11px", color: "#000000" }}>
               {languages.map((lang, index) => (
                 <span key={index}>
-                  <strong>{lang.name}</strong>{" "}
-                  {lang.proficiency ? `(${lang.proficiency})` : ""}
+                  <strong>{typeof lang === 'object' ? lang.name : String(lang)}</strong>{" "}
+                  {typeof lang === 'object' && lang.proficiency ? `(${lang.proficiency})` : ""}
                   {index < languages.length - 1 && (
                     <span style={{ color: "#cbd5e1", margin: "0 0.75rem" }}>
                       |
@@ -680,7 +639,7 @@ const AslamTemplate = ({ resumeData }) => {
             style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
           >
             {customSections
-              .filter((sec) => sec.title)
+              .filter((sec) => sec && sec.title)
               .map((sec, idx) => (
                 <div key={sec.id || idx} style={{ marginBottom: "1rem" }}>
                   <h3

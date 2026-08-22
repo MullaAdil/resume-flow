@@ -1,92 +1,46 @@
 import React from "react";
-import { Mail, Phone, MapPin, Globe, Calendar, Award } from "lucide-react";
-
-const localDummyData = {
-  personalInfo: {
-    fullName: "Aarav Joshi",
-    jobTitle: "Technical Writer",
-    email: "joshi@goresume.io",
-    phone: "+918527122712",
-    location: "Bangalore , India",
-    linkedin: "LinkedIn",
-    github: "Github",
-    summary:
-      "A CS Graduate who found love in writing. With over three years of expertise in creating, editing, and maintaining high-quality technical documentation, I am adept at translating complex technical information into clear, user-friendly manuals and online content. Proficient in utilizing various documentation tools and platforms. I do think I will be a great fit in your team. Further, I have good at collaborating with cross-functional teams to deliver precise and effective documentation.",
-  },
-  experience: [
-    {
-      id: "boxed-exp-1",
-      title: "Technical Writer",
-      company: "Studymitr AI Private Limited",
-      date: "July 2024 - Present",
-      location: "Gurugram",
-      description:
-        "Developed and maintained user manuals, installation guides, and API documentation for various software products.\nCollaborated with software engineers, product managers, and UX designers to gather information and ensure accuracy of documentation.\nImplemented a new documentation process using MadCap Flare, which improved consistency and reduced errors by 20%.\nConducted usability testing of documentation with end users, leading to a 15% improvement in user satisfaction.\nTrained new technical writers and provided ongoing mentorship to junior team members.",
-    },
-  ],
-  education: [
-    {
-      id: "boxed-edu-1",
-      degree: "BSc in Computer Science",
-      school: "Thapper University",
-      cgpa: "8.5",
-      date: "July 2021 - May 2024",
-      location: "Chandigarh",
-      details:
-        "Core courses included Data Structures and Algorithms, Object-Oriented Programming, Database Management Systems, Operating Systems, and Computer Networks.\nDeveloped strong problem-solving and analytical skills through extensive coursework and practical application.\nGained hands-on experience in software development, web development, and database design.",
-    },
-  ],
-  projects: [
-    {
-      id: "boxed-proj-1",
-      name: "User Guide For Cloud-Based Software",
-      link: "https://githubLink.com/project",
-      duration: "February 2023 - May 2023",
-      description:
-        "Created a comprehensive user guide for a new cloud-based software application.\nWorked with the UX team to integrate documentation into the user interface for seamless access.\nAchieved a 95% satisfaction rate from users based on feedback surveys.",
-    },
-  ],
-  skills: [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "Python",
-    "GraphQL",
-    "AWS",
-    "Docker",
-  ],
-  languages: [
-    { name: "English", proficiency: "Native" },
-    { name: "Japanese", proficiency: "Conversational" },
-    { name: "Hindi", proficiency: "Native" },
-  ],
-  hobbies: [
-    "Photography & Videography",
-    "Fitness & Gym",
-    "Podcast Listening",
-    "Travelling",
-    "Reading Self-Development Books",
-  ],
-};
+import { Mail, Phone, MapPin, Globe, Award, Calendar } from "lucide-react";
 
 const BoxedModernTemplate = ({ resumeData }) => {
-  const hasUserData =
-    resumeData?.personalInfo?.fullName &&
-    resumeData.personalInfo.fullName.trim().length > 0;
+  const p = resumeData?.personalInfo || {};
 
-  const activeData = hasUserData ? resumeData : localDummyData;
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    certifications,
-    languages,
-    interests,
-    projects,
-    customSections,
-  } = activeData;
+  const personalInfo = {
+    fullName: (p.fullName && p.fullName.trim()) || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || '',
+    jobTitle: (p.jobTitle && p.jobTitle.trim()) || '',
+    email: (p.email && p.email.trim()) || '',
+    phone: (p.phone && p.phone.trim()) || '',
+    location: (p.location && p.location.trim()) || '',
+    linkedin: (p.linkedin && p.linkedin.trim()) || '',
+    github: (p.github && p.github.trim()) || '',
+    website: (p.website && p.website.trim()) || '',
+    summary: (p.summary && p.summary.trim()) || '',
+  };
+
+  const experience = (Array.isArray(resumeData?.experience) && resumeData.experience.length > 0 && resumeData.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? resumeData.experience
+    : [];
+
+  const education = (Array.isArray(resumeData?.education) && resumeData.education.length > 0 && resumeData.education.some(e => e && (e.school || e.degree)))
+    ? resumeData.education
+    : [];
+
+  const projects = (Array.isArray(resumeData?.projects) && resumeData.projects.length > 0 && resumeData.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? resumeData.projects
+    : [];
+
+  const certifications = (Array.isArray(resumeData?.certifications) && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c && (c.name || c.title)))
+    ? resumeData.certifications
+    : [];
+
+  const languages = (Array.isArray(resumeData?.languages) && resumeData.languages.length > 0 && resumeData.languages.some(l => l && (typeof l === 'string' ? l.trim() : l.name)))
+    ? resumeData.languages
+    : [];
+
+  const interests = (Array.isArray(resumeData?.interests) && resumeData.interests.length > 0)
+    ? resumeData.interests
+    : [];
+
+  const customSections = Array.isArray(resumeData?.customSections) ? resumeData.customSections : [];
   const settings = resumeData?.settings || {};
   const primaryColor = settings.primaryColor || "#059669";
   const marginPadding =
@@ -105,23 +59,20 @@ const BoxedModernTemplate = ({ resumeData }) => {
       }}
     ></div>
   );
-  const skillsList = Array.isArray(skills) ? skills : [];
 
   const getSkillsArray = () => {
-    if (skillsList.length > 0) return skillsList;
-    if (resumeData?.skills) {
-      if (Array.isArray(resumeData.skills))
-        return resumeData.skills.filter(Boolean);
-      return Object.values(resumeData.skills).flat().filter(Boolean);
-    }
-    return localDummyData.skills;
+    const raw = resumeData?.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw === 'object') return Object.values(raw).flat().filter(Boolean);
+    return [];
   };
   const activeSkills = getSkillsArray();
 
   const activeHobbies =
     interests && interests.length > 0
       ? interests.map((i) => i.name || i)
-      : resumeData?.hobbies || localDummyData.hobbies;
+      : resumeData?.hobbies || [];
 
   // Helper to map skill proficiencies for the grid columns
   const getSkillLevel = (skill) => {
@@ -148,11 +99,12 @@ const BoxedModernTemplate = ({ resumeData }) => {
     return "Experienced";
   };
 
-  // Helper to format locations nicely with space before comma
   const formatLocation = (loc) => {
     if (!loc) return "";
     return loc.replace(/,/, " ,");
   };
+
+  const hasContacts = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin || personalInfo.github || personalInfo.website;
 
   return (
     <div
@@ -161,108 +113,144 @@ const BoxedModernTemplate = ({ resumeData }) => {
         minHeight: "1131px",
         background: "#ffffff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
-        padding: "3.5rem 4rem",
+        padding: marginPadding,
         fontFamily: "var(--resume-font-family, inherit)",
         color: "#000000",
         lineHeight: "1.4",
-        fontSize: "13px",
+        fontSize: "12px",
+        boxSizing: "border-box",
       }}
     >
-      {/* Boxed Title Header */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginBottom: "1rem",
-        }}
-      >
-        <div
-          style={{
-            border: "2.5px solid #008080",
-            padding: "0.5rem 2.5rem",
-            textAlign: "center",
-            minWidth: "350px",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: "26px",
-              fontWeight: "bold",
-              color: "#000000",
-              margin: 0,
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-            }}
-          >
-            {personalInfo.fullName}
-          </h1>
-          {personalInfo.jobTitle && (
-            <h2
+      {/* Top Header */}
+      {(personalInfo.fullName || hasContacts) && (
+        <div style={{ marginBottom: "1.2rem" }}>
+          {personalInfo.fullName && (
+            <h1
               style={{
-                fontSize: "12px",
+                fontSize: "24px",
                 fontWeight: "bold",
+                margin: "0 0 0.15rem 0",
+                color: "#000000",
+                letterSpacing: "-0.5px",
+              }}
+            >
+              {personalInfo.fullName}
+            </h1>
+          )}
+          {personalInfo.jobTitle && (
+            <div
+              style={{
+                fontSize: "13px",
+                fontWeight: 600,
                 color: primaryColor,
-                margin: "0.1rem 0 0 0",
-                textTransform: "uppercase",
-                letterSpacing: "2px",
+                marginBottom: "0.4rem",
               }}
             >
               {personalInfo.jobTitle}
-            </h2>
+            </div>
           )}
-        </div>
 
-        {/* Contact info row below box */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: "0.8rem",
-            fontSize: "11.5px",
-            color: "#000000",
-            marginTop: "0.5rem",
-          }}
-        >
-          {personalInfo.phone && (
-            <span
-              style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}
+          {hasContacts && (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: "0.8rem 1.2rem",
+                fontSize: "11px",
+                color: "#000000",
+                marginTop: "0.3rem",
+              }}
             >
-              <Phone size={11} color="#008080" /> {personalInfo.phone}
-            </span>
-          )}
-          {personalInfo.email && (
-            <span
-              style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}
-            >
-              <Mail size={11} color="#008080" /> {personalInfo.email}
-            </span>
-          )}
-          {personalInfo.location && (
-            <span
-              style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}
-            >
-              <MapPin size={11} color="#008080" />{" "}
-              {formatLocation(personalInfo.location)}
-            </span>
-          )}
-          {personalInfo.linkedin && (
-            <span
-              style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}
-            >
-              <Globe size={11} color="#008080" /> {personalInfo.linkedin}
-            </span>
-          )}
-          {personalInfo.github && (
-            <span
-              style={{ display: "flex", alignItems: "center", gap: "0.2rem" }}
-            >
-              <Globe size={11} color="#008080" /> {personalInfo.github}
-            </span>
+              {personalInfo.phone && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Phone size={11} color="#008080" /> {personalInfo.phone}
+                </span>
+              )}
+              {personalInfo.email && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Mail size={11} color="#008080" /> {personalInfo.email}
+                </span>
+              )}
+              {personalInfo.location && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <MapPin size={11} color="#008080" />{" "}
+                  {formatLocation(personalInfo.location)}
+                </span>
+              )}
+              {personalInfo.linkedin && (
+                <a
+                  href={`https://${personalInfo.linkedin.replace(/^(https?:\/\/)?(www\.)?/, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    color: "#0000ee",
+                    textDecoration: "underline",
+                  }}
+                >
+                  <Globe size={11} color="#008080" />{" "}
+                  {personalInfo.linkedin.replace(
+                    /^(https?:\/\/)?(www\.)?linkedin\.com\/in\//,
+                    "",
+                  )}
+                </a>
+              )}
+              {personalInfo.github && (
+                <a
+                  href={`https://${personalInfo.github.replace(/^(https?:\/\/)?(www\.)?/, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    color: "#0000ee",
+                    textDecoration: "underline",
+                  }}
+                >
+                  <Globe size={11} color="#008080" />{" "}
+                  {personalInfo.github.replace(
+                    /^(https?:\/\/)?(www\.)?github\.com\//,
+                    "",
+                  )}
+                </a>
+              )}
+              {personalInfo.website && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                  }}
+                >
+                  <Globe size={11} color="#008080" /> {personalInfo.website}
+                </span>
+              )}
+            </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Summary */}
       {settings.showSummary !== false && personalInfo.summary && (
@@ -325,7 +313,7 @@ const BoxedModernTemplate = ({ resumeData }) => {
                       color: "#000000",
                     }}
                   >
-                    {exp.title}
+                    {exp.title || exp.jobTitle}
                   </div>
                   <div
                     style={{
@@ -436,7 +424,7 @@ const BoxedModernTemplate = ({ resumeData }) => {
                       color: "#000000",
                     }}
                   >
-                    {edu.degree || "Degree"}
+                    {edu.degree || edu.fieldOfStudy || ""}
                   </div>
                   <div
                     style={{
@@ -554,7 +542,7 @@ const BoxedModernTemplate = ({ resumeData }) => {
                     color: "#000000",
                   }}
                 >
-                  {proj.name}
+                  {proj.name || proj.title}
                 </div>
                 <div
                   style={{
@@ -577,7 +565,7 @@ const BoxedModernTemplate = ({ resumeData }) => {
                       {proj.link}
                     </a>
                   )}
-                  {proj.duration && (
+                  {(proj.duration || proj.date) && (
                     <span
                       style={{
                         display: "flex",
@@ -587,7 +575,7 @@ const BoxedModernTemplate = ({ resumeData }) => {
                       }}
                     >
                       <Calendar size={11} color="#008080" />
-                      {proj.duration}
+                      {proj.duration || proj.date}
                     </span>
                   )}
                 </div>
@@ -613,6 +601,33 @@ const BoxedModernTemplate = ({ resumeData }) => {
                     ))}
                   </ul>
                 )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Certifications */}
+      {settings.showCertifications !== false && certifications && certifications.length > 0 && (
+        <div style={{ marginBottom: "0.8rem" }}>
+          <h3
+            style={{
+              fontSize: "13px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+              margin: "0 0 0.2rem 0",
+              letterSpacing: "0.5px",
+            }}
+          >
+            Certifications
+          </h3>
+          {divider}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+            {certifications.map((cert, index) => (
+              <div key={cert.id || index} style={{ fontSize: "12px", color: "#000000" }}>
+                <span>• <strong>{cert.name || cert.title}</strong></span>
+                {cert.issuer ? ` — ${cert.issuer}` : ""}
+                {cert.date ? ` (${cert.date})` : ""}
               </div>
             ))}
           </div>
@@ -716,8 +731,8 @@ const BoxedModernTemplate = ({ resumeData }) => {
                           paddingLeft: "0.2rem",
                         }}
                       >
-                        <strong>{lang.name}</strong>{" "}
-                        {lang.proficiency ? `(${lang.proficiency})` : ""}
+                        <strong>{typeof lang === 'object' ? lang.name : String(lang)}</strong>{" "}
+                        {typeof lang === 'object' && lang.proficiency ? `(${lang.proficiency})` : ""}
                       </li>
                     ))}
                   </ul>
@@ -761,7 +776,7 @@ const BoxedModernTemplate = ({ resumeData }) => {
             }}
           >
             {customSections
-              .filter((sec) => sec.title)
+              .filter((sec) => sec && sec.title)
               .map((sec, idx) => (
                 <div key={sec.id || idx} style={{ marginBottom: "0.8rem" }}>
                   <h3

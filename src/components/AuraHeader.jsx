@@ -80,6 +80,7 @@ const AuraHeader = () => {
 
   const navLinks = [
     { label: 'Home',           path: '/' },
+    { label: 'Services',       path: '/services' },
     { label: 'Templates',      path: '/templates' },
     { label: 'Import Resume',  path: '/import' },
     { label: 'Activity Vault', path: '/activity' },
@@ -440,13 +441,14 @@ const AuraHeader = () => {
               </button>
             )}
 
-            {/* ── Launch CTA ── */}
+            {/* ── Framer Launch CTA ── */}
             <button
               onClick={() => navigate('/choose')}
-              className="aura-btn-primary"
-              style={{ height: '34px', padding: '0 0.95rem', fontSize: '0.85rem', borderRadius: '8px', flexShrink: 0 }}
+              className="framer-btn-shimmer"
+              style={{ height: '36px', padding: '0 1.15rem', fontSize: '0.85rem', flexShrink: 0 }}
             >
-              Get Started
+              <span>Get Started</span>
+              <ArrowRight size={14} />
             </button>
             <CurlyBraceRight />
           </div>

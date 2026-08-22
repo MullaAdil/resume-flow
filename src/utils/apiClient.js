@@ -170,5 +170,26 @@ export const apiClient = {
       const param = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
       return request(`/api/activity${param}`);
     }
+  },
+
+  customTemplates: {
+    async list(userId) {
+      const param = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
+      return request(`/api/custom-templates${param}`);
+    },
+
+    async save(userId, name, blueprint, thumbnailUrl) {
+      return request('/api/custom-templates', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: userId, name, blueprint, thumbnailUrl }),
+      });
+    },
+
+    async delete(id, userId) {
+      const param = userId ? `?user_id=${encodeURIComponent(userId)}` : '';
+      return request(`/api/custom-templates/${id}${param}`, {
+        method: 'DELETE',
+      });
+    }
   }
 };

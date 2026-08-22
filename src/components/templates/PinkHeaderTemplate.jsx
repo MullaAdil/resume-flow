@@ -1,120 +1,55 @@
 import React from "react";
-
 import {
   Mail,
   Phone,
   MapPin,
   Globe,
   Calendar,
-  GraduationCap,
-  Briefcase,
   Award,
 } from "lucide-react";
 
-const localDummyData = {
-  personalInfo: {
-    fullName: "Anubhavi Singh Chauhan",
-    jobTitle: "AI Engineer",
-    email: "anubhavi@goresume.io",
-    phone: "+918527122712",
-    location: "Bangalore , India",
-    linkedin: "LinkedIn",
-    github: "Github",
-    summary:
-      "Innovative and results-driven AI Engineer with 3+ years of experience in developing machine learning models, natural language processing solutions, and computer vision applications. Skilled in Python, TensorFlow, and PyTorch with hands-on experience in deploying AI solutions in cloud environments.",
-  },
-  experience: [
-    {
-      id: "anubhavi-exp-1",
-      title: "AI Engineer",
-      company: "Infosys Ltd.",
-      date: "July 2022 - Present",
-      location: "Bangalore",
-      description:
-        "Designed and deployed deep learning models for image recognition and NLP tasks\nImplemented AI solutions in cloud platforms like AWS and Azure\nCollaborated with cross-functional teams to integrate AI into production systems",
-    },
-    {
-      id: "anubhavi-exp-2",
-      title: "Machine Learning Engineer",
-      company: "Wipro Technologies",
-      date: "July 2021 - June 2022",
-      location: "Bangalore",
-      description:
-        "Developed and deployed predictive analytics models for comprehensive customer behavior analysis at Wipro Technologies.\nEngineered robust recommendation systems utilizing collaborative and content-based filtering techniques to optimize user engagement.",
-    },
-  ],
-  education: [
-    {
-      id: "anubhavi-edu-1",
-      degree: "Master of Technology (M.Tech)",
-      school: "IIT Delhi",
-      cgpa: "8",
-      date: "January 2019 - January 2021",
-      location: "Delhi",
-      details: "Specialization in Artificial Intelligence",
-    },
-    {
-      id: "anubhavi-edu-2",
-      degree: "Bachelor of Technology (B.Tech)",
-      school: "NIT Karnataka",
-      cgpa: "9.23",
-      date: "January 2015 - January 2019",
-      location: "Karnataka",
-      details: "Specialization in Computer Science and Engineering",
-    },
-  ],
-  certifications: [
-    {
-      id: "anubhavi-cert-1",
-      name: "TensorFlow Developer Certificate - TensorFlow.org",
-      issuer: "http://TensorFlow.org",
-      date: "January 0001 - January 0001",
-      details:
-        "TensorFlow Developer Certificate\nAWS Certified Machine Learning Specialty",
-    },
-  ],
-  skills: [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "Python",
-    "GraphQL",
-    "AWS",
-    "Docker",
-  ],
-  languages: [
-    { name: "Hindi", proficiency: "Very Good Command" },
-    { name: "English", proficiency: "Highly Proficient" },
-    { name: "Kannada", proficiency: "Native Speaker" },
-  ],
-};
-
 const PinkHeaderTemplate = ({ resumeData }) => {
-  const hasUserData =
-    resumeData?.personalInfo?.fullName &&
-    resumeData.personalInfo.fullName.trim().length > 0;
+  const p = resumeData?.personalInfo || {};
 
-  const activeData = hasUserData ? resumeData : localDummyData;
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    certifications,
-    languages,
-    interests,
-    customSections,
-    projects,
-  } = activeData;
+  const personalInfo = {
+    fullName: (p.fullName && p.fullName.trim()) || (p.firstName ? `${p.firstName || ''} ${p.lastName || ''}`.trim() : '') || '',
+    jobTitle: (p.jobTitle && p.jobTitle.trim()) || '',
+    email: (p.email && p.email.trim()) || '',
+    phone: (p.phone && p.phone.trim()) || '',
+    location: (p.location && p.location.trim()) || '',
+    linkedin: (p.linkedin && p.linkedin.trim()) || '',
+    github: (p.github && p.github.trim()) || '',
+    website: (p.website && p.website.trim()) || '',
+    summary: (p.summary && p.summary.trim()) || '',
+  };
+
+  const experience = (Array.isArray(resumeData?.experience) && resumeData.experience.length > 0 && resumeData.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? resumeData.experience
+    : [];
+
+  const education = (Array.isArray(resumeData?.education) && resumeData.education.length > 0 && resumeData.education.some(e => e && (e.school || e.degree)))
+    ? resumeData.education
+    : [];
+
+  const projects = (Array.isArray(resumeData?.projects) && resumeData.projects.length > 0 && resumeData.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? resumeData.projects
+    : [];
+
+  const certifications = (Array.isArray(resumeData?.certifications) && resumeData.certifications.length > 0 && resumeData.certifications.some(c => c && (c.name || c.title)))
+    ? resumeData.certifications
+    : [];
+
+  const languages = (Array.isArray(resumeData?.languages) && resumeData.languages.length > 0 && resumeData.languages.some(l => l && (typeof l === 'string' ? l.trim() : l.name)))
+    ? resumeData.languages
+    : [];
+
+  const interests = (Array.isArray(resumeData?.interests) && resumeData.interests.length > 0)
+    ? resumeData.interests
+    : [];
+
+  const customSections = Array.isArray(resumeData?.customSections) ? resumeData.customSections : [];
   const settings = resumeData?.settings || {};
   const primaryColor = settings.primaryColor || "#E11D48";
-  const marginPadding =
-    settings.margins === "Compact"
-      ? "1.5rem 2rem"
-      : settings.margins === "Spacious"
-        ? "3rem 3.5rem"
-        : "2rem 2.5rem";
 
   const divider = (
     <div
@@ -127,29 +62,26 @@ const PinkHeaderTemplate = ({ resumeData }) => {
     ></div>
   );
 
-  const skillsList = Array.isArray(skills) ? skills : [];
-
   const getSkillsArray = () => {
-    if (skillsList.length > 0) return skillsList;
-    if (resumeData?.skills) {
-      if (Array.isArray(resumeData.skills))
-        return resumeData.skills.filter(Boolean);
-      return Object.values(resumeData.skills).flat().filter(Boolean);
-    }
-    return localDummyData.skills;
+    const raw = resumeData?.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw === 'object') return Object.values(raw).flat().filter(Boolean);
+    return [];
   };
   const activeSkills = getSkillsArray();
 
   const activeHobbies =
     interests && interests.length > 0
-      ? interests.map((i) => i.name || i)
-      : resumeData?.hobbies || [];
+      ? interests.map((i) => (typeof i === 'object' ? i.name : i))
+      : (Array.isArray(resumeData?.hobbies) ? resumeData.hobbies : []);
 
-  // Helper to format locations nicely with space before comma
   const formatLocation = (loc) => {
     if (!loc) return "";
     return loc.replace(/,/, " ,");
   };
+
+  const hasContacts = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin || personalInfo.github || personalInfo.website;
 
   return (
     <div
@@ -164,120 +96,139 @@ const PinkHeaderTemplate = ({ resumeData }) => {
         fontSize: "13px",
         display: "flex",
         flexDirection: "column",
+        boxSizing: "border-box",
       }}
     >
       {/* Pink Header Banner */}
-      <div
-        style={{
-          background: primaryColor,
-          color: "#000000",
-          padding: "2rem 2.5rem",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "0.35rem",
-          borderBottom: "1px solid #FDA4AF",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "28px",
-            fontWeight: "bold",
-            color: primaryColor,
-            margin: 0,
-            letterSpacing: "0.5px",
-          }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <h2
-            style={{
-              fontSize: "14px",
-              fontWeight: "bold",
-              color: "#000000",
-              margin: "0.1rem 0 0.5rem 0",
-              textTransform: "none",
-            }}
-          >
-            {personalInfo.jobTitle}
-          </h2>
-        )}
-
-        {/* Contact info row in Header */}
+      {(personalInfo.fullName || hasContacts) && (
         <div
           style={{
+            background: primaryColor,
+            color: "#000000",
+            padding: "2rem 2.5rem",
             display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: "1rem",
-            fontSize: "11.5px",
-            color: primaryColor,
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.35rem",
+            borderBottom: "1px solid #FDA4AF",
           }}
         >
-          {personalInfo.phone && (
-            <span
+          {personalInfo.fullName && (
+            <h1
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#000000",
+                fontSize: "28px",
+                fontWeight: "bold",
+                color: "#FFFFFF",
+                margin: 0,
+                letterSpacing: "0.5px",
               }}
             >
-              <Phone size={12} color="#E11D48" /> {personalInfo.phone}
-            </span>
+              {personalInfo.fullName}
+            </h1>
           )}
-          {personalInfo.email && (
-            <span
+          {personalInfo.jobTitle && (
+            <h2
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#000000",
+                fontSize: "14px",
+                fontWeight: "bold",
+                color: "#FFFFFF",
+                margin: "0.1rem 0 0.5rem 0",
+                textTransform: "none",
               }}
             >
-              <Mail size={12} color="#E11D48" /> {personalInfo.email}
-            </span>
+              {personalInfo.jobTitle}
+            </h2>
           )}
-          {personalInfo.location && (
-            <span
+
+          {/* Contact info row in Header */}
+          {hasContacts && (
+            <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#000000",
+                justifyContent: "center",
+                flexWrap: "wrap",
+                gap: "1rem",
+                fontSize: "11.5px",
+                color: "#FFFFFF",
               }}
             >
-              <MapPin size={12} color="#E11D48" />{" "}
-              {formatLocation(personalInfo.location)}
-            </span>
-          )}
-          {personalInfo.linkedin && (
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#000000",
-              }}
-            >
-              <Globe size={12} color="#E11D48" /> {personalInfo.linkedin}
-            </span>
-          )}
-          {personalInfo.github && (
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.2rem",
-                color: "#000000",
-              }}
-            >
-              <Globe size={12} color="#E11D48" /> {personalInfo.github}
-            </span>
+              {personalInfo.phone && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Phone size={12} color="#FFFFFF" /> {personalInfo.phone}
+                </span>
+              )}
+              {personalInfo.email && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Mail size={12} color="#FFFFFF" /> {personalInfo.email}
+                </span>
+              )}
+              {personalInfo.location && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <MapPin size={12} color="#FFFFFF" />{" "}
+                  {formatLocation(personalInfo.location)}
+                </span>
+              )}
+              {personalInfo.linkedin && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Globe size={12} color="#FFFFFF" /> {personalInfo.linkedin}
+                </span>
+              )}
+              {personalInfo.github && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Globe size={12} color="#FFFFFF" /> {personalInfo.github}
+                </span>
+              )}
+              {personalInfo.website && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.2rem",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Globe size={12} color="#FFFFFF" /> {personalInfo.website}
+                </span>
+              )}
+            </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Main Body */}
       <div style={{ padding: "2rem 2.5rem", flex: 1 }}>
@@ -379,7 +330,7 @@ const PinkHeaderTemplate = ({ resumeData }) => {
                         color: "#000000",
                       }}
                     >
-                      {exp.title}
+                      {exp.title || exp.jobTitle}
                     </div>
                     <div
                       style={{
@@ -493,16 +444,18 @@ const PinkHeaderTemplate = ({ resumeData }) => {
                         {proj.technologies}
                       </span>
                     )}
-                    <span
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.2rem",
-                      }}
-                    >
-                      <Calendar size={11} color="#E11D48" />
-                      {proj.duration || proj.date}
-                    </span>
+                    {(proj.duration || proj.date) && (
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.2rem",
+                        }}
+                      >
+                        <Calendar size={11} color="#E11D48" />
+                        {proj.duration || proj.date}
+                      </span>
+                    )}
                   </div>
                   {proj.description && (
                     <ul
@@ -564,7 +517,7 @@ const PinkHeaderTemplate = ({ resumeData }) => {
                         color: "#000000",
                       }}
                     >
-                      {edu.degree || "Degree"}
+                      {edu.degree || edu.fieldOfStudy || ""}
                     </div>
                     <div
                       style={{
@@ -678,7 +631,7 @@ const PinkHeaderTemplate = ({ resumeData }) => {
                         color: "#000000",
                       }}
                     >
-                      {cert.name}
+                      {cert.name || cert.title}
                     </div>
                     <div
                       style={{
@@ -701,16 +654,18 @@ const PinkHeaderTemplate = ({ resumeData }) => {
                           {cert.issuer}
                         </span>
                       )}
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.2rem",
-                        }}
-                      >
-                        <Calendar size={11} color="#E11D48" />
-                        {cert.date}
-                      </span>
+                      {cert.date && (
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.2rem",
+                          }}
+                        >
+                          <Calendar size={11} color="#E11D48" />
+                          {cert.date}
+                        </span>
+                      )}
                     </div>
                     {cert.details && (
                       <ul
@@ -776,11 +731,13 @@ const PinkHeaderTemplate = ({ resumeData }) => {
                     }}
                   >
                     <span style={{ fontWeight: "normal", color: "#000000" }}>
-                      {lang.name}
+                      {typeof lang === 'object' ? lang.name : String(lang)}
                     </span>
-                    <span style={{ color: "#000000", fontWeight: "normal" }}>
-                      {lang.proficiency || "Conversational"}
-                    </span>
+                    {typeof lang === 'object' && lang.proficiency && (
+                      <span style={{ color: "#000000", fontWeight: "normal" }}>
+                        {lang.proficiency}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -829,7 +786,7 @@ const PinkHeaderTemplate = ({ resumeData }) => {
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
               {customSections
-                .filter((sec) => sec.title)
+                .filter((sec) => sec && sec.title)
                 .map((sec, idx) => (
                   <div key={sec.id || idx} style={{ marginBottom: "1rem" }}>
                     <h3

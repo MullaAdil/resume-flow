@@ -14,19 +14,129 @@ try {
 const ResumeContext = createContext();
 export const useResume = () => useContext(ResumeContext);
 
-export const defaultState = {
+export const sampleResumeData = {
+  profileType: 'professional',
+  personalInfo: {
+    fullName: 'John Doe',
+    jobTitle: 'Senior Full Stack Engineer',
+    email: 'john.doe@example.com',
+    phone: '+1 (555) 234-5678',
+    location: 'San Francisco, CA',
+    summary: 'Experienced Full Stack Engineer with 6+ years of expertise in architecting cloud-native web applications, distributed APIs, and scalable user interfaces with React, Node.js, and modern TypeScript.',
+    portfolio: 'https://johndoe.dev',
+    linkedin: 'linkedin.com/in/johndoe',
+    github: 'github.com/johndoe',
+    website: 'https://johndoe.dev'
+  },
+  experience: [
+    {
+      id: 'exp_sample_1',
+      title: 'Lead Software Engineer',
+      jobTitle: 'Lead Software Engineer',
+      company: 'Apex Technologies',
+      location: 'San Francisco, CA',
+      startDate: 'Jan 2022',
+      endDate: 'Present',
+      date: 'Jan 2022 - Present',
+      currentPosition: true,
+      description: '• Spearheaded migration from legacy monolith to React & Node.js microservices, boosting throughput by 45%.\n• Designed scalable RESTful APIs serving 2M+ active monthly users.\n• Led code reviews and mentored a distributed team of 8 engineers.',
+      technologies: 'React, TypeScript, Node.js, AWS, PostgreSQL'
+    },
+    {
+      id: 'exp_sample_2',
+      title: 'Full Stack Developer',
+      jobTitle: 'Full Stack Developer',
+      company: 'CloudScale Solutions',
+      location: 'San Jose, CA',
+      startDate: 'Aug 2019',
+      endDate: 'Dec 2021',
+      date: 'Aug 2019 - Dec 2021',
+      currentPosition: false,
+      description: '• Developed responsive single-page web applications with React, Redux, and Express.\n• Implemented automated CI/CD deployment pipelines on Docker and Kubernetes.\n• Collaborated with UX designers to build accessible UI design system components.',
+      technologies: 'JavaScript, React, Express, MongoDB, Docker'
+    }
+  ],
+  education: [
+    {
+      id: 'edu_sample_1',
+      school: 'University of California, Berkeley',
+      institution: 'University of California, Berkeley',
+      degree: 'B.S. in Computer Science',
+      location: 'Berkeley, CA',
+      startDate: '2015',
+      endDate: '2019',
+      date: '2015 - 2019',
+      cgpa: '3.8 / 4.0',
+      details: "Dean's Honor List, Academic Excellence in Software Engineering"
+    }
+  ],
+  projects: [
+    {
+      id: 'proj_sample_1',
+      name: 'Distributed Cloud Dashboard',
+      technologies: 'React, Node.js, GraphQL, Redis, Docker',
+      duration: '2023 - 2024',
+      date: '2023 - 2024',
+      description: '• Architected real-time analytics monitoring dashboard for microservice clusters.\n• Reduced metric aggregation latency by 60% using Redis caching and WebSocket streams.'
+    }
+  ],
+  skills: {
+    programming: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML5/CSS3', 'SQL'],
+    frameworks: ['React', 'Node.js', 'Express', 'Next.js', 'TailwindCSS'],
+    databases: ['PostgreSQL', 'MongoDB', 'Redis'],
+    cloud: ['AWS', 'Docker', 'Kubernetes', 'CI/CD Pipelines', 'REST APIs'],
+    tools: ['Git', 'Vite', 'Postman', 'Webpack', 'Jest'],
+    soft: ['Technical Leadership', 'Agile/Scrum', 'System Architecture', 'Problem Solving'],
+    other: []
+  },
+  certifications: [
+    {
+      id: 'cert_sample_1',
+      name: 'AWS Certified Solutions Architect – Associate',
+      issuer: 'Amazon Web Services',
+      date: '2023'
+    }
+  ],
+  languages: [
+    { id: 'lang_sample_1', name: 'English', proficiency: 'Native' },
+    { id: 'lang_sample_2', name: 'Spanish', proficiency: 'Conversational' }
+  ],
+  interests: ['Open Source Contributing', 'Cloud Computing', 'AI & Machine Learning', 'Cycling'],
+  customSections: [],
+  settings: {
+    fontFamily: 'Inter',
+    fontSize: 'Medium',
+    primaryColor: '#6366F1',
+    secondaryColor: '#4F46E5',
+    lineSpacing: '1.5',
+    margins: 'Standard',
+    pageSize: 'A4',
+    showPhoto: true,
+    iconsEnabled: true
+  }
+};
+
+export const emptyState = {
   profileType: null,
   personalInfo: { fullName: '', jobTitle: '', email: '', phone: '', location: '', summary: '', portfolio: '', linkedin: '', github: '', website: '' },
   experience: [], education: [], projects: [], skills: { programming: [], frameworks: [], databases: [], cloud: [], tools: [], soft: [], other: [] },
   certifications: [], publications: [], awards: [], languages: [], interests: [], volunteer: [], references: [], customSections: [],
-  settings: { fontFamily: 'Inter', fontSize: 'Medium', primaryColor: '#4338ca', secondaryColor: '#4f46e5', lineSpacing: '1.5', margins: 'Standard', pageSize: 'A4', showPhoto: true, iconsEnabled: true }
+  settings: { fontFamily: 'Inter', fontSize: 'Medium', primaryColor: '#6366F1', secondaryColor: '#4F46E5', lineSpacing: '1.5', margins: 'Standard', pageSize: 'A4', showPhoto: true, iconsEnabled: true }
 };
+
+export const defaultState = sampleResumeData;
 
 export const ResumeProvider = ({ children }) => {
   const [resumeData, setResumeData] = useState(() => {
     try {
       const saved = localStorage.getItem('lumen_resume_draft');
-      return saved ? JSON.parse(saved) : defaultState;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && (parsed.personalInfo || parsed.experience || parsed.education || parsed.skills)) {
+          return parsed;
+        }
+      }
+      return defaultState;
     } catch {
       return defaultState;
     }
@@ -60,27 +170,50 @@ export const ResumeProvider = ({ children }) => {
     try {
       localStorage.removeItem('lumen_resume_draft');
     } catch {}
-    setResumeData(defaultState);
+    setResumeData(sampleResumeData);
     setSelectedTemplate('multicolor');
   };
 
-  const updateSection = (section, data) => setResumeData(prev => ({ ...prev, [section]: data }));
-  // Debug wrapper: log updates to sections to trace UI actions
-  const _updateSection = (section, data) => {
-    return updateSection(section, data);
+  const loadSampleData = () => {
+    setResumeData(JSON.parse(JSON.stringify(sampleResumeData)));
   };
+
+  const clearAllData = () => {
+    setResumeData(JSON.parse(JSON.stringify(emptyState)));
+  };
+
+  const clearSection = (sectionName) => {
+    setResumeData(prev => {
+      const next = { ...prev };
+      if (sectionName === 'personal') {
+        next.personalInfo = { ...emptyState.personalInfo };
+      } else if (sectionName === 'summary') {
+        next.personalInfo = { ...next.personalInfo, summary: '' };
+      } else if (sectionName === 'skills') {
+        next.skills = { programming: [], frameworks: [], databases: [], cloud: [], tools: [], soft: [], other: [] };
+      } else if (Array.isArray(next[sectionName])) {
+        next[sectionName] = [];
+      } else {
+        next[sectionName] = [];
+      }
+      return next;
+    });
+  };
+
+  const updateSection = (section, data) => setResumeData(prev => ({ ...prev, [section]: data }));
+  const _updateSection = (section, data) => updateSection(section, data);
 
   const updatePersonalInfo = (field, value) => setResumeData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, [field]: value } }));
   const setProfileType = (type) => setResumeData(prev => ({ ...prev, profileType: type }));
-  const addItem = (section, item) => setResumeData(prev => ({ ...prev, [section]: [...prev[section], { ...item, id: Date.now().toString() }] }));
-  const updateItem = (section, id, updated) => setResumeData(prev => ({ ...prev, [section]: prev[section].map(i => i.id === id ? { ...i, ...updated } : i) }));
-  const removeItem = (section, id) => setResumeData(prev => ({ ...prev, [section]: prev[section].filter(i => i.id !== id) }));
-  const updateSkills = (category, skillsArray) => setResumeData(prev => ({ ...prev, skills: { ...prev.skills, [category]: skillsArray } }));
+  const addItem = (section, item) => setResumeData(prev => ({ ...prev, [section]: [...(prev[section] || []), { ...item, id: Date.now().toString() }] }));
+  const updateItem = (section, id, updated) => setResumeData(prev => ({ ...prev, [section]: (prev[section] || []).map(i => i.id === id ? { ...i, ...updated } : i) }));
+  const removeItem = (section, id) => setResumeData(prev => ({ ...prev, [section]: (prev[section] || []).filter(i => i.id !== id) }));
+  const updateSkills = (category, skillsArray) => setResumeData(prev => ({ ...prev, skills: { ...(prev.skills || {}), [category]: skillsArray } }));
   const updateSettings = (field, value) => setResumeData(prev => ({ ...prev, settings: { ...prev.settings, [field]: value } }));
 
   const addExperience = () => setResumeData(prev => ({
     ...prev,
-    experience: [...(prev.experience || []), { id: 'exp' + Date.now(), title: '', jobTitle: '', company: '', startDate: '', endDate: '', location: '', description: '' }]
+    experience: [...(prev.experience || []), { id: 'exp_' + Date.now(), title: '', jobTitle: '', company: '', startDate: '', endDate: '', location: '', description: '' }]
   }));
   const updateExperience = (index, field, value) => setResumeData(prev => {
     const nextExp = [...(prev.experience || [])];
@@ -97,7 +230,7 @@ export const ResumeProvider = ({ children }) => {
 
   const addEducation = () => setResumeData(prev => ({
     ...prev,
-    education: [...(prev.education || []), { id: 'edu' + Date.now(), school: '', institution: '', degree: '', startDate: '', endDate: '', location: '', cgpa: '' }]
+    education: [...(prev.education || []), { id: 'edu_' + Date.now(), school: '', institution: '', degree: '', startDate: '', endDate: '', location: '', cgpa: '' }]
   }));
   const updateEducation = (index, field, value) => setResumeData(prev => {
     const nextEdu = [...(prev.education || [])];
@@ -114,12 +247,12 @@ export const ResumeProvider = ({ children }) => {
 
   const addSkill = (category, skillsArray) => setResumeData(prev => ({
     ...prev,
-    skills: { ...prev.skills, [category]: skillsArray }
+    skills: { ...(prev.skills || {}), [category]: skillsArray }
   }));
   const removeSkill = (category, index) => setResumeData(prev => {
     const skills = [...(prev.skills?.[category] || [])];
     skills.splice(index, 1);
-    return { ...prev, skills: { ...prev.skills, [category]: skills } };
+    return { ...prev, skills: { ...(prev.skills || {}), [category]: skills } };
   });
 
   const cleanExtractedString = (str) => {
@@ -139,11 +272,20 @@ export const ResumeProvider = ({ children }) => {
     // Strip trailing colons or bullets at beginning
     clean = clean.replace(/^[:\s•\-\*]+/, '');
 
+    // Strip known placeholder values
+    const placeholderValues = [
+      'role title', 'company name', 'job title', 'school name', 'degree name',
+      'candidate name', 'project name', 'organization name', 'institution name'
+    ];
+    if (placeholderValues.includes(clean.toLowerCase())) {
+      return '';
+    }
+
     return clean.trim();
   };
 
   const normalizeExtractedResumeData = (parsed) => {
-    const merged = { ...defaultState, ...(parsed || {}) };
+    const merged = { ...emptyState, ...(parsed || {}) };
     
     // Personal Info
     const p = merged.personalInfo || {};
@@ -168,19 +310,27 @@ export const ResumeProvider = ({ children }) => {
           const title = cleanExtractedString(exp.title || exp.jobTitle || exp.position || exp.role || '');
           const company = cleanExtractedString(exp.company || exp.organization || exp.employer || '');
           const desc = cleanExtractedString(exp.description || exp.achievements || exp.details || '');
+          const startDate = cleanExtractedString(exp.startDate || exp.date?.split('-')?.[0]?.trim() || '');
+          const endDate = cleanExtractedString(exp.endDate || exp.date?.split('-')?.[1]?.trim() || '');
+          const date = (startDate || endDate)
+            ? `${startDate}${endDate ? ' - ' + endDate : ''}`
+            : cleanExtractedString(exp.date || '');
+
           return {
             id: exp.id || `exp_${Date.now()}_${idx}`,
             title,
             jobTitle: title,
             company,
             location: cleanExtractedString(exp.location || ''),
-            startDate: cleanExtractedString(exp.startDate || exp.date?.split('-')?.[0]?.trim() || ''),
-            endDate: cleanExtractedString(exp.endDate || exp.date?.split('-')?.[1]?.trim() || ''),
-            currentPosition: exp.currentPosition || exp.endDate?.toLowerCase()?.includes('present') || false,
+            startDate,
+            endDate,
+            date,
+            currentPosition: Boolean(exp.currentPosition || (endDate && endDate.toLowerCase().includes('present'))),
             description: desc,
             technologies: cleanExtractedString(exp.technologies || '')
           };
-        });
+        })
+        .filter(exp => exp.title || exp.company || exp.description);
     } else {
       merged.experience = [];
     }
@@ -188,21 +338,30 @@ export const ResumeProvider = ({ children }) => {
     // Education
     if (Array.isArray(merged.education)) {
       merged.education = merged.education
-        .filter(edu => edu && (edu.school || edu.institution || edu.degree))
+        .filter(edu => edu && (edu.school || edu.institution || edu.degree || edu.fieldOfStudy))
         .map((edu, idx) => {
           const inst = cleanExtractedString(edu.school || edu.institution || edu.university || edu.college || '');
+          const degree = cleanExtractedString(edu.degree || edu.fieldOfStudy || edu.branch || '');
+          const startDate = cleanExtractedString(edu.startDate || '');
+          const endDate = cleanExtractedString(edu.endDate || edu.year || '');
+          const date = (startDate || endDate)
+            ? `${startDate}${endDate ? ' - ' + endDate : ''}`
+            : cleanExtractedString(edu.date || edu.year || '');
+
           return {
             id: edu.id || `edu_${Date.now()}_${idx}`,
             school: inst,
             institution: inst,
-            degree: cleanExtractedString(edu.degree || edu.fieldOfStudy || edu.branch || ''),
+            degree,
             location: cleanExtractedString(edu.location || ''),
-            startDate: cleanExtractedString(edu.startDate || ''),
-            endDate: cleanExtractedString(edu.endDate || edu.year || ''),
+            startDate,
+            endDate,
+            date,
             cgpa: cleanExtractedString(edu.cgpa || edu.gpa || ''),
             details: cleanExtractedString(edu.details || edu.description || '')
           };
-        });
+        })
+        .filter(edu => edu.school || edu.degree);
     } else {
       merged.education = [];
     }
@@ -211,49 +370,59 @@ export const ResumeProvider = ({ children }) => {
     if (Array.isArray(merged.projects)) {
       merged.projects = merged.projects
         .filter(proj => proj && (proj.name || proj.title || proj.description))
-        .map((proj, idx) => ({
-          id: proj.id || `proj_${Date.now()}_${idx}`,
-          name: cleanExtractedString(proj.name || proj.title || ''),
-          technologies: cleanExtractedString(proj.technologies || proj.techStack || ''),
-          duration: cleanExtractedString(proj.duration || proj.date || ''),
-          description: cleanExtractedString(proj.description || proj.details || '')
-        }));
+        .map((proj, idx) => {
+          const name = cleanExtractedString(proj.name || proj.title || '');
+          const duration = cleanExtractedString(proj.duration || proj.date || '');
+          return {
+            id: proj.id || `proj_${Date.now()}_${idx}`,
+            name,
+            technologies: cleanExtractedString(proj.technologies || proj.techStack || ''),
+            duration,
+            date: duration,
+            description: cleanExtractedString(proj.description || proj.details || '')
+          };
+        })
+        .filter(proj => proj.name || proj.description);
     } else {
       merged.projects = [];
     }
 
-    // Skills Filter & Sanitizer
-    const rawSkills = merged.skills;
-    const cleanSkill = (s) => cleanExtractedString(typeof s === 'object' ? s.name || s.value || '' : String(s));
-    const isValidSkill = (s) => {
-      const clean = cleanSkill(s);
-      if (!clean || clean.length < 2 || clean.length > 40) return false;
-      return !/^(programming|technical skills|frameworks|tools|databases|cloud|soft skills|languages|certifications|experience|education|projects|summary|page \d+)$/i.test(clean);
-    };
-
-    if (Array.isArray(rawSkills)) {
-      const stringList = rawSkills.map(cleanSkill).filter(isValidSkill);
-      merged.skills = {
-        programming: stringList.slice(0, 8),
-        frameworks: stringList.slice(8, 16),
-        databases: stringList.slice(16, 22),
-        cloud: [],
-        tools: stringList.slice(22, 30),
-        soft: [],
-        other: stringList.slice(30)
-      };
-    } else if (rawSkills && typeof rawSkills === 'object') {
-      merged.skills = {
-        programming: (rawSkills.programming || []).map(cleanSkill).filter(isValidSkill),
-        frameworks: (rawSkills.frameworks || []).map(cleanSkill).filter(isValidSkill),
-        databases: (rawSkills.databases || []).map(cleanSkill).filter(isValidSkill),
-        cloud: (rawSkills.cloud || []).map(cleanSkill).filter(isValidSkill),
-        tools: (rawSkills.tools || []).map(cleanSkill).filter(isValidSkill),
-        soft: (rawSkills.soft || []).map(cleanSkill).filter(isValidSkill),
-        other: (rawSkills.other || []).map(cleanSkill).filter(isValidSkill)
-      };
+    // Skills
+    if (merged.skills) {
+      if (Array.isArray(merged.skills)) {
+        const cleanArr = merged.skills
+          .map(s => typeof s === 'object' ? s.name || s.value || '' : String(s))
+          .map(cleanExtractedString)
+          .filter(Boolean);
+        merged.skills = {
+          programming: cleanArr.slice(0, 10),
+          frameworks: [],
+          databases: [],
+          cloud: [],
+          tools: cleanArr.slice(10),
+          soft: [],
+          other: []
+        };
+      } else if (typeof merged.skills === 'object') {
+        const newSkills = { programming: [], frameworks: [], databases: [], cloud: [], tools: [], soft: [], other: [] };
+        for (const [k, arr] of Object.entries(merged.skills)) {
+          const targetKey = newSkills[k] !== undefined ? k : 'other';
+          if (Array.isArray(arr)) {
+            newSkills[targetKey] = arr
+              .map(s => typeof s === 'object' ? s.name || s.value || '' : String(s))
+              .map(cleanExtractedString)
+              .filter(Boolean);
+          } else if (typeof arr === 'string') {
+            newSkills[targetKey] = arr
+              .split(/[,•|]/)
+              .map(cleanExtractedString)
+              .filter(Boolean);
+          }
+        }
+        merged.skills = newSkills;
+      }
     } else {
-      merged.skills = defaultState.skills;
+      merged.skills = { programming: [], frameworks: [], databases: [], cloud: [], tools: [], soft: [], other: [] };
     }
 
     // Certifications
@@ -263,9 +432,10 @@ export const ResumeProvider = ({ children }) => {
         .map((c, idx) => ({
           id: c.id || `cert_${Date.now()}_${idx}`,
           name: cleanExtractedString(c.name || c.title || ''),
-          issuer: cleanExtractedString(c.issuer || c.organization || ''),
+          issuer: cleanExtractedString(c.issuer || c.authority || ''),
           date: cleanExtractedString(c.date || c.year || '')
-        }));
+        }))
+        .filter(c => c.name);
     } else {
       merged.certifications = [];
     }
@@ -278,7 +448,8 @@ export const ResumeProvider = ({ children }) => {
           id: l.id || `lang_${Date.now()}_${idx}`,
           name: cleanExtractedString(typeof l === 'object' ? l.name || '' : String(l)),
           proficiency: typeof l === 'object' ? cleanExtractedString(l.proficiency || 'Proficient') : 'Proficient'
-        }));
+        }))
+        .filter(l => l.name);
     } else {
       merged.languages = [];
     }
@@ -325,26 +496,71 @@ export const ResumeProvider = ({ children }) => {
       } else if (extension === 'pdf') {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pageTexts = [];
+
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.0 });
+          const pageWidth = viewport.width || 600;
           const content = await page.getTextContent();
-          let lastY = null;
-          let pageText = '';
-          for (const item of content.items) {
-            if (!item.str) continue;
-            const currentY = item.transform ? item.transform[5] : null;
-            if (lastY !== null && currentY !== null && Math.abs(lastY - currentY) > 5) {
-              pageText += '\n';
-            } else if (item.hasEOL) {
-              pageText += '\n';
-            } else if (pageText.length > 0 && !pageText.endsWith('\n') && !pageText.endsWith(' ')) {
-              pageText += ' ';
+          
+          const items = content.items
+            .filter(it => it && it.str && it.str.trim().length > 0)
+            .map(it => ({
+              text: it.str,
+              x: it.transform ? it.transform[4] : 0,
+              y: it.transform ? it.transform[5] : 0,
+              w: it.width || 0,
+              h: it.height || 0
+            }));
+
+          if (items.length === 0) continue;
+
+          // Check for 2-column layout by spatial distribution
+          const midX = pageWidth * 0.4;
+          const leftItems = items.filter(it => (it.x + (it.w / 2)) < midX);
+          const rightItems = items.filter(it => (it.x + (it.w / 2)) >= midX);
+          const isTwoColumn = leftItems.length >= 8 && rightItems.length >= 8;
+
+          const extractBlockText = (blockItems) => {
+            blockItems.sort((a, b) => {
+              const yDiff = b.y - a.y;
+              if (Math.abs(yDiff) > 3.5) return yDiff;
+              return a.x - b.x;
+            });
+
+            let str = '';
+            let lastY = null;
+            for (const it of blockItems) {
+              if (lastY !== null && Math.abs(lastY - it.y) > 3.5) {
+                str += '\n';
+              } else if (str.length > 0 && !str.endsWith('\n') && !str.endsWith(' ')) {
+                str += ' ';
+              }
+              str += it.text;
+              lastY = it.y;
             }
-            pageText += item.str;
-            lastY = currentY;
+            return str.trim();
+          };
+
+          if (isTwoColumn) {
+            const maxY = Math.max(...items.map(it => it.y));
+            const headerItems = items.filter(it => it.y >= maxY - 80);
+            const bodyLeft = items.filter(it => it.y < maxY - 80 && (it.x + (it.w / 2)) < midX);
+            const bodyRight = items.filter(it => it.y < maxY - 80 && (it.x + (it.w / 2)) >= midX);
+
+            const headerText = extractBlockText(headerItems);
+            const leftText = extractBlockText(bodyLeft);
+            const rightText = extractBlockText(bodyRight);
+
+            const pageStr = [headerText, rightText, leftText].filter(Boolean).join('\n\n');
+            pageTexts.push(pageStr);
+          } else {
+            const pageStr = extractBlockText(items);
+            pageTexts.push(pageStr);
           }
-          rawText += pageText + '\n\n';
         }
+        rawText = pageTexts.join('\n\n');
       } else if (mimeType.startsWith('image/') || ['png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif', 'svg'].includes(extension)) {
         isImageData = true;
         const reader = new FileReader();
@@ -353,40 +569,109 @@ export const ResumeProvider = ({ children }) => {
           reader.readAsDataURL(file);
         });
       } else {
-        // Generic fallback text reader for any custom extension
         rawText = await file.text();
       }
 
       const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
 
-      if (groqApiKey) {
+      if (groqApiKey && (rawText.trim().length > 10 || isImageData)) {
         try {
           const profileContext = resumeData.profileType === 'student' 
-            ? "The user is a student/fresher. Focus on academic projects, education, and technical skills."
-            : "The user is a professional. Extract work history, achievements, projects, and skills.";
+            ? "The candidate is a student/fresher. Focus on academic projects, education, and technical skills."
+            : "The candidate is a professional. Extract work history, achievements, projects, and skills.";
 
-          const systemPrompt = `You are an expert resume parser. Extract the details from the user's resume into a strict JSON format. 
-CRITICAL: DO NOT invent, fabricate, or hallucinate any information. Only extract data explicitly present in the provided text or image. If a detail is missing, leave the field as an empty string or an empty array.
+          const systemPrompt = `You are a precision resume data extraction engine.
+Extract all details from the provided resume text/image into strict JSON format matching the schema below.
+
+CRITICAL EXTRACTION RULES:
+1. ONLY extract information that is explicitly present in the resume text/image.
+2. NEVER invent, hallucinate, or fill in placeholder/dummy data (e.g., do not return "Role Title", "Company Name", "Candidate Name").
+3. If a section or field is missing or not mentioned (e.g. no summary, no certifications, no projects, no phone number, no languages), leave the string as "" or the array as [].
+4. DO NOT return placeholder objects like [{"company": "", "title": ""}] for empty sections. If a section has no entries, return an empty array [].
+5. Ensure dates are cleanly formatted strings (e.g. 'Jun 2021 - Present', '2019 - 2023', or 'Aug 2022').
+6. For skills, organize them into standard categories (programming, frameworks, databases, cloud, tools, soft, other) if possible, otherwise put them in programming/tools.
+
 ${profileContext}
-DO NOT output any markdown, only valid JSON. The JSON must exactly match this structure:
+
+Required JSON schema:
 {
-  "personalInfo": { "fullName": "", "jobTitle": "", "email": "", "phone": "", "location": "", "summary": "", "portfolio": "", "linkedin": "", "github": "", "website": "" },
-  "experience": [{ "id": "exp1", "company": "", "title": "", "jobTitle": "", "location": "", "startDate": "", "endDate": "", "currentPosition": false, "description": "" }],
-  "education": [{ "id": "edu1", "school": "", "institution": "", "degree": "", "location": "", "startDate": "", "endDate": "", "cgpa": "", "details": "" }],
-  "projects": [{ "id": "proj1", "name": "", "technologies": "", "duration": "", "description": "" }],
-  "skills": { "programming": [], "frameworks": [], "databases": [], "cloud": [], "tools": [], "soft": [], "other": [] },
-  "certifications": [{ "id": "cert1", "name": "", "issuer": "", "date": "" }],
-  "languages": [{ "id": "lang1", "name": "", "proficiency": "" }],
+  "personalInfo": {
+    "fullName": "",
+    "jobTitle": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "summary": "",
+    "portfolio": "",
+    "linkedin": "",
+    "github": "",
+    "website": ""
+  },
+  "experience": [
+    {
+      "company": "",
+      "title": "",
+      "jobTitle": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "date": "",
+      "currentPosition": false,
+      "description": ""
+    }
+  ],
+  "education": [
+    {
+      "school": "",
+      "institution": "",
+      "degree": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "date": "",
+      "cgpa": "",
+      "details": ""
+    }
+  ],
+  "projects": [
+    {
+      "name": "",
+      "technologies": "",
+      "duration": "",
+      "description": ""
+    }
+  ],
+  "skills": {
+    "programming": [],
+    "frameworks": [],
+    "databases": [],
+    "cloud": [],
+    "tools": [],
+    "soft": [],
+    "other": []
+  },
+  "certifications": [
+    {
+      "name": "",
+      "issuer": "",
+      "date": ""
+    }
+  ],
+  "languages": [
+    {
+      "name": "",
+      "proficiency": ""
+    }
+  ],
   "customSections": []
-}
-Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If information is missing, leave the field empty or as an empty array.`;
+}`;
 
           const userMessageContent = isImageData ? [
             { type: "text", text: "Extract all text and sections from this resume image." },
             { type: "image_url", image_url: { url: imageDataUrl } }
           ] : rawText;
 
-          const modelName = isImageData ? 'llama-3.2-11b-vision-preview' : 'llama-3.3-70b-versatile';
+          const modelName = isImageData ? 'llama-3.2-11b-vision-preview' : 'openai/gpt-oss-120b';
 
           const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
@@ -416,73 +701,109 @@ Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If informa
         }
       }
 
-      // Advanced Local Heuristic Extractor (NO AI Fallback)
+      // Local Heuristic Extractor (Offline Fallback)
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-      let currentSection = 'summary';
-      let data = { summary: [], experience: [], education: [], skills: [], projects: [], certifications: [], languages: [] };
+      let currentSection = 'header';
+      let data = { header: [], summary: [], experience: [], education: [], skills: [], projects: [], certifications: [], languages: [] };
 
       const sectionMatchers = {
-        experience: ['EXPERIENCE', 'EMPLOYMENT', 'WORK HISTORY', 'CAREER', 'WORK EXPERIENCE'],
-        education: ['EDUCATION', 'ACADEMIC', 'QUALIFICATIONS'],
-        skills: ['SKILLS', 'TECHNOLOGIES', 'TECHNICAL SKILLS', 'COMPETENCIES'],
-        projects: ['PROJECTS', 'KEY PROJECTS', 'ACADEMIC PROJECTS'],
-        certifications: ['CERTIFICATIONS', 'LICENSES', 'CERTIFICATES'],
-        languages: ['LANGUAGES'],
-        summary: ['SUMMARY', 'PROFILE', 'OBJECTIVE', 'ABOUT ME', 'EXECUTIVE SUMMARY']
+        experience: ['EXPERIENCE', 'EMPLOYMENT', 'WORK HISTORY', 'CAREER', 'WORK EXPERIENCE', 'PROFESSIONAL EXPERIENCE'],
+        education: ['EDUCATION', 'ACADEMIC', 'ACADEMICS', 'QUALIFICATIONS', 'EDUCATIONAL BACKGROUND'],
+        skills: ['SKILLS', 'TECHNOLOGIES', 'TECHNICAL SKILLS', 'COMPETENCIES', 'CORE COMPETENCIES'],
+        projects: ['PROJECTS', 'KEY PROJECTS', 'ACADEMIC PROJECTS', 'PERSONAL PROJECTS'],
+        certifications: ['CERTIFICATIONS', 'LICENSES', 'CERTIFICATES', 'CERTIFICATION'],
+        languages: ['LANGUAGES', 'LANGUAGE SKILLS'],
+        summary: ['SUMMARY', 'PROFILE', 'OBJECTIVE', 'ABOUT ME', 'EXECUTIVE SUMMARY', 'PROFESSIONAL SUMMARY']
       };
 
       for (const line of lines) {
         const upper = line.toUpperCase().replace(/[^A-Z ]/g, '').trim();
         let matched = false;
         for (const [sec, keywords] of Object.entries(sectionMatchers)) {
-          if (keywords.includes(upper) || (upper.length < 30 && keywords.some(k => upper.startsWith(k)))) {
+          if (keywords.includes(upper) || (upper.length < 30 && keywords.some(k => upper === k || upper.startsWith(k + ' ') || upper.endsWith(' ' + k)))) {
             currentSection = sec;
             matched = true;
             break;
           }
         }
-        if (!matched) data[currentSection].push(line);
+        if (!matched) {
+          data[currentSection].push(line);
+        }
       }
 
-      const email = rawText.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/i)?.[0] || '';
-      const phone = rawText.match(/(\+\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/)?.[0] || '';
+      const email = rawText.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i)?.[0] || '';
+      const phone = rawText.match(/(?:\+?\d{1,3}[ -.]?)?\(?\d{3}\)?[ -.]?\d{3}[ -.]?\d{4}/)?.[0] || '';
       const linkedin = rawText.match(/linkedin\.com\/in\/[a-zA-Z0-9_-]+/i)?.[0] || '';
       const github = rawText.match(/github\.com\/[a-zA-Z0-9_-]+/i)?.[0] || '';
-      const name = lines[0] ? lines[0].replace(/[^a-zA-Z\s.-]/g, "").trim().slice(0, 40) : 'Extracted User';
+      
+      let candidateName = '';
+      const headerLines = data.header.filter(l => !l.includes('@') && !l.match(/\d{3}/) && !l.toLowerCase().includes('linkedin') && !l.toLowerCase().includes('github'));
+      if (headerLines.length > 0) {
+        candidateName = headerLines[0].replace(/[^a-zA-Z\s.-]/g, '').trim().slice(0, 50);
+      }
+      let candidateTitle = headerLines.length > 1 ? headerLines[1].trim().slice(0, 60) : '';
 
-      // Parse Experience blocks cleanly
       let expBlocks = [];
       if (data.experience.length > 0) {
         let currentJob = [];
         data.experience.forEach(line => {
-          if (line.match(/\b(20\d{2}|19\d{2}|Present|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i) && currentJob.length > 1) {
+          if (line.match(/\b(20\d{2}|19\d{2}|Present|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i) && currentJob.length > 0) {
             expBlocks.push(currentJob);
             currentJob = [line];
-          } else currentJob.push(line);
+          } else {
+            currentJob.push(line);
+          }
         });
         if (currentJob.length) expBlocks.push(currentJob);
       }
       
-      const finalExp = expBlocks.map((block, i) => ({
-        id: `exp_${i}`,
-        title: block[0] || 'Role Title',
-        jobTitle: block[0] || 'Role Title',
-        company: block[1] || 'Company Name',
-        startDate: block[2] || '',
-        endDate: '',
-        description: block.slice(2).join('\n')
-      }));
+      const finalExp = expBlocks.map((block, i) => {
+        const title = block[0] || '';
+        const company = block[1] || '';
+        const desc = block.slice(2).join('\n');
+        return {
+          id: `exp_${i}`,
+          title,
+          jobTitle: title,
+          company,
+          startDate: '',
+          endDate: '',
+          description: desc
+        };
+      }).filter(e => e.title || e.company || e.description);
 
       const allSkills = data.skills.join(', ').split(/[,•|]/).map(s => s.trim()).filter(s => s.length > 1);
 
       const localParsed = {
-        personalInfo: { fullName: name, jobTitle: lines[1] || '', email, phone, location: '', summary: data.summary.join(' ').slice(0,800), portfolio: '', linkedin, github, website: '' },
+        personalInfo: {
+          fullName: candidateName,
+          jobTitle: candidateTitle,
+          email,
+          phone,
+          location: '',
+          summary: data.summary.join(' ').slice(0, 800),
+          portfolio: '',
+          linkedin,
+          github,
+          website: ''
+        },
         experience: finalExp,
-        education: data.education.length ? [{ id: 'edu1', school: data.education[0] || '', institution: data.education[0] || '', degree: data.education[1] || '', startDate: '', endDate: '' }] : [],
-        projects: data.projects.length ? [{ id: 'proj1', name: data.projects[0] || 'Project', description: data.projects.slice(1).join('\n') }] : [],
+        education: data.education.length ? [{
+          id: 'edu1',
+          school: data.education[0] || '',
+          institution: data.education[0] || '',
+          degree: data.education[1] || '',
+          startDate: '',
+          endDate: ''
+        }] : [],
+        projects: data.projects.length ? [{
+          id: 'proj1',
+          name: data.projects[0] || '',
+          description: data.projects.slice(1).join('\n')
+        }].filter(p => p.name || p.description) : [],
         skills: allSkills,
-        certifications: data.certifications.length ? data.certifications.map((c, i) => ({ id: `cert_${i}`, name: c })) : [],
-        languages: data.languages.length ? data.languages.map((l, i) => ({ id: `lang_${i}`, name: l })) : []
+        certifications: data.certifications.map((c, i) => ({ id: `cert_${i}`, name: c })).filter(c => c.name),
+        languages: data.languages.map((l, i) => ({ id: `lang_${i}`, name: l })).filter(l => l.name)
       };
 
       const normalizedData = normalizeExtractedResumeData(localParsed);
@@ -520,7 +841,7 @@ Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If informa
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
+            model: 'openai/gpt-oss-120b',
             messages: [
               {
                 role: 'system',
@@ -544,7 +865,6 @@ Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If informa
       console.warn('Groq API unavailable, using intelligent local AI summary generator:', err.message);
     }
 
-    // Local Intelligent Summary Generator Fallback
     const roleStr = type === 'student' ? 'aspiring software developer' : 'experienced technical professional';
     const skillsText = skillsList ? `proficient in ${skillsList}` : 'skilled in modern engineering practices';
     const notesText = roughNotes ? ` Focused on ${roughNotes}.` : '';
@@ -567,7 +887,7 @@ Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If informa
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
+            model: 'openai/gpt-oss-120b',
             messages: [
               {
                 role: 'system',
@@ -591,7 +911,6 @@ Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If informa
       console.warn('Groq API unavailable, using intelligent local AI bullet generator:', err.message);
     }
 
-    // Local Intelligent Bullet Generator Fallback
     const name = projectName || 'Application';
     const tech = technologies || 'modern tech stack';
     const info = projectInfo ? ` featuring ${projectInfo}` : '';
@@ -601,6 +920,7 @@ Ensure dates are string format (e.g. 'Jun 2018' or '2020 - Present'). If informa
   return (
     <ResumeContext.Provider value={{
       resumeData, setResumeData, selectedTemplate, setSelectedTemplate, processRealFile, setProfileType, generateSummaryAI, generateProjectDescriptionAI, resetResume,
+      loadSampleData, clearAllData, clearSection,
       updateSection: _updateSection, updatePersonalInfo, addItem, updateItem, removeItem, updateSkills, updateSettings,
       addExperience, updateExperience, removeExperience,
       addEducation, updateEducation, removeEducation,

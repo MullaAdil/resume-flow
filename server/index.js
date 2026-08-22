@@ -638,6 +638,69 @@ app.get('/api/activity', optionalAuthenticate, async (req, res) => {
   res.json(filtered);
 });
 
+// --- AI TEXT TO RESUME PARSER ENDPOINT ---
+app.post('/api/ai/parse-text-resume', async (req, res) => {
+  const { rawText, targetRole, formatStyle, customPrompt } = req.body;
+  if (!rawText || rawText.trim().length < 5) {
+    return res.status(400).json({ error: 'rawText is required (minimum 5 characters)' });
+  }
+
+  const groqApiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
+  if (!groqApiKey) {
+    return res.status(500).json({ error: 'AI server key not configured. Client fallback active.' });
+  }
+
+  try {
+    const systemPrompt = `You are a world-class Executive Resume Architect & AI Career Strategist.
+Transform unformatted candidate notes/text into strict, perfected JSON matching the resume schema.
+- Target Role: ${targetRole || 'Infer from text'}
+- Format Style: ${formatStyle || 'ATS High-Impact XYZ/STAR format'}
+${customPrompt ? `- Custom Instructions: "${customPrompt}"` : ''}
+
+CRITICAL RULES:
+1. DATES: If the input text does NOT explicitly specify dates for experience, education, or projects, output startDate: "", endDate: "", and date: "". NEVER invent or guess dates.
+2. SIDE HEADINGS & CUSTOM SECTIONS: If the text includes custom side headings (e.g. "Key Achievements:", "Certifications:", "Publications:", "Volunteering:"), structure them under the customSections array: [{ "title": "Heading Title", "content": "• Item 1\\n• Item 2" }].
+3. Output strictly valid JSON with keys: personalInfo, experience, education, projects, skills, customSections, certifications, languages.`;
+
+  const modelsToTry = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.6-27b'];
+
+  for (const model of modelsToTry) {
+    try {
+      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Analyze, perfect, and structure this candidate text:\n\n${rawText}` }
+          ],
+          response_format: { type: 'json_object' },
+          temperature: 0.2
+        })
+      });
+
+      if (groqRes.ok) {
+        const groqData = await groqRes.json();
+        const parsed = JSON.parse(groqData.choices[0].message.content);
+        return res.json({ success: true, data: parsed });
+      }
+    } catch (modelErr) {
+      console.warn(`Server AI model ${model} failed, trying next:`, modelErr.message);
+    }
+  }
+
+  return res.status(500).json({ error: 'All AI models on server failed. Please check prompt or API key.' });
+    return res.json({ success: true, data: parsed });
+  } catch (err) {
+    console.error('Backend AI parse error:', err);
+    return res.status(500).json({ error: err.message || 'Internal AI parsing error' });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });

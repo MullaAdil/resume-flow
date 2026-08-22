@@ -1,16 +1,11 @@
 import React from "react";
-
 import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
 const ClassicTemplate = ({ resumeData }) => {
-  const {
-    personalInfo,
-    experience,
-    education,
-    skills,
-    projects,
-    settings = {},
-  } = resumeData;
+  const data = resumeData || {};
+  const personalInfo = data.personalInfo || {};
+  const settings = data.settings || {};
+
   const primaryColor = settings.primaryColor || "#059669";
   const marginPadding =
     settings.margins === "Compact"
@@ -19,16 +14,32 @@ const ClassicTemplate = ({ resumeData }) => {
         ? "2.5rem 3rem"
         : "1.75rem 2.25rem";
 
-  const divider = (
-    <div
-      style={{
-        width: "100%",
-        height: "1px",
-        background: "#CBD5E1",
-        margin: "0.5rem 0",
-      }}
-    ></div>
-  );
+  const experience = (Array.isArray(data.experience) && data.experience.length > 0 && data.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? data.experience
+    : [];
+
+  const education = (Array.isArray(data.education) && data.education.length > 0 && data.education.some(e => e && (e.school || e.degree)))
+    ? data.education
+    : [];
+
+  const projects = (Array.isArray(data.projects) && data.projects.length > 0 && data.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? data.projects
+    : [];
+
+  const getSkillsArray = () => {
+    const raw = data.skills;
+    if (!raw) return [];
+    if (Array.isArray(raw)) {
+      return raw.map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+    }
+    if (typeof raw === 'object') {
+      return Object.values(raw).flat().map(s => typeof s === 'object' ? s.name || s.value || '' : String(s)).filter(Boolean);
+    }
+    return [];
+  };
+  const activeSkills = getSkillsArray();
+
+  const hasContacts = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin || personalInfo.github;
 
   return (
     <div
@@ -38,7 +49,7 @@ const ClassicTemplate = ({ resumeData }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
         background: "#fff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
         padding: marginPadding,
@@ -48,67 +59,80 @@ const ClassicTemplate = ({ resumeData }) => {
       }}
     >
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "0.75rem" }}>
-        <h1
-          style={{
-            fontSize: "2rem",
-            fontWeight: "bold",
-            margin: "0 0 0.15rem 0",
-            letterSpacing: "-0.02em"
-          }}
-        >
-          {personalInfo.fullName}
-        </h1>
-        {personalInfo.jobTitle && (
-          <h2
+      {(personalInfo.fullName || hasContacts) && (
+        <div style={{ textAlign: "center", marginBottom: "0.75rem" }}>
+          {personalInfo.fullName && (
+            <h1
+              style={{
+                fontSize: "2rem",
+                fontWeight: "bold",
+                margin: "0 0 0.15rem 0",
+                letterSpacing: "-0.02em"
+              }}
+            >
+              {personalInfo.fullName}
+            </h1>
+          )}
+          {personalInfo.jobTitle && (
+            <h2
+              style={{
+                fontSize: "0.95rem",
+                fontWeight: "500",
+                margin: "0 0 0.5rem 0",
+                color: primaryColor,
+              }}
+            >
+              {personalInfo.jobTitle}
+            </h2>
+          )}
+
+          {hasContacts && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                flexWrap: "wrap",
+                gap: "0.75rem",
+                fontSize: "0.8rem",
+                color: "#475569",
+              }}
+            >
+              {personalInfo.phone && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                  <Phone size={12} /> {personalInfo.phone}
+                </div>
+              )}
+              {personalInfo.email && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                  <Mail size={12} /> {personalInfo.email}
+                </div>
+              )}
+              {personalInfo.location && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                  <MapPin size={12} /> {personalInfo.location}
+                </div>
+              )}
+              {(personalInfo.website || personalInfo.linkedin || personalInfo.github) && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                  <Globe size={12} /> {personalInfo.website || personalInfo.linkedin || personalInfo.github}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div
             style={{
-              fontSize: "0.95rem",
-              fontWeight: "500",
-              margin: "0 0 0.5rem 0",
-              color: primaryColor,
+              width: "100%",
+              height: "1px",
+              background: "#CBD5E1",
+              margin: "0.75rem 0 0.5rem 0",
             }}
-          >
-            {personalInfo.jobTitle}
-          </h2>
-        )}
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: "0.75rem",
-            fontSize: "0.8rem",
-            color: "#475569",
-          }}
-        >
-          {personalInfo.phone && (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-              <Phone size={12} /> {personalInfo.phone}
-            </div>
-          )}
-          {personalInfo.email && (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-              <Mail size={12} /> {personalInfo.email}
-            </div>
-          )}
-          {personalInfo.location && (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-              <MapPin size={12} /> {personalInfo.location}
-            </div>
-          )}
-          {personalInfo.website && (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-              <Globe size={12} /> {personalInfo.website}
-            </div>
-          )}
+          ></div>
         </div>
-      </div>
-
-      {divider}
+      )}
 
       {/* Summary */}
-      {personalInfo.summary && (
+      {settings.showSummary !== false && personalInfo.summary && (
         <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
@@ -130,7 +154,8 @@ const ClassicTemplate = ({ resumeData }) => {
         </div>
       )}
 
-      {skills.length > 0 && (
+      {/* Skills */}
+      {settings.showSkills !== false && activeSkills.length > 0 && (
         <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
@@ -153,7 +178,7 @@ const ClassicTemplate = ({ resumeData }) => {
               gap: "0.3rem 1rem",
             }}
           >
-            {skills.map((skill, index) => (
+            {activeSkills.map((skill, index) => (
               <div
                 key={index}
                 style={{
@@ -172,7 +197,7 @@ const ClassicTemplate = ({ resumeData }) => {
       )}
 
       {/* Experience */}
-      {experience.length > 0 && (
+      {settings.showExperience !== false && experience.length > 0 && (
         <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
@@ -189,8 +214,8 @@ const ClassicTemplate = ({ resumeData }) => {
             Experience
           </h3>
 
-          {experience.map((exp) => (
-            <div key={exp.id} style={{ marginBottom: "0.6rem" }}>
+          {experience.map((exp, idx) => (
+            <div key={exp.id || idx} style={{ marginBottom: "0.6rem" }}>
               <div
                 style={{
                   display: "flex",
@@ -200,17 +225,19 @@ const ClassicTemplate = ({ resumeData }) => {
                 }}
               >
                 <div style={{ fontWeight: "bold", fontSize: "0.88rem", color: "#0F172A" }}>
-                  {exp.title}
+                  {exp.title || exp.jobTitle}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#64748B",
-                    fontWeight: "600",
-                  }}
-                >
-                  {exp.date}
-                </div>
+                {(exp.date || exp.startDate || exp.endDate) && (
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#64748B",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {exp.date || (exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : exp.startDate || exp.endDate)}
+                  </div>
+                )}
               </div>
               <div
                 style={{
@@ -255,7 +282,7 @@ const ClassicTemplate = ({ resumeData }) => {
       )}
 
       {/* Projects */}
-      {settings.showProjects !== false && projects && projects.length > 0 && (
+      {settings.showProjects !== false && projects.length > 0 && (
         <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
@@ -271,8 +298,8 @@ const ClassicTemplate = ({ resumeData }) => {
           >
             Projects
           </h3>
-          {projects.map((proj) => (
-            <div key={proj.id} style={{ marginBottom: "0.6rem" }}>
+          {projects.map((proj, idx) => (
+            <div key={proj.id || idx} style={{ marginBottom: "0.6rem" }}>
               <div
                 style={{
                   display: "flex",
@@ -284,15 +311,17 @@ const ClassicTemplate = ({ resumeData }) => {
                 <div style={{ fontWeight: "bold", fontSize: "0.88rem", color: "#0F172A" }}>
                   {proj.name || proj.title}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#64748B",
-                    fontWeight: "600",
-                  }}
-                >
-                  {proj.duration || proj.date}
-                </div>
+                {(proj.duration || proj.date) && (
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#64748B",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {proj.duration || proj.date}
+                  </div>
+                )}
               </div>
               {proj.technologies && (
                 <div
@@ -338,7 +367,7 @@ const ClassicTemplate = ({ resumeData }) => {
       )}
 
       {/* Education */}
-      {education.length > 0 && (
+      {settings.showEducation !== false && education.length > 0 && (
         <div style={{ marginBottom: "0.5rem" }}>
           <h3
             style={{
@@ -354,8 +383,8 @@ const ClassicTemplate = ({ resumeData }) => {
           >
             Education
           </h3>
-          {education.map((edu) => (
-            <div key={edu.id} style={{ marginBottom: "0.4rem" }}>
+          {education.map((edu, idx) => (
+            <div key={edu.id || idx} style={{ marginBottom: "0.4rem" }}>
               <div
                 style={{
                   display: "flex",
@@ -365,20 +394,22 @@ const ClassicTemplate = ({ resumeData }) => {
                 }}
               >
                 <div style={{ fontWeight: "bold", fontSize: "0.88rem", color: "#0F172A" }}>
-                  {edu.degree}
+                  {edu.degree || edu.fieldOfStudy || ''}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.8rem",
-                    color: "#64748B",
-                    fontWeight: "600",
-                  }}
-                >
-                  {edu.date}
-                </div>
+                {(edu.date || edu.startDate || edu.endDate) && (
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#64748B",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {edu.date || (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : edu.startDate || edu.endDate)}
+                  </div>
+                )}
               </div>
               <div style={{ fontSize: "0.83rem", color: "#475569" }}>
-                {edu.school}
+                {edu.school || edu.institution}
               </div>
             </div>
           ))}

@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Mail,
   Phone,
@@ -15,17 +14,34 @@ import {
 } from "lucide-react";
 
 const ArtisticTemplate = ({ resumeData }) => {
-  const {
-    personalInfo,
-    experience,
-    education,
-    projects,
-    skills,
-    certifications,
-    languages,
-  } = resumeData;
+  const data = resumeData || {};
+  const personalInfo = data.personalInfo || {};
+  const settings = data.settings || {};
+
+  const experience = (Array.isArray(data.experience) && data.experience.length > 0 && data.experience.some(e => e && (e.company || e.title || e.jobTitle)))
+    ? data.experience
+    : [];
+
+  const education = (Array.isArray(data.education) && data.education.length > 0 && data.education.some(e => e && (e.school || e.degree)))
+    ? data.education
+    : [];
+
+  const projects = (Array.isArray(data.projects) && data.projects.length > 0 && data.projects.some(pr => pr && (pr.name || pr.title || pr.description)))
+    ? data.projects
+    : [];
+
+  const certifications = (Array.isArray(data.certifications) && data.certifications.length > 0 && data.certifications.some(c => c && (c.name || c.title)))
+    ? data.certifications
+    : [];
+
+  const languages = (Array.isArray(data.languages) && data.languages.length > 0 && data.languages.some(l => l && (typeof l === 'string' ? l.trim() : l.name)))
+    ? data.languages
+    : [];
+
+  const skills = data.skills;
 
   const renderSkills = () => {
+    if (!skills) return null;
     if (Array.isArray(skills)) {
       if (skills.length === 0) return null;
       return (
@@ -40,14 +56,14 @@ const ArtisticTemplate = ({ resumeData }) => {
                 borderRadius: "4px",
               }}
             >
-              {skill}
+              {typeof skill === 'object' ? skill.name || skill.value || '' : String(skill)}
             </span>
           ))}
         </div>
       );
     }
     const activeCategories = Object.entries(skills || {}).filter(
-      ([_, arr]) => arr && arr.length > 0,
+      ([_, arr]) => Array.isArray(arr) && arr.length > 0,
     );
     if (activeCategories.length === 0) return null;
 
@@ -82,7 +98,7 @@ const ArtisticTemplate = ({ resumeData }) => {
                     borderRadius: "4px",
                   }}
                 >
-                  {skill}
+                  {typeof skill === 'object' ? skill.name || skill.value || '' : String(skill)}
                 </span>
               ))}
             </div>
@@ -92,6 +108,15 @@ const ArtisticTemplate = ({ resumeData }) => {
     );
   };
 
+  const hasSkills = () => {
+    if (!skills) return false;
+    if (Array.isArray(skills)) return skills.length > 0;
+    if (typeof skills === 'object') return Object.values(skills).flat().length > 0;
+    return false;
+  };
+
+  const hasContacts = personalInfo.email || personalInfo.phone || personalInfo.location || personalInfo.website || personalInfo.linkedin || personalInfo.github;
+
   return (
     <div
       style={{
@@ -100,142 +125,150 @@ const ArtisticTemplate = ({ resumeData }) => {
         background: "#fff",
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.1)",
         padding:
-          resumeData.settings?.margins === "Compact"
+          settings.margins === "Compact"
             ? "2rem 3rem"
-            : resumeData.settings?.margins === "Spacious"
+            : settings.margins === "Spacious"
               ? "4rem 5rem"
               : "3rem 4rem",
         fontFamily:
-          resumeData.settings?.fontFamily === "Inter"
+          settings.fontFamily === "Inter"
             ? "'Inter', sans-serif"
-            : resumeData.settings?.fontFamily === "Geist"
+            : settings.fontFamily === "Geist"
               ? "'Geist', sans-serif"
-              : resumeData.settings?.fontFamily === "SF Pro Display"
+              : settings.fontFamily === "SF Pro Display"
                 ? "system-ui, -apple-system, sans-serif"
                 : "'Merriweather', serif",
         color: "#000",
+        boxSizing: "border-box",
       }}
     >
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "1rem",
-        }}
-      >
-        <div>
-          <h1
+      {(personalInfo.fullName || hasContacts) && (
+        <>
+          <div
             style={{
-              fontSize: "3rem",
-              fontWeight: 800,
-              margin: "0 0 0.5rem 0",
-              color: resumeData.settings?.primaryColor || "#2563EB",
-              letterSpacing: "-0.02em",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              marginBottom: "1rem",
             }}
           >
-            {personalInfo?.fullName ||
-              `${personalInfo?.firstName || ""} ${personalInfo?.lastName || ""}`.trim()}
-          </h1>
-          {personalInfo.jobTitle && (
-            <h2
-              style={{
-                fontSize: "1.4rem",
-                fontWeight: "normal",
-                color: "#444",
-                margin: 0,
-              }}
-            >
-              {personalInfo.jobTitle}
-            </h2>
-          )}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-            fontSize: "1rem",
-            color: "#4B5563",
-            textAlign: "right",
-            fontFamily: "Arial, sans-serif",
-          }}
-        >
-          {personalInfo.email && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                justifyContent: "flex-end",
-              }}
-            >
-              {personalInfo.email} <Mail size={14} />
+            <div>
+              {personalInfo.fullName && (
+                <h1
+                  style={{
+                    fontSize: "3rem",
+                    fontWeight: 800,
+                    margin: "0 0 0.5rem 0",
+                    color: settings.primaryColor || "#2563EB",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {personalInfo.fullName}
+                </h1>
+              )}
+              {personalInfo.jobTitle && (
+                <h2
+                  style={{
+                    fontSize: "1.4rem",
+                    fontWeight: "normal",
+                    color: "#444",
+                    margin: 0,
+                  }}
+                >
+                  {personalInfo.jobTitle}
+                </h2>
+              )}
             </div>
-          )}
-          {personalInfo.phone && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                justifyContent: "flex-end",
-              }}
-            >
-              {personalInfo.phone} <Phone size={14} />
-            </div>
-          )}
-          {personalInfo.location && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                justifyContent: "flex-end",
-              }}
-            >
-              {personalInfo.location} <MapPin size={14} />
-            </div>
-          )}
-          {personalInfo.website && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                justifyContent: "flex-end",
-              }}
-            >
-              {personalInfo.website} <Globe size={14} />
-            </div>
-          )}
-          {personalInfo.linkedin && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                justifyContent: "flex-end",
-              }}
-            >
-              {personalInfo.linkedin} <LinkIcon size={14} />
-            </div>
-          )}
-        </div>
-      </div>
+            {hasContacts && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem",
+                  fontSize: "1rem",
+                  color: "#4B5563",
+                  textAlign: "right",
+                  fontFamily: "Arial, sans-serif",
+                }}
+              >
+                {personalInfo.email && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    {personalInfo.email} <Mail size={14} />
+                  </div>
+                )}
+                {personalInfo.phone && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    {personalInfo.phone} <Phone size={14} />
+                  </div>
+                )}
+                {personalInfo.location && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    {personalInfo.location} <MapPin size={14} />
+                  </div>
+                )}
+                {(personalInfo.website || personalInfo.github) && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    {personalInfo.website || personalInfo.github} <Globe size={14} />
+                  </div>
+                )}
+                {personalInfo.linkedin && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    {personalInfo.linkedin} <LinkIcon size={14} />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-      <div
-        style={{
-          width: "100%",
-          height: "2px",
-          background: resumeData.settings?.primaryColor || "#2563EB",
-          marginBottom: "2rem",
-        }}
-      ></div>
+          <div
+            style={{
+              width: "100%",
+              height: "2px",
+              background: settings.primaryColor || "#2563EB",
+              marginBottom: "2rem",
+            }}
+          ></div>
+        </>
+      )}
 
       {/* Summary */}
-      {personalInfo.summary && (
+      {settings.showSummary !== false && personalInfo.summary && (
         <div
           style={{ marginBottom: "2.5rem", fontFamily: "Arial, sans-serif" }}
         >
@@ -266,7 +299,7 @@ const ArtisticTemplate = ({ resumeData }) => {
       )}
 
       {/* Experience */}
-      {(experience || []).length > 0 && (
+      {settings.showExperience !== false && experience.length > 0 && (
         <div
           style={{ marginBottom: "2.5rem", fontFamily: "Arial, sans-serif" }}
         >
@@ -284,8 +317,8 @@ const ArtisticTemplate = ({ resumeData }) => {
             <Briefcase size={18} /> Experience
           </h3>
 
-          {experience.map((exp) => (
-            <div key={exp.id} style={{ marginBottom: "1.5rem" }}>
+          {experience.map((exp, idx) => (
+            <div key={exp.id || idx} style={{ marginBottom: "1.5rem" }}>
               <div
                 style={{
                   fontWeight: "bold",
@@ -307,53 +340,56 @@ const ArtisticTemplate = ({ resumeData }) => {
                   style={{
                     fontSize: "1rem",
                     fontWeight: "bold",
-                    color: resumeData.settings?.primaryColor || "#2563EB",
+                    color: settings.primaryColor || "#2563EB",
                   }}
                 >
-                  {exp.title}
+                  {exp.title || exp.jobTitle}
                 </div>
-                <div
-                  style={{
-                    fontSize: "0.95rem",
-                    color: "#666",
-                    fontStyle: "italic",
-                  }}
-                >
-                  {exp.startDate || exp.date}{" "}
-                  {exp.endDate ? `- ${exp.endDate}` : ""}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  fontSize: "1rem",
-                  lineHeight: 1.6,
-                  whiteSpace: "pre-wrap",
-                  color: "#374151",
-                }}
-              >
-                {(exp.description || "").split("\\n").map((line, i) =>
-                  line.trim().length > 0 ? (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        marginBottom: "0.3rem",
-                      }}
-                    >
-                      <span>•</span> <span>{line}</span>
-                    </div>
-                  ) : null,
+                {(exp.startDate || exp.date || exp.endDate) && (
+                  <div
+                    style={{
+                      fontSize: "0.95rem",
+                      color: "#666",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {exp.date || (exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : exp.startDate || exp.endDate)}
+                  </div>
                 )}
               </div>
+
+              {exp.description && (
+                <div
+                  style={{
+                    fontSize: "1rem",
+                    lineHeight: 1.6,
+                    whiteSpace: "pre-wrap",
+                    color: "#374151",
+                  }}
+                >
+                  {exp.description.split("\n").map((line, i) =>
+                    line.trim().length > 0 ? (
+                      <div
+                        key={i}
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          marginBottom: "0.3rem",
+                        }}
+                      >
+                        <span>•</span> <span>{line}</span>
+                      </div>
+                    ) : null,
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
 
       {/* Education */}
-      {(education || []).length > 0 && (
+      {settings.showEducation !== false && education.length > 0 && (
         <div
           style={{ marginBottom: "2.5rem", fontFamily: "Arial, sans-serif" }}
         >
@@ -381,17 +417,19 @@ const ArtisticTemplate = ({ resumeData }) => {
                 }}
               >
                 <strong style={{ fontSize: "1.1rem", color: "#111827" }}>
-                  {edu.degree}
+                  {edu.degree || edu.fieldOfStudy || ''}
                 </strong>
-                <span
-                  style={{
-                    fontSize: "0.95rem",
-                    color: "#6B7280",
-                    fontWeight: 500,
-                  }}
-                >
-                  {edu.startDate} {edu.endDate ? `- ${edu.endDate}` : ""}
-                </span>
+                {(edu.startDate || edu.endDate || edu.date) && (
+                  <span
+                    style={{
+                      fontSize: "0.95rem",
+                      color: "#6B7280",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {edu.date || (edu.startDate && edu.endDate ? `${edu.startDate} - ${edu.endDate}` : edu.startDate || edu.endDate)}
+                  </span>
+                )}
               </div>
               <div style={{ fontSize: "1.05rem", color: "#4B5563" }}>
                 {edu.institution || edu.school}
@@ -407,7 +445,7 @@ const ArtisticTemplate = ({ resumeData }) => {
       )}
 
       {/* Projects */}
-      {(projects || []).length > 0 && (
+      {settings.showProjects !== false && projects.length > 0 && (
         <div
           style={{ marginBottom: "2.5rem", fontFamily: "Arial, sans-serif" }}
         >
@@ -425,8 +463,8 @@ const ArtisticTemplate = ({ resumeData }) => {
             <Folder size={18} /> Projects
           </h3>
 
-          {projects.map((proj) => (
-            <div key={proj.id} style={{ marginBottom: "1.25rem" }}>
+          {projects.map((proj, idx) => (
+            <div key={proj.id || idx} style={{ marginBottom: "1.25rem" }}>
               <div
                 style={{
                   display: "flex",
@@ -442,35 +480,39 @@ const ArtisticTemplate = ({ resumeData }) => {
                     color: "#111827",
                   }}
                 >
-                  {proj.name}
+                  {proj.name || proj.title}
                 </div>
+                {(proj.duration || proj.date) && (
+                  <div
+                    style={{
+                      fontSize: "0.95rem",
+                      color: "#666",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {proj.duration || proj.date}
+                  </div>
+                )}
+              </div>
+              {proj.description && (
                 <div
                   style={{
-                    fontSize: "0.95rem",
-                    color: "#666",
-                    fontStyle: "italic",
+                    fontSize: "1rem",
+                    lineHeight: 1.6,
+                    color: "#374151",
+                    whiteSpace: "pre-wrap",
                   }}
                 >
-                  {proj.duration}
+                  {proj.description}
                 </div>
-              </div>
-              <div
-                style={{
-                  fontSize: "1rem",
-                  lineHeight: 1.6,
-                  color: "#374151",
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {proj.description}
-              </div>
+              )}
             </div>
           ))}
         </div>
       )}
 
       {/* Skills */}
-      {skills && Object.keys(skills).length > 0 && (
+      {settings.showSkills !== false && hasSkills() && (
         <div
           style={{ marginBottom: "2.5rem", fontFamily: "Arial, sans-serif" }}
         >
@@ -492,7 +534,7 @@ const ArtisticTemplate = ({ resumeData }) => {
       )}
 
       {/* Certifications */}
-      {(certifications || []).length > 0 && (
+      {settings.showCertifications !== false && certifications.length > 0 && (
         <div
           style={{ marginBottom: "2.5rem", fontFamily: "Arial, sans-serif" }}
         >
@@ -512,7 +554,7 @@ const ArtisticTemplate = ({ resumeData }) => {
           {certifications.map((cert, idx) => (
             <div key={cert.id || idx} style={{ marginBottom: "1rem" }}>
               <div style={{ fontSize: "1.1rem" }}>
-                <strong>{cert.name}</strong>{" "}
+                <strong>{cert.name || cert.title}</strong>{" "}
                 {cert.issuer ? `- ${cert.issuer}` : ""}
               </div>
               {cert.date && (
@@ -532,7 +574,7 @@ const ArtisticTemplate = ({ resumeData }) => {
       )}
 
       {/* Languages */}
-      {(languages || []).length > 0 && (
+      {settings.showLanguages !== false && languages.length > 0 && (
         <div
           style={{ marginBottom: "2.5rem", fontFamily: "Arial, sans-serif" }}
         >
@@ -552,17 +594,19 @@ const ArtisticTemplate = ({ resumeData }) => {
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
             {languages.map((lang, idx) => (
               <div key={lang.id || idx} style={{ fontSize: "1.1rem" }}>
-                <strong>{lang.name}</strong>
-                <span
-                  style={{
-                    color: "#666",
-                    fontStyle: "italic",
-                    marginLeft: "0.4rem",
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  ({lang.proficiency})
-                </span>
+                <strong>{typeof lang === 'string' ? lang : lang.name}</strong>
+                {typeof lang === 'object' && lang.proficiency && (
+                  <span
+                    style={{
+                      color: "#666",
+                      fontStyle: "italic",
+                      marginLeft: "0.4rem",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    ({lang.proficiency})
+                  </span>
+                )}
               </div>
             ))}
           </div>
